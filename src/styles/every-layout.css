@@ -77,11 +77,12 @@
 
   /* ─── 3. Center ────────────────────────────────────
      Horizontal centering with max-inline-size.
-     Uses content-box and auto margins.
+     Intrinsic padding and safe border-box containment.
      ────────────────────────────────────────────────── */
   .center {
-    box-sizing: content-box;
-    max-inline-size: var(--center-max, var(--measure));
+    box-sizing: border-box;
+    max-inline-size: min(var(--center-max, var(--measure)), 100%);
+    inline-size: 100%;
     margin-inline: auto;
     padding-inline: var(--center-gutter, var(--space-m));
   }

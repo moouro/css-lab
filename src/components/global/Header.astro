@@ -661,7 +661,9 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     margin: 0;
     block-size: 100dvh;
     max-block-size: 100dvh;
+    height: 100dvh;
     inline-size: min(88vw, 360px);
+    max-inline-size: 88vw;
     border: none;
     border-inline-start: 1px solid var(--color-border);
     background-color: var(--color-bg);
@@ -669,7 +671,6 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     padding: 0;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    overscroll-behavior: contain;
     box-sizing: border-box;
   }
 
@@ -684,18 +685,23 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     display: flex;
     flex-direction: column;
     min-block-size: 100%;
-    padding: var(--space-m);
-    padding-bottom: calc(var(--space-2xl) + 2rem + env(safe-area-inset-bottom, 2rem));
-    gap: var(--space-m);
+    padding: var(--space-s);
+    padding-bottom: calc(var(--space-l) + env(safe-area-inset-bottom, 1rem));
+    gap: var(--space-s);
     box-sizing: border-box;
   }
 
   .mobile-drawer-header {
+    position: sticky;
+    inset-block-start: 0;
+    background-color: var(--color-bg);
+    z-index: 10;
     display: flex;
     align-items: center;
     justify-content: space-between;
     border-block-end: 1px solid var(--color-border);
-    padding-block-end: var(--space-s);
+    padding-block-end: var(--space-xs);
+    padding-block-start: var(--space-2xs);
   }
 
   .close-btn {
@@ -797,6 +803,9 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
 
   /* Responsive Breakpoint for Mobile (<= 1024px) */
   @media (max-width: 1024px) {
+    .header-inner {
+      padding-inline: var(--space-s);
+    }
     .desktop-nav {
       display: none;
     }

@@ -70,9 +70,14 @@ const {
     <style>
       .site-wrapper {
         min-block-size: 100dvh;
+        max-inline-size: 100%;
+        overflow-x: clip;
       }
       .main-content {
         flex: 1 0 auto;
+        min-inline-size: 0;
+        max-inline-size: 100%;
+        inline-size: 100%;
       }
     </style>
   </body>

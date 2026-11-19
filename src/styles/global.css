@@ -5,6 +5,15 @@
    ═══════════════════════════════════════════════════════ */
 
 @layer base {
+  /* ═══ Universal Box Model ════════════════════════════
+     Predictable box sizing across all components.
+     ═══════════════════════════════════════════════════ */
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
   /* ═══ Every Layout: Measure Axiom ═══════════════════
      "The measure should never exceed 65ch."
      Applied with zero specificity via :where().
@@ -21,6 +30,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     hanging-punctuation: first last;
+    max-inline-size: 100%;
+    overflow-x: clip;
   }
 
   @media (prefers-reduced-motion: no-preference) {
@@ -31,6 +42,8 @@
 
   body {
     min-block-size: 100dvh;
+    max-inline-size: 100%;
+    overflow-x: clip;
   }
 
   /* ─── Images and media ───────────────────────────── */

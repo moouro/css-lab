@@ -259,6 +259,9 @@ const pillars = [
   .home-container {
     padding-block-start: var(--space-xl);
     padding-block-end: var(--space-3xl);
+    padding-inline: var(--space-s);
+    max-inline-size: 100%;
+    overflow-x: clip;
   }
 
   .hero-section {
@@ -376,8 +379,15 @@ const pillars = [
   /* Pillars Grid: Cards perfeitamente proporcionais */
   .pillars-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
     gap: var(--space-m);
+  }
+
+  @media (max-width: 640px) {
+    .pillars-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-s);
+    }
   }
 
   .pillar-card-link {
@@ -610,9 +620,21 @@ const pillars = [
   @media (max-width: 520px) {
     .primitive-row {
       grid-template-columns: 1fr auto;
+      padding: var(--space-xs) var(--space-s);
     }
     .primitive-order {
       display: none;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-actions {
+      flex-direction: column;
+      inline-size: 100%;
+    }
+    .hero-actions .btn {
+      inline-size: 100%;
+      justify-content: center;
     }
   }
 </style>

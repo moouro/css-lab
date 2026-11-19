@@ -173,6 +173,8 @@ const slugBase = collectionSlug ?? collectionName.toLowerCase().replace(/\s+/g, 
     margin-inline: auto;
     padding-inline: var(--space-s);
     padding-block: var(--space-m);
+    min-inline-size: 0;
+    max-inline-size: 100%;
   }
 
   /* Desktop Sticky Sidebar */
@@ -331,12 +333,20 @@ const slugBase = collectionSlug ?? collectionName.toLowerCase().replace(/\s+/g, 
 
   .doc-main-col {
     min-inline-size: 0;
+    max-inline-size: 100%;
+  }
+
+  .doc-article {
+    min-inline-size: 0;
+    max-inline-size: 100%;
   }
 
   .doc-content-wrapper {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 14rem;
     gap: var(--space-xl);
+    min-inline-size: 0;
+    max-inline-size: 100%;
   }
 
   @media (max-width: 1080px) {
@@ -349,12 +359,27 @@ const slugBase = collectionSlug ?? collectionName.toLowerCase().replace(/\s+/g, 
   }
 
   @media (max-width: 1024px) {
+    .doc-container :global(.with-sidebar) {
+      display: flex;
+      flex-direction: column !important;
+      gap: var(--space-m) !important;
+    }
+
+    .doc-container :global(.with-sidebar > :first-child),
+    .doc-container :global(.with-sidebar > :last-child) {
+      flex-basis: auto !important;
+      min-inline-size: 0 !important;
+      max-inline-size: 100% !important;
+      inline-size: 100% !important;
+    }
+
     .doc-sidebar {
       border-inline-end: none;
       padding-inline-end: 0;
       border-block-end: 1px solid var(--color-border);
       padding-block-end: var(--space-s);
       margin-block-end: var(--space-s);
+      inline-size: 100%;
     }
 
     .desktop-sidebar-sticky {
@@ -363,6 +388,7 @@ const slugBase = collectionSlug ?? collectionName.toLowerCase().replace(/\s+/g, 
 
     .mobile-collection-accordion {
       display: block;
+      inline-size: 100%;
     }
   }
 
@@ -425,6 +451,23 @@ const slugBase = collectionSlug ?? collectionName.toLowerCase().replace(/\s+/g, 
 
   .prose-content {
     line-height: var(--leading-relaxed);
+    min-inline-size: 0;
+    max-inline-size: 100%;
+    overflow-wrap: break-word;
+    word-break: break-word;
+  }
+
+  .prose-content :global(pre) {
+    max-inline-size: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .prose-content :global(table) {
+    display: block;
+    max-inline-size: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
 
   .prose-content :global(h2) {

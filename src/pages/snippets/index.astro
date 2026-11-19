@@ -87,7 +87,9 @@ const categories = ['layout', 'typography', 'animation', 'utilities', 'patterns'
 <style>
   .hub-container {
     padding-block: var(--space-xl);
-    padding-inline: var(--space-m);
+    padding-inline: var(--space-s);
+    max-inline-size: 100%;
+    overflow-x: clip;
   }
 
   .hub-badge {
@@ -151,8 +153,15 @@ const categories = ['layout', 'typography', 'animation', 'utilities', 'patterns'
 
   .hub-cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
     gap: var(--space-m);
+  }
+
+  @media (max-width: 640px) {
+    .hub-cards-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-s);
+    }
   }
 
   .hub-card-link {
