@@ -30,6 +30,13 @@
         <a href="/cheatsheets" class="footer-link">Cheatsheets</a>
         <a href="/design-tokens" class="footer-link">Design Tokens</a>
       </div>
+
+      <div class="stack" style="--stack-space: var(--space-3xs);">
+        <span class="text-xs font-semibold tracking-caps text-muted">Projeto</span>
+        <a href="https://github.com/moouro/css-lab" target="_blank" rel="noopener noreferrer" class="footer-link">GitHub (Open Source) ↗</a>
+        <a href="https://github.com/moouro/css-lab/blob/main/LICENSE" target="_blank" rel="noopener noreferrer" class="footer-link">Licença MIT ↗</a>
+        <button type="button" class="footer-link-btn" data-open-search>Buscar no site (⌘K)</button>
+      </div>
     </div>
   </div>
 
@@ -66,6 +73,23 @@
   }
 
   .footer-link:hover {
+    color: var(--color-text-strong);
+    text-decoration: underline;
+  }
+
+  .footer-link-btn {
+    background: none;
+    border: none;
+    padding: 0;
+    font-family: inherit;
+    font-size: var(--step--1);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    text-align: start;
+    transition: color var(--duration-fast) ease;
+  }
+
+  .footer-link-btn:hover {
     color: var(--color-text-strong);
     text-decoration: underline;
   }

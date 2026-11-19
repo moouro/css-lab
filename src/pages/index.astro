@@ -88,12 +88,23 @@ const pillars = [
           </p>
 
           <div class="hero-actions cluster" style="--cluster-space: var(--space-s); padding-block-start: var(--space-xs); justify-content: center;">
-            <a href="/every-layout" class="btn btn-primary">
-              Explorar Every Layout
+            <a href="#pilares" class="btn btn-primary">
+              <span>Explorar os 9 Pilares</span>
+              <span class="action-arrow" aria-hidden="true">↓</span>
             </a>
-            <a href="/every-layout/stack" class="btn btn-secondary">
-              Começar pelo The Stack →
-            </a>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-open-search
+              aria-label="Abrir busca rápida por conceitos e propriedades (Atalho: Cmd+K ou Ctrl+K)"
+            >
+              <svg class="btn-search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" width="16" height="16" aria-hidden="true">
+                <circle cx="8.5" cy="8.5" r="5.75" stroke-width="1.75" />
+                <line x1="13" y1="13" x2="18" y2="18" stroke-width="1.75" stroke-linecap="round" />
+              </svg>
+              <span>Buscar Conceito</span>
+              <kbd class="shortcut-kbd-inline font-mono">⌘K</kbd>
+            </button>
           </div>
 
           <!-- Dica de Produtividade & Atalhos -->
@@ -184,7 +195,7 @@ const pillars = [
     </script>
 
     <!-- Pilares de Conhecimento (Cards Proporcionais) -->
-    <section class="pillars-section">
+    <section class="pillars-section" id="pilares">
       <Center max="1200px">
         <div class="stack" style="--stack-space: var(--space-m);">
           <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: center;">
@@ -294,14 +305,25 @@ const pillars = [
   .btn {
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     gap: var(--space-2xs);
     padding-inline: var(--space-m);
     padding-block: 0.65rem;
     border-radius: var(--radius-sm);
     font-size: var(--step--1);
     font-weight: 600;
+    font-family: inherit;
     text-decoration: none;
+    border: none;
+    cursor: pointer;
+    min-block-size: var(--target-size, 24px);
     transition: all var(--duration-fast) ease;
+  }
+
+  @media (pointer: coarse) {
+    .btn {
+      min-block-size: 44px;
+    }
   }
 
   .btn-primary {
@@ -324,6 +346,19 @@ const pillars = [
     border-color: var(--color-border-hover);
     text-decoration: none;
     transform: translateY(-1px);
+  }
+
+  .btn-search-icon {
+    flex-shrink: 0;
+  }
+
+  .shortcut-kbd-inline {
+    font-size: 0.75em;
+    padding: 0.1em 0.35em;
+    background-color: var(--color-bg-subtle);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg-muted);
   }
 
   .shortcut-tag {
@@ -384,6 +419,12 @@ const pillars = [
   }
 
   @media (max-width: 640px) {
+    .shortcuts-legend {
+      display: none;
+    }
+    .shortcut-kbd-inline {
+      display: none;
+    }
     .pillars-grid {
       grid-template-columns: 1fr;
       gap: var(--space-s);

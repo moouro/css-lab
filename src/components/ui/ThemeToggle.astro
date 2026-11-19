@@ -93,7 +93,16 @@
     justify-content: center;
     cursor: pointer;
     font-size: 0.9em;
+    min-inline-size: 2.25rem;
+    min-block-size: 2.25rem;
     transition: background-color var(--duration-fast) var(--ease-out);
+  }
+
+  @media (pointer: coarse) {
+    .theme-toggle {
+      min-inline-size: 44px;
+      min-block-size: 44px;
+    }
   }
 
   .theme-toggle:hover {
