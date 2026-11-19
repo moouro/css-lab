@@ -11,7 +11,7 @@ export interface Props {
 const { props = [] } = Astro.props;
 ---
 
-<div class="props-table-wrapper">
+<div class="props-table-wrapper" tabindex="0" role="region" aria-label="Tabela de Props e Atributos">
   <table class="props-table">
     <thead>
       <tr>
@@ -23,11 +23,11 @@ const { props = [] } = Astro.props;
     </thead>
     <tbody>
       {props.map((p) => (
-        <tr>
-          <td><code class="prop-name">{p.name}</code></td>
-          <td><code class="prop-type">{p.type}</code></td>
-          <td>{p.default ? <code>{p.default}</code> : <span class="text-subtle">—</span>}</td>
-          <td>{p.description}</td>
+        <tr class="props-row">
+          <td data-label="Prop"><code class="prop-name">{p.name}</code></td>
+          <td data-label="Tipo"><code class="prop-type">{p.type}</code></td>
+          <td data-label="Padrão">{p.default ? <code>{p.default}</code> : <span class="text-subtle">—</span>}</td>
+          <td data-label="Descrição" class="prop-desc">{p.description}</td>
         </tr>
       ))}
     </tbody>
@@ -36,14 +36,18 @@ const { props = [] } = Astro.props;
 
 <style>
   .props-table-wrapper {
-    overflow-x: auto;
     margin-block: var(--space-m);
     border: var(--border-thin) solid var(--color-border);
     border-radius: var(--radius-m);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    background-color: var(--color-bg-surface);
   }
 
   .props-table {
     inline-size: 100%;
+    min-inline-size: 540px;
+    border-collapse: collapse;
     font-size: var(--step--1);
   }
 
@@ -73,5 +77,78 @@ const { props = [] } = Astro.props;
 
   .prop-type {
     color: var(--color-text-muted);
+  }
+
+  /* ═══ Transformação Responsiva em Cards (Modern Web Guidance) ═══
+     Em telas estreitas (<= 640px), transforma linhas tabulares em cards
+     verticais independentes, impedindo que textos se quebrem letra por letra.
+     ══════════════════════════════════════════════════════════════ */
+  @media (max-width: 640px) {
+    .props-table-wrapper {
+      border: none;
+      background: transparent;
+      overflow-x: visible;
+      margin-block: var(--space-s);
+    }
+
+    .props-table {
+      min-inline-size: 100%;
+      display: block;
+    }
+
+    .props-table thead {
+      display: none; /* Esconde cabeçalho fixo na versão card */
+    }
+
+    .props-table tbody {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-s);
+    }
+
+    .props-row {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2xs);
+      padding: var(--space-s);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background-color: var(--color-bg-surface);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .props-row td {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: var(--space-s);
+      padding: 0;
+      border: none;
+      font-size: var(--step--1);
+    }
+
+    .props-row td::before {
+      content: attr(data-label);
+      font-family: var(--font-mono);
+      font-size: var(--step--2);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--color-fg-muted);
+      flex-shrink: 0;
+    }
+
+    .props-row td.prop-desc {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: var(--space-3xs);
+      border-block-start: 1px dashed var(--color-border);
+      padding-block-start: var(--space-2xs);
+      margin-block-start: var(--space-3xs);
+    }
+
+    .props-row td.prop-desc::before {
+      margin-block-end: 2px;
+    }
   }
 </style>

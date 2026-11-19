@@ -62,6 +62,8 @@ const { badCode, goodCode, explanation } = Astro.props;
     border-radius: var(--radius-s);
     overflow: hidden;
     border: var(--border-thin) solid var(--color-border);
+    min-inline-size: 0;
+    inline-size: 100%;
   }
 
   .pane-label {
@@ -77,5 +79,19 @@ const { badCode, goodCode, explanation } = Astro.props;
     margin: 0;
     border: none;
     border-radius: 0;
+    max-inline-size: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    font-size: var(--step--1);
+  }
+
+  @media (max-width: 640px) {
+    .antipattern-box {
+      padding: var(--space-xs);
+      margin-block: var(--space-s);
+    }
+    .code-comparison {
+      grid-template-columns: 1fr;
+    }
   }
 </style>
