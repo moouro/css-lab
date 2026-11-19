@@ -1,0 +1,40 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { mergeVars } from '../../utils/style';
+
+type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{
+  as: Tag;
+  position?: 'absolute' | 'fixed';
+  contain?: boolean;
+  margin?: string;
+}>;
+
+const {
+  as: Tag = 'div',
+  position = 'absolute',
+  contain = false,
+  margin = 'var(--space-s)',
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Element = Tag as 'div';
+const computedStyle = mergeVars(
+  {
+    '--imposter-position': position,
+    '--imposter-margin': margin,
+  },
+  style,
+);
+---
+
+<Element
+  class:list={['imposter', className]}
+  data-contain={contain ? '' : undefined}
+  data-fixed={position === 'fixed' ? '' : undefined}
+  style={computedStyle}
+  {...rest}
+>
+  <slot />
+</Element>

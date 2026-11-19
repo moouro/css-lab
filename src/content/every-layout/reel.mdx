@@ -1,0 +1,107 @@
+---
+title: "The Reel"
+description: "Carrossel de rolagem horizontal nativo com scroll-snap e scrollbar acessível, sem dependência de JavaScript."
+draft: false
+publishDate: 2026-01-01
+tags: ["scrolling", "overflow", "scroll-snap", "carousel", "reel"]
+difficulty: "intermediate"
+order: 10
+primitive: "reel"
+problem: "Plugins de carrossel de terceiros pesam centenas de kilobytes de JavaScript, sequestram eventos de toque nativos e são notoriamente inacessíveis."
+solution: "Aproveitar o overflow-x nativo do navegador combinado com CSS Scroll Snap e scrollbar estilizada para uma experiência fluida de 60fps a custo zero de runtime."
+cssProperties:
+  - "overflow-x: auto"
+  - "overflow-y: hidden"
+  - "scroll-snap-type: x mandatory"
+  - "scroll-snap-align: start"
+propsApi:
+  - name: "itemWidth"
+    type: "string"
+    default: "auto"
+    description: "Largura ideal de cada item filho dentro do rolo."
+  - name: "space"
+    type: "string"
+    default: "var(--space-s)"
+    description: "Espaçamento horizontal entre os itens filhos."
+  - name: "height"
+    type: "string"
+    default: "auto"
+    description: "Altura do container caso seja necessário fixar (padrão é auto, ditado pelo filho mais alto)."
+  - name: "noBar"
+    type: "boolean"
+    default: "false"
+    description: "Oculta a barra de rolagem visual mantendo a navegação por toque e trackpad funcional."
+relatedContent:
+  - "cluster"
+  - "box"
+layoutPrimitives:
+  - "reel"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Reel from '@/components/layout/Reel.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+A web por padrão expande-se verticalmente. Rolar horizontalmente uma página inteira é uma falha de design grave (critério WCAG 1.4.10 Reflow). No entanto, seções **deliberadamente contidas** de rolagem horizontal (como vitrines de streaming de vídeo, prateleiras de produtos ou galerias de fotos) são extremamente ergonômicas em dispositivos de toque.
+
+O **Reel** entrega um carrossel 100% nativo em CSS sem nenhuma biblioteca externa.
+
+## 2. A Mecânica: Scroll Snap Nativo
+
+```css
+.reel {
+  display: flex;
+  overflow-x: auto;
+  overflow-y: hidden;
+  gap: var(--space-s);
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--space-s);
+  scrollbar-color: var(--color-border) transparent;
+  -webkit-overflow-scrolling: touch;
+}
+
+.reel > * {
+  flex-shrink: 0;
+  flex-basis: var(--reel-item-width, auto);
+  scroll-snap-align: start;
+}
+```
+
+<AntiPattern
+  badCode={`/* Frágil: biblioteca de terceiros de 120KB com JS touch listeners */\nnew Swiper('.carousel', {\n  slidesPerView: 3,\n  spaceBetween: 16,\n});`}
+  goodCode={`/* Resiliente: CSS nativo puro */\n.reel {\n  display: flex;\n  overflow-x: auto;\n  scroll-snap-type: x mandatory;\n  gap: 1rem;\n}`}
+  explanation="O browser já possui os algoritmos mais eficientes e de menor consumo de bateria do mundo para rolagem inercial e gestos de toque. Evite reinventar a roda com scripts pesados."
+/>
+
+## 3. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 4. Playground Interativo
+
+Role horizontalmente pelo trackpad, mouse ou toque:
+
+<Playground title="Demonstração do Reel Nativo">
+  <Reel itemWidth="14rem" space="1rem">
+    <Box padding="1.5rem"><h4>Item de Mídia 1</h4><p class="text-xs text-muted">Role para o lado →</p></Box>
+    <Box padding="1.5rem"><h4>Item de Mídia 2</h4><p class="text-xs text-muted">Alinhamento snap suave</p></Box>
+    <Box padding="1.5rem"><h4>Item de Mídia 3</h4><p class="text-xs text-muted">60fps garantido</p></Box>
+    <Box padding="1.5rem"><h4>Item de Mídia 4</h4><p class="text-xs text-muted">Zero JavaScript</p></Box>
+    <Box padding="1.5rem"><h4>Item de Mídia 5</h4><p class="text-xs text-muted">Acessível nativamente</p></Box>
+  </Reel>
+</Playground>
+
+## 5. Checklist de Qualidade
+
+<Checklist items={[
+  "flex-shrink: 0 configurado nos itens filhos para impedir que eles sejam esmagados.",
+  "scroll-snap-type: x mandatory no pai e scroll-snap-align: start nos filhos.",
+  "scroll-padding-inline configurado para que o primeiro e último itens não fiquem colados à margem.",
+  "overflow-y: hidden explícito para evitar saltos ou trepidações verticais durante a rolagem horizontal."
+]} />

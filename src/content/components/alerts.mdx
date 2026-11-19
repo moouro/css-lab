@@ -1,0 +1,146 @@
+---
+title: "Alerts & Notificações"
+description: "Alertas de sistema acessíveis com layout Cluster, papéis ARIA (role='alert') e paleta semântica."
+draft: false
+publishDate: 2026-01-01
+tags: ["components", "alerts", "notifications", "aria", "semantics"]
+difficulty: "beginner"
+order: 7
+anatomy:
+  - "<aside role='alert' ou role='status'>"
+  - "Ícone semântico de status"
+  - "Mensagem descritiva"
+  - "Botão de fechar (opcional)"
+hasPlayground: true
+a11yNotes: "Use role='alert' para avisos críticos imediatos e role='status' para notificações informativas que não devem interromper o leitor de tela."
+relatedContent:
+  - "badges"
+  - "buttons"
+layoutPrimitives:
+  - "cluster"
+  - "box"
+  - "icon"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+O **Alerta** comunica mensagens de sistema de alta relevância para o usuário: confirmações de sucesso, avisos de atenção, falhas críticas de operação ou notas contextuais de instrução.
+
+Para construir um alerta sênior e acessível:
+- Não use cores de fundo supersaturadas e cansativas para a vista.
+- Garanta contraste de texto suficiente em ambos os modos (claro e escuro).
+- Utilize o atributo `role="alert"` (com anúncio `assertive` para erros) ou `role="status"` (com anúncio `polite` para mensagens informativas).
+- Sempre inclua um ícone ou prefixo textual, pois **a cor sozinha jamais deve ser o único canal de informação** (Requisito WCAG 1.4.1).
+
+## 2. A Estrutura CSS Semântica
+
+```css
+.alert {
+  --alert-bg: var(--color-bg-subtle);
+  --alert-border: var(--color-border);
+  --alert-fg: var(--color-fg);
+  --alert-accent: var(--color-accent);
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-s);
+  padding: var(--space-s) var(--space-m);
+  border-radius: var(--radius-md);
+  background-color: var(--alert-bg);
+  border: 1px solid var(--alert-border);
+  border-inline-start: 4px solid var(--alert-accent);
+  color: var(--alert-fg);
+  font-size: var(--step--1);
+  line-height: 1.5;
+}
+
+.alert-icon {
+  flex-shrink: 0;
+  inline-size: 1.25em;
+  block-size: 1.25em;
+  color: var(--alert-accent);
+  margin-block-start: 0.1em;
+}
+
+.alert-content {
+  flex-grow: 1;
+}
+
+.alert-title {
+  font-weight: 600;
+  margin-block-end: var(--space-3xs);
+}
+
+/* Variantes Semânticas */
+.alert-info {
+  --alert-accent: var(--color-accent);
+  --alert-border: var(--color-accent-subtle);
+}
+
+.alert-success {
+  --alert-accent: var(--color-success);
+  --alert-border: var(--color-success-subtle);
+}
+
+.alert-warning {
+  --alert-accent: var(--color-warning);
+  --alert-border: var(--color-warning-subtle);
+}
+
+.alert-danger {
+  --alert-accent: var(--color-danger);
+  --alert-border: var(--color-danger-subtle);
+}
+```
+
+<Callout type="info" title="A Borda Lateral (border-inline-start)">
+  A técnica de usar uma borda sutil em 3 lados e uma borda reforçada de 4px no início (`border-inline-start`) cria uma assinatura editorial elegante e profissional, inspirada nos melhores produtos de tecnologia (Linear, GitHub e Stripe).
+</Callout>
+
+## 3. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Apenas a Cor para Transmitir o Tipo de Erro"
+  badCode={`<!-- Violação do critério WCAG de não depender apenas de cor -->
+<div class="alert" style="background: pink;">
+  Operação finalizada.
+</div>`}
+  goodTitle="Incluir Ícone e Título Descritivo com Semântica ARIA"
+  goodCode={`<div class="alert alert-danger" role="alert">
+  <span class="alert-icon" aria-hidden="true">✕</span>
+  <div class="alert-content">
+    <strong class="alert-title">Falha no Envio:</strong>
+    O arquivo anexado excede o limite de 10MB.
+  </div>
+</div>`}
+  explanation="Pessoas daltônicas ou que utilizam navegadores de alto contraste podem não perceber tons de rosa ou verde. O ícone e o prefixo textual garantem compreensão imediata para 100% dos usuários."
+/>
+
+## 4. Boas Práticas
+
+1. **Use `role="status"` por padrão**: Reserve `role="alert"` apenas para erros graves que exigem atenção imediata.
+2. **Separe o título da descrição**: Ajuda o usuário a escanear a página em segundos.
+3. **Mantenha botões de fechar acessíveis**: Botões de fechar devem ter `aria-label="Fechar alerta"`.
+
+## 5. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "O alerta possui role='status' ou role='alert' apropriado?", checked: true },
+    { text: "A mensagem não depende exclusivamente da cor para ser compreendida?", checked: true },
+    { text: "border-inline-start foi utilizado para suporte automático a LTR/RTL?", checked: true },
+    { text: "O contraste de cor do texto contra o fundo atende ao padrão WCAG AA?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Componentes: Badges](/components/badges) — Etiquetas de status condensadas.
+- [Every Layout: Cluster](/every-layout/cluster) — Agrupamento de ícone e texto.
+- [Every Layout: Box](/every-layout/box) — Injeção de padding e bordas.

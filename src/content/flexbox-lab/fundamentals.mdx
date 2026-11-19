@@ -1,0 +1,108 @@
+---
+title: "Fundamentos do Flexbox"
+description: "O modelo unidimensional: Eixo Principal (Main Axis), Eixo Transversal (Cross Axis) e o algoritmo de flexibilidade."
+draft: false
+publishDate: 2026-01-01
+tags: ["flexbox", "fundamentals", "main-axis", "cross-axis", "layout-1d"]
+difficulty: "beginner"
+order: 1
+relatedContent:
+  - "flex-shorthand"
+  - "alignment"
+  - "wrapping"
+layoutPrimitives:
+  - "cluster"
+  - "stack"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+O **CSS Flexbox** (Flexible Box Layout) é um modelo de layout projetado para organizar, distribuir e alinhar elementos ao longo de **um único eixo de cada vez**: ou horizontalmente (em linha) ou verticalmente (em coluna).
+
+Ao contrário do CSS Grid (onde o contêiner impõe uma grade bidimensional rígida e os filhos devem se encaixar nela), no Flexbox **o conteúdo interno dos filhos dita o tamanho das caixas**, e o algoritmo flexível distribui o espaço restante ou absorve o encolhimento.
+
+```
+       Eixo Principal (Main Axis) ────►
+     ┌──────────────┬──────────────────┬──────────────┐ ▲
+     │  Flex Item 1 │   Flex Item 2    │  Flex Item 3 │ │ Eixo Transversal
+     │  (conteúdo)  │ (conteúdo maior) │  (conteúdo)  │ │ (Cross Axis)
+     └──────────────┴──────────────────┴──────────────┘ ▼
+```
+
+<Callout type="info" title="Axioma Unidimensional">
+  Se você precisa alinhar elementos ao longo de uma linha (como botões, tags ou itens de navegação), use Flexbox. Se você precisa coordenar simultaneamente linhas E colunas, use CSS Grid.
+</Callout>
+
+## 2. A Direção do Fluxo (`flex-direction`)
+
+O eixo principal é determinado por `flex-direction`:
+
+- `row` (padrão em LTR): Da esquerda para a direita.
+- `row-reverse`: Da direita para a esquerda.
+- `column`: De cima para baixo (ideal para pilhas verticais e cartões).
+- `column-reverse`: De baixo para cima.
+
+Quando você altera `flex-direction: column`, **tudo se inverte**:
+- O Eixo Principal passa a ser o eixo vertical.
+- O Eixo Transversal passa a ser o eixo horizontal.
+- `justify-content` agora governa o alinhamento vertical.
+- `align-items` agora governa o alinhamento horizontal.
+
+## 3. O Comportamento Padrão dos Filhos
+
+Ao transformar um elemento em `display: flex`:
+1. Os filhos diretos se tornam *flex items*.
+2. Os itens são dispostos em uma única linha (`flex-wrap: nowrap`).
+3. Os itens começam alinhados no início (`justify-content: flex-start`).
+4. Os itens **esticam para ter a mesma altura** no eixo transversal (`align-items: stretch`).
+5. Os itens encolhem para não estourar a tela se necessário (`flex-shrink: 1`), mas não crescem sozinhos (`flex-grow: 0`).
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Flexbox para Montar a Grade Completa da Página"
+  badCode={`/* Tentar simular Grid 2D com Flexbox aninhado */
+.row { display: flex; }
+.col-4 { width: 33.333%; }
+.col-8 { width: 66.666%; }`}
+  goodTitle="Usar CSS Grid para Estrutura 2D e Flexbox para Componentes 1D"
+  goodCode={`.page-shell {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+}
+.header-actions {
+  display: flex;
+  gap: var(--space-s);
+}`}
+  explanation="Usar divs com classes de grid simuladas em Flexbox recria o peso desnecessário de frameworks antigos como Bootstrap. Use Grid para a matriz e Flexbox para grupos de controles lineares."
+/>
+
+## 5. Boas Práticas
+
+1. **Use `gap` no Flexbox**: Nunca mais adicione `margin-right` com pseudo-classes `:last-child` nos filhos.
+2. **Entenda a inversão de eixos em `column`**: Lembre-se que `justify-content` atua no eixo da direção escolhida.
+3. **Respeite o tamanho intrínseco**: Deixe botões e badges assumirem sua largura natural a partir do texto.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A escolha do Flexbox foi orientada a uma distribuição unidimensional (1D)?", checked: true },
+    { text: "O espaçamento entre flex items utiliza exclusivamente a propriedade gap?", checked: true },
+    { text: "A inversão de eixos (row vs column) foi considerada ao usar justify e align?", checked: true },
+    { text: "Classes legadas de largura em porcentagem estilo Bootstrap foram evitadas?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [O Shorthand flex](/flexbox-lab/flex-shorthand) — flex-grow, flex-shrink e flex-basis.
+- [Alinhamento no Flexbox](/flexbox-lab/alignment) — A mágica de margin: auto.
+- [Every Layout: Cluster](/every-layout/cluster) — A primitiva algorítmica linear.

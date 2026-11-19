@@ -1,0 +1,131 @@
+---
+title: "Inputs & Formulários"
+description: "Campos de texto, textareas auto-expansíveis com field-sizing: content e validação acessível via :user-invalid."
+draft: false
+publishDate: 2026-01-01
+tags: ["components", "inputs", "forms", "validation", "field-sizing"]
+difficulty: "intermediate"
+order: 3
+anatomy:
+  - "<label> acessível associada via id/for"
+  - "<input> ou <textarea>"
+  - "Mensagem de ajuda ou erro"
+hasPlayground: true
+a11yNotes: "Sempre associe o <label> ao <input> através do atributo 'for' e 'id'. Mensagens de erro devem ser associadas via aria-describedby."
+relatedContent:
+  - "buttons"
+  - "alerts"
+layoutPrimitives:
+  - "stack"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Formulários são a espinha dorsal de qualquer aplicação interativa. Tradicionalmente, estilizar formulários em CSS era doloroso: estilos de borda nativos desiguais entre sistemas operacionais, textareas de tamanho fixo que exigiam scripts pesados para auto-expansão e mensagens de erro que apareciam antes do usuário terminar de digitar.
+
+O CSS moderno introduziu três recursos de ponta:
+1. **A pseudo-classe `:user-invalid`**: Dispara estilos de erro apenas *depois* que o usuário interagiu com o campo e saiu dele (evitando o estresse de ver borda vermelha assim que a página carrega).
+2. **A propriedade `field-sizing: content`**: Faz `<textarea>` e `<input>` expandirem ou encolherem automaticamente de acordo com o texto digitado sem uma única linha de JavaScript!
+3. **A pseudo-classe `:has()`**: Permite que o contêiner do campo alterne estilos quando o input interno estiver em foco.
+
+## 2. A Mágica de `field-sizing: content`
+
+Antes de 2024, para fazer um `<textarea>` crescer à medida que o usuário escrevia, você precisava calcular `scrollHeight` via eventos `input` no JavaScript.
+
+Hoje, basta uma única propriedade CSS:
+
+```css
+.auto-textarea {
+  /* O textarea expande a altura automaticamente com o texto! */
+  field-sizing: content;
+  min-block-size: 80px;
+  max-block-size: 300px;
+  resize: none;
+}
+```
+
+<Callout type="info" title="Baseline 2024">
+  `field-sizing: content` funciona nativamente em Chromium e simplifica dramaticamente editores de texto, áreas de comentários e campos de busca dinâmica.
+</Callout>
+
+## 3. Validação Amigável: `:user-invalid` vs `:invalid`
+
+A pseudo-classe clássica `:invalid` tem uma falha fatal de UX: se um campo for obrigatório (`required`), ele já é considerado `:invalid` no instante em que a página abre, pintando a tela de vermelho antes do usuário encostar no teclado.
+
+A pseudo-classe moderna **`:user-invalid`** só é acionada após o usuário cometer um erro real e retirar o foco do campo:
+
+```css
+.form-input {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  color: var(--color-fg);
+  padding: var(--space-xs) var(--space-s);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: var(--step--1);
+  inline-size: 100%;
+  transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+}
+
+/* Foco amigável */
+.form-input:focus-visible {
+  outline: none;
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 3px var(--color-accent-subtle);
+}
+
+/* Erro somente após interação do usuário */
+.form-input:user-invalid {
+  border-color: var(--color-danger);
+  box-shadow: 0 0 0 3px var(--color-danger-subtle);
+}
+
+/* Exibe a mensagem de erro associada via :has() */
+.form-field:has(:user-invalid) .form-error-msg {
+  display: block;
+}
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Apenas Placeholder no Lugar de <label>"
+  badCode={`<!-- Péssimo para acessibilidade e memória do usuário -->
+<input type="text" placeholder="Digite seu CPF..." />`}
+  goodTitle="Usar <label> Visível Associada por ID"
+  goodCode={`<div class="form-field">
+  <label for="cpf" class="form-label">CPF</label>
+  <input type="text" id="cpf" class="form-input" placeholder="000.000.000-00" />
+</div>`}
+  explanation="Placeholders desaparecem quando o usuário começa a digitar, forçando-o a apagar o texto para lembrar o que o campo pedia. Além disso, leitores de tela exigem <label> associada."
+/>
+
+## 5. Boas Práticas
+
+1. **Sempre use `id` no input e `for` no label**: Clicar no texto do label dá foco automático ao campo.
+2. **Adicione `autocomplete` apropriado**: `autocomplete="email"`, `autocomplete="tel"`, etc., aceleram a experiência mobile.
+3. **Use `:user-invalid` para estilos de erro**: Proporciona uma experiência muito menos punitiva para o usuário.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "Todo input possui um elemento <label> explicitamente associado via for/id?", checked: true },
+    { text: "Estilos de erro utilizam :user-invalid em vez do agressivo :invalid?", checked: true },
+    { text: "field-sizing: content foi testado para textareas expansíveis?", checked: true },
+    { text: "O anel de foco é claro e possui contraste mínimo de 3:1 contra o fundo?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Componentes: Botões](/components/buttons) — Botões de submissão.
+- [Seletor :has()](/css-moderno/has-selector) — Formulários reativos.
+- [Propriedades Lógicas](/css-moderno/logical-properties) — Padding e inline-size em inputs.

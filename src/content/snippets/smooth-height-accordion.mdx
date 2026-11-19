@@ -1,0 +1,33 @@
+---
+title: "Transição Suave de Altura Auto (interpolate-size)"
+description: "Animar height: auto diretamente no CSS sem JavaScript usando interpolate-size: allow-keywords."
+category: "animation"
+tags: ["animation", "interpolate-size", "height-auto", "baseline-2024"]
+draft: false
+order: 11
+language: "css"
+---
+
+### Problema
+No CSS tradicional, transicionar `height: 0` para `height: auto` era impossível sem truques de `max-height: 1000px` (que quebravam o ritmo da animação) ou scripts medindo `scrollHeight`.
+
+### Código
+
+```css
+:root {
+  /* Habilita animação de palavras-chave como 'auto' */
+  interpolate-size: allow-keywords;
+}
+
+.collapsible-content {
+  block-size: 0;
+  overflow: clip;
+  opacity: 0;
+  transition: block-size 0.3s ease, opacity 0.3s ease;
+}
+
+.collapsible-container.is-open .collapsible-content {
+  block-size: auto;
+  opacity: 1;
+}
+```

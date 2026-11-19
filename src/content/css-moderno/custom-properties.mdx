@@ -1,0 +1,143 @@
+---
+title: "CSS Custom Properties & @property"
+description: "Variáveis CSS reativas, cascading values, fallbacks resilientes e tipagem forte com a regra @property."
+draft: false
+publishDate: 2026-01-01
+tags: ["custom-properties", "variables", "at-property", "design-tokens"]
+difficulty: "intermediate"
+order: 4
+feature: "custom-properties"
+browserSupport: "stable"
+canIUseId: "css-variables"
+relatedContent:
+  - "design-tokens"
+  - "color-scheme"
+  - "cascade-layers"
+layoutPrimitives:
+  - "box"
+  - "stack"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+**CSS Custom Properties** (comumente chamadas de Variáveis CSS) são propriedades dinâmicas que respeitam a cascata e a herança do DOM. Diferente das variáveis do Sass (que são resolvidas em tempo de compilação e viram valores estáticos no arquivo final), as Custom Properties do CSS vivem no runtime do navegador.
+
+Isso significa que elas:
+- Podem ser modificadas via JavaScript instantaneamente.
+- Respondem a seletores de mídia (`@media`), container queries e pseudoclasses (`:hover`, `:focus`).
+- Podem ser redefinidas em nós específicos do DOM sem afetar o restante da árvore.
+
+## 2. Sintaxe Básica, Herança e Fallbacks
+
+A declaração se inicia sempre com dois hifens (`--`):
+
+```css
+:root {
+  --primary-hue: 220;
+  --color-primary: hsl(var(--primary-hue) 90% 56%);
+  --space-unit: 1rem;
+}
+
+/* Fallback encadeado resiliente */
+.element {
+  /* Se --card-padding não existir, usa var(--space-unit), se não existir usa 1rem */
+  padding: var(--card-padding, var(--space-unit, 1rem));
+}
+```
+
+## 3. O Paradigma do Componente "API-First"
+
+Ao criar componentes desacoplados (como as primitivas do Every Layout), Custom Properties funcionam como a **API pública** do componente:
+
+```css
+/* Definição interna do componente */
+.stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: var(--stack-space, 1.5rem);
+}
+
+/* Consumidor sobrescreve o valor inline sem quebrar a cascata */
+.hero-stack {
+  --stack-space: 3rem;
+}
+```
+
+O consumidor não precisa saber que a propriedade interna é `gap` ou `margin-block-start`. Ele interage apenas com o contrato `--stack-space`.
+
+## 4. A Regra `@property` (CSS Houdini Baseline)
+
+Historicamente, variáveis CSS eram tratadas pelo navegador como strings opacas de texto. Não era possível interpolar ou animar transições numéricas de uma variável.
+
+Com `@property` (agora amplamente suportado), podemos registrar uma custom property com tipo explícito, valor inicial e herança:
+
+```css
+@property --gradient-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+.glow-card {
+  background: linear-gradient(var(--gradient-angle), #3b82f6, #ec4899);
+  transition: --gradient-angle 0.5s ease;
+}
+
+.glow-card:hover {
+  --gradient-angle: 180deg; /* O navegador anima suavemente o ângulo! */
+}
+```
+
+Tipos suportados por `syntax`:
+- `<color>`
+- `<length>`
+- `<percentage>`
+- `<angle>`
+- `<number>`
+- `<integer>`
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Criar Variáveis Globais sem Estratégia de Fallback"
+  badCode={`.button {
+  /* Se --btn-bg falhar ou estiver indefinida, o botão fica transparente */
+  background-color: var(--btn-bg);
+}`}
+  goodTitle="Fornecer Fallbacks Seguros ou Defaults no Próprio Seletor"
+  goodCode={`.button {
+  --btn-bg: var(--color-interactive-primary, #0969da);
+  background-color: var(--btn-bg);
+}`}
+  explanation="Sempre garanta que uma variável consumida por um componente possua um valor default acessível, evitando que o layout quebre caso a propriedade não seja fornecida."
+/>
+
+## 6. Boas Práticas
+
+1. **Separe Tokens Globais de Propriedades Locais**: Use nomes como `--color-brand-primary` no `:root` e remapeie para `--btn-bg` no componente.
+2. **Evite Aninhar Múltiplas Funções Pesadas**: Não encadeie dezenas de `calc()` e `var()` desnecessários em propriedades animadas para preservar 60fps.
+3. **Utilize `@property` para Animações**: Registre ângulos, números e cores para transições elegantes entre estados.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "As custom properties de componente oferecem fallback ou default seguro?", checked: true },
+    { text: "Propriedades que sofrem transição/animação foram registradas via @property?", checked: true },
+    { text: "A nomenclatura segue uma hierarquia consistente (ex: --categoria-subcategoria-variante)?", checked: true },
+    { text: "Os valores semânticos estão no :root e são consumidos nos componentes?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Design Tokens](/css-moderno/design-tokens) — Estratégia completa de arquitetura de tokens.
+- [Color Scheme & light-dark()](/css-moderno/color-scheme) — Alternância semântica de temas.
+- [Every Layout Lab](/every-layout) — Uso de custom properties como API de layout.

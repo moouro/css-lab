@@ -1,0 +1,32 @@
+---
+title: "Proporção de Imagem sem CLS (aspect-ratio)"
+description: "Preservação da proporção exata de vídeos e imagens (16:9, 4:3, 1:1) com eliminação do Cumulative Layout Shift."
+category: "layout"
+tags: ["layout", "aspect-ratio", "cls", "core-web-vitals", "images"]
+draft: false
+order: 3
+language: "css"
+---
+
+### Problema
+O antigo truque do "padding-top hack" (`padding-top: 56.25%`) exigia contêineres pais com `position: relative` e imagens filhas com `position: absolute`.
+
+### Código
+
+```css
+.media-frame {
+  inline-size: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-subtle);
+}
+
+/* Proporção quadrada para avatares */
+.avatar-frame {
+  inline-size: 48px;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+```

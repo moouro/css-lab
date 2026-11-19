@@ -1,0 +1,175 @@
+---
+title: "Modals & Diálogos (<dialog>)"
+description: "Diálogos modais nativos com o elemento <dialog>, método showModal(), estilização de ::backdrop e foco preso sem JS."
+draft: false
+publishDate: 2026-01-01
+tags: ["components", "modals", "dialog", "backdrop", "accessibility", "focus-trap"]
+difficulty: "intermediate"
+order: 10
+anatomy:
+  - "<dialog> (janela modal na Top Layer)"
+  - "::backdrop (fundo escurecido nativo)"
+  - "Cabeçalho com título e botão de fechar"
+  - "Corpo do modal e barra de ações"
+hasPlayground: true
+a11yNotes: "O elemento <dialog> com showModal() implementa aprisionamento de foco (focus trap), bloqueio de interações externas (inert) e fechamento por Escape nativamente no navegador."
+relatedContent:
+  - "buttons"
+  - "dropdowns"
+layoutPrimitives:
+  - "box"
+  - "stack"
+  - "cluster"
+  - "imposter"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Durante mais de vinte anos, construir uma **Janela Modal** acessível no navegador era um pesadelo de engenharia:
+- Era preciso criar um overlay cinza falso com `position: fixed` e `z-index: 999999`.
+- Era preciso escrever dezenas de linhas de script para implementar o **Focus Trap** (impedir que o usuário navegando via teclado dê `Tab` e foque elementos escondidos atrás do modal).
+- Era preciso manipular `document.body.style.overflow = 'hidden'` para travar a rolagem da página ao fundo.
+- Era preciso escutar a tecla `Escape` manualmente.
+
+O elemento HTML nativo **`<dialog>`** e a API `showModal()` resolveram **todos** esses problemas nativamente no motor C++ do navegador!
+
+<Callout type="info" title="Baseline Universal">
+  O elemento `<dialog>` e o pseudo-elemento `::backdrop` possuem suporte de 100% em todos os navegadores modernos há anos.
+</Callout>
+
+## 2. A Estrutura Semântica e o Método `showModal()`
+
+```html
+<!-- Botão que abre o modal -->
+<button type="button" class="btn" id="open-dialog-btn">
+  Excluir Projeto
+</button>
+
+<!-- O Diálogo Nativo -->
+<dialog id="confirm-dialog" class="modal-dialog" aria-labelledby="dialog-title">
+  <form method="dialog" class="modal-content">
+    <header class="modal-header">
+      <h2 id="dialog-title" class="modal-title">Confirmar Exclusão</h2>
+      <button type="submit" value="cancel" class="btn-close" aria-label="Fechar">✕</button>
+    </header>
+
+    <div class="modal-body">
+      <p>Você tem certeza absoluta de que deseja excluir este projeto? Esta ação é irreversível.</p>
+    </div>
+
+    <footer class="modal-footer">
+      <button type="submit" value="cancel" class="btn">Cancelar</button>
+      <button type="submit" value="confirm" class="btn btn-danger">Excluir Permanentemente</button>
+    </footer>
+  </form>
+</dialog>
+```
+
+```javascript
+// Apenas 2 linhas para abrir com aprisionamento nativo de foco!
+const dialog = document.getElementById('confirm-dialog');
+document.getElementById('open-dialog-btn').addEventListener('click', () => {
+  dialog.showModal(); // ATENÇÃO: use showModal(), NUNCA show()!
+});
+```
+
+<Callout type="important" title="showModal() vs show()">
+  - `dialog.showModal()`: Abre o diálogo na **Top Layer**, cria o `::backdrop`, bloqueia o resto da página (torna tudo atrás `inert`) e prende o foco do teclado dentro do modal.
+  - `dialog.show()`: Abre apenas como uma caixa flutuante não-modal na posição do fluxo, sem backdrop e sem aprisionamento de foco.
+</Callout>
+
+## 3. Estilização do Modal e do `::backdrop`
+
+```css
+/* O Diálogo na Top Layer */
+.modal-dialog {
+  padding: 0;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-bg-surface);
+  color: var(--color-fg);
+  max-inline-size: min(90vw, 540px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+
+  /* Transição moderna de entrada */
+  opacity: 0;
+  transform: scale(0.95);
+  transition: opacity var(--duration-normal) ease,
+              transform var(--duration-normal) ease,
+              overlay var(--duration-normal) allow-discrete,
+              display var(--duration-normal) allow-discrete;
+}
+
+.modal-dialog[open] {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* O fundo escurecido nativo da Top Layer */
+.modal-dialog::backdrop {
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  opacity: 0;
+  transition: opacity var(--duration-normal) ease,
+              overlay var(--duration-normal) allow-discrete,
+              display var(--duration-normal) allow-discrete;
+}
+
+.modal-dialog[open]::backdrop {
+  opacity: 1;
+}
+
+/* Bloqueio automático de scroll na página via :has() */
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+```
+
+## 4. O Truque Genial de `<form method="dialog">`
+
+Observe que o formulário dentro do modal possui `method="dialog"`.
+Quando o usuário clica em qualquer `<button type="submit">` dentro dele, o navegador **fecha o modal automaticamente** e preenche `dialog.returnValue` com o valor do botão clicado (`"cancel"` ou `"confirm"`), **sem precisar de nenhuma linha de JavaScript de fechamento**!
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Construir Modais com Divs, position: fixed e z-index 99999"
+  badCode={`<!-- Antigo, sem focus trap e com bugs de z-index -->
+<div class="overlay" style="position: fixed; z-index: 99999;">
+  <div class="modal">...</div>
+</div>`}
+  goodTitle="Usar o Elemento <dialog> com showModal()"
+  goodCode={`<dialog class="modal-dialog">
+  <form method="dialog">...</form>
+</dialog>`}
+  explanation="Divs normais não bloqueiam o teclado para elementos de trás, forçando pessoas cegas a navegar por toda a página enquanto o modal estiver aberto. O <dialog> resolve isso nativamente."
+/>
+
+## 6. Boas Práticas
+
+1. **Sempre use `dialog.showModal()`**: Garante que o backdrop e o focus trap sejam ativados.
+2. **Adicione `aria-labelledby`**: Aponte para o ID do título do modal para que leitores de tela anunciem o propósito da janela assim que ela abrir.
+3. **Use `method="dialog"`**: Permite fechamento nativo sem handlers de clique adicionais.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A tag semântica <dialog> foi utilizada?", checked: true },
+    { text: "A abertura ocorre via método nativo showModal()?", checked: true },
+    { text: "O fechamento via tecla Escape funciona sem código JavaScript adicional?", checked: true },
+    { text: "O pseudo-elemento ::backdrop foi estilizado com opacidade e blur sutis?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Componentes: Botões](/components/buttons) — Botões de ação e cancelamento.
+- [Every Layout: Imposter](/every-layout/imposter) — Centralização absoluta e isolada.
+- [Seletor :has()](/css-moderno/has-selector) — Bloqueio automático do scroll do body.

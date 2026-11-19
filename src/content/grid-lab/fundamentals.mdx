@@ -1,0 +1,119 @@
+---
+title: "Fundamentos do CSS Grid"
+description: "O modelo mental bidimensional: linhas explícitas, faixas (tracks), células e a unidade fracional fr."
+draft: false
+publishDate: 2026-01-01
+tags: ["grid", "fundamentals", "tracks", "fr-unit", "layout-2d"]
+difficulty: "beginner"
+order: 1
+relatedContent:
+  - "template-areas"
+  - "minmax-auto-fill"
+  - "alignment"
+layoutPrimitives:
+  - "grid"
+  - "box"
+  - "stack"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+O **CSS Grid** é o primeiro sistema de layout do CSS projetado desde o primeiro dia para trabalhar com **duas dimensões simultaneamente**: linhas (horizontal) e colunas (vertical).
+
+Enquanto o Flexbox calcula os tamanhos com base no conteúdo de cada item individual ao longo de um eixo, o CSS Grid projeta uma matriz espacial rígida ou flexível sobre a qual os elementos são acomodados.
+
+```
+       Coluna 1       Coluna 2       Coluna 3
+Linha 1 ┌──────────────┬──────────────┬──────────────┐ Linha 1
+        │ Célula (1,1) │ Célula (1,2) │ Célula (1,3) │
+Linha 2 ├──────────────┼──────────────┼──────────────┤ Linha 2
+        │ Célula (2,1) │ Célula (2,2) │ Célula (2,3) │
+Linha 3 └──────────────┴──────────────┴──────────────┘ Linha 3
+        Linha 1        Linha 2        Linha 3        Linha 4
+```
+
+<Callout type="info" title="Linhas vs Faixas">
+  As **Linhas de Grade** (*Grid Lines*) são as divisórias numeradas (começando em 1). As **Faixas** (*Grid Tracks*) são o espaço físico entre duas linhas consecutivas (ou seja, uma coluna inteira ou uma linha inteira).
+</Callout>
+
+## 2. A Unidade Fracional (`fr`)
+
+A unidade `fr` (*fractional unit*) representa uma fração do espaço livre restante no contêiner de grid após todos os elementos de tamanho fixo ou intrínseco serem alocados.
+
+```css
+.layout {
+  display: grid;
+  /* 200px fixos para sidebar, e o restante dividido em 1 parte e 2 partes */
+  grid-template-columns: 200px 1fr 2fr;
+  gap: var(--space-m);
+}
+```
+
+O cálculo feito pelo navegador:
+1. Subtrai a largura fixa (`200px`) e os dois espaçamentos (`gap`) da largura total do contêiner.
+2. Divide o espaço restante por 3 (1fr + 2fr).
+3. Atribui 1 terço à coluna do meio e 2 terços à coluna da direita.
+
+## 3. Posicionamento Baseado em Linhas
+
+Os elementos podem se expandir por múltiplas faixas usando coordenadas de linha:
+
+```css
+.header {
+  /* Ocupa da linha 1 até a última linha (representada por -1) */
+  grid-column: 1 / -1;
+}
+
+.main-content {
+  grid-column: 2 / span 2; /* Começa na linha 2 e se estende por 2 faixas */
+}
+```
+
+O índice negativo (`-1`) é uma das ferramentas mais convenientes do CSS Grid: ele sempre aponta para a borda final explícita do grid, não importa quantas colunas existam!
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Porcentagens Fixas com Gaps (Causando Overflow)"
+  badCode={`.grid-container {
+  display: grid;
+  grid-template-columns: 33.33% 33.33% 33.33%;
+  gap: 20px; /* Causa transbordamento horizontal da tela! */
+}`}
+  goodTitle="Usar 1fr para Absorver o Espaço Descontando os Gaps"
+  goodCode={`.grid-container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px; /* O navegador calcula o espaço perfeitamente */
+}`}
+  explanation="Porcentagens não levam o gap em consideração no cálculo das larguras. A unidade fr desconta todos os gaps antes de calcular o tamanho de cada faixa."
+/>
+
+## 5. Boas Práticas
+
+1. **Prefira `repeat()` para colunas homogêneas**: Em vez de `1fr 1fr 1fr 1fr`, escreva `repeat(4, 1fr)`.
+2. **Use nomes de linhas semânticos**: Você pode nomear linhas `[sidebar-start] 250px [sidebar-end content-start] 1fr [content-end]`.
+3. **Use o índice negativo `-1` para faixas full-width**: Garante que o elemento ocupe 100% da largura mesmo se novas colunas forem adicionadas.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A unidade fr foi utilizada no lugar de porcentagens para evitar overflow com gaps?", checked: true },
+    { text: "A distinção entre linhas de grade (1, 2, 3) e faixas está clara no código?", checked: true },
+    { text: "O índice -1 foi utilizado para itens que devem cruzar toda a largura?", checked: true },
+    { text: "O espaçamento entre células é gerenciado exclusivamente via gap?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Template Areas](/grid-lab/template-areas) — Mapeamento visual em ASCII.
+- [Minmax e Auto-fill](/grid-lab/minmax-auto-fill) — Grids intrínsecos sem media queries.
+- [Subgrid](/grid-lab/subgrid) — Alinhando elementos em grids aninhados.

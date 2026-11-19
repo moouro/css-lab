@@ -1,0 +1,38 @@
+---
+title: "Pilha de Avatares Sobrepostos (Avatar Stack)"
+description: "Avatares redondos sobrepostos com borda recortada de máscara e hover que eleva o item focado."
+category: "patterns"
+tags: ["patterns", "avatar-stack", "cluster", "social-proof"]
+draft: false
+order: 25
+language: "css"
+---
+
+### Problema
+Criar a pilha de fotos de usuários colaboradores que se sobrepõem suavemente com borda destacada.
+
+### Código
+
+```css
+.avatar-stack {
+  display: flex;
+  flex-direction: row;
+  padding-inline-start: var(--space-xs);
+}
+
+.avatar-stack img {
+  inline-size: 36px;
+  block-size: 36px;
+  border-radius: var(--radius-full);
+  border: 2px solid var(--color-bg-surface);
+  margin-inline-start: -10px; /* Sobreposição elegante */
+  object-fit: cover;
+  transition: transform var(--duration-fast) ease, z-index var(--duration-fast) ease;
+}
+
+.avatar-stack img:hover {
+  transform: translateY(-2px) scale(1.1);
+  position: relative;
+  z-index: 10;
+}
+```

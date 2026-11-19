@@ -1,0 +1,149 @@
+---
+title: "Design Tokens & Arquitetura de Cores"
+description: "A arquitetura em 3 níveis (Global, Semântico e Componente) para estruturar sistemas de design escaláveis com CSS nativo."
+draft: false
+publishDate: 2026-01-01
+tags: ["design-tokens", "architecture", "variables", "design-system", "tokens"]
+difficulty: "intermediate"
+order: 11
+feature: "design-tokens"
+browserSupport: "stable"
+canIUseId: "css-variables"
+relatedContent:
+  - "custom-properties"
+  - "color-scheme"
+  - "cascade-layers"
+layoutPrimitives:
+  - "box"
+  - "stack"
+  - "cluster"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+**Design Tokens** são as decisões visuais fundamentais de uma marca ou produto codificadas em dados reutilizáveis: cores, espaçamentos, tipografia, raios de borda, sombras e durações de movimento.
+
+Muitas equipes cometem o erro de consumir valores literais (ex: `#3b82f6` ou `16px`) diretamente nas regras de componentes. Quando a marca muda ou um novo modo escuro é introduzido, centenas de arquivos quebram.
+
+A arquitetura profissional de tokens é dividida em **3 níveis de abstração**:
+
+```
+[Nível 1: Tokens Globais / Primitivos]  --> Valores brutos e paletas de cor (ex: --blue-500)
+              │
+[Nível 2: Tokens Semânticos / Contexto] --> Papel na interface e tema (ex: --color-accent)
+              │
+[Nível 3: Tokens de Componente]         --> Contrato local do componente (ex: --btn-bg)
+```
+
+## 2. A Estrutura dos 3 Níveis no CSS Nativo
+
+### Nível 1: Tokens Globais (Primitivos)
+Estes tokens descrevem o valor literal, sem intenção de uso:
+
+```css
+:root {
+  /* Escala de Cinzas */
+  --gray-100: #f6f8fa;
+  --gray-200: #d0d7de;
+  --gray-700: #30363d;
+  --gray-900: #0d1117;
+
+  /* Escala de Azuis */
+  --blue-500: #0969da;
+  --blue-400: #2f81f7;
+}
+```
+
+### Nível 2: Tokens Semânticos
+Estes tokens atribuem significado ao valor e integram os modos claro e escuro via `light-dark()`:
+
+```css
+:root {
+  color-scheme: light dark;
+
+  /* Superfícies */
+  --color-bg-canvas: light-dark(var(--gray-100), var(--gray-900));
+  --color-bg-surface: light-dark(#ffffff, #161b22);
+  --color-border: light-dark(var(--gray-200), var(--gray-700));
+
+  /* Cores de Ação */
+  --color-accent: light-dark(var(--blue-500), var(--blue-400));
+}
+```
+
+### Nível 3: Tokens de Componente
+O componente consome o token semântico, mas permite overrides contextuais:
+
+```css
+.button-primary {
+  --btn-bg: var(--color-accent);
+  --btn-fg: #ffffff;
+
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+}
+```
+
+## 3. Escala Espacial Modular e Harmônica
+
+O espaçamento jamais deve ser um número arbitrário inventado na hora (`margin: 13px;` ou `padding: 27px;`). Utilize uma progressão geométrica consistente:
+
+```css
+:root {
+  --space-3xs: clamp(0.25rem, 0.23rem + 0.11vw, 0.31rem);
+  --space-2xs: clamp(0.5rem, 0.46rem + 0.22vw, 0.63rem);
+  --space-xs:  clamp(0.75rem, 0.68rem + 0.33vw, 0.94rem);
+  --space-s:   clamp(1rem, 0.91rem + 0.43vw, 1.25rem);
+  --space-m:   clamp(1.5rem, 1.37rem + 0.65vw, 1.88rem);
+  --space-l:   clamp(2rem, 1.83rem + 0.87vw, 2.5rem);
+  --space-xl:  clamp(3rem, 2.74rem + 1.3vw, 3.75rem);
+  --space-2xl: clamp(4rem, 3.65rem + 1.74vw, 5rem);
+}
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Tokens Globais Diretamente nos Componentes"
+  badCode={`.card {
+  /* Péssimo: amarra o componente a uma cor física direta */
+  background-color: var(--gray-100);
+  border: 1px solid var(--gray-200);
+}`}
+  goodTitle="Consumir Apenas Tokens Semânticos nos Componentes"
+  goodCode={`.card {
+  /* Excelente: o card reage ao tema e ao papel visual */
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+}`}
+  explanation="Se você consumir --gray-100 no card, quando o usuário entrar em modo escuro o card continuará cinza claro. Ao consumir --color-bg-surface, o tema claro e escuro funcionam instantaneamente."
+/>
+
+## 5. Boas Práticas
+
+1. **Nunca use cores hexadecimais soltas no CSS de componentes**: Centralize tudo em `tokens.css`.
+2. **Defina tokens para Raios de Borda e Sombras**: `--radius-sm: 4px; --radius-md: 8px; --radius-full: 9999px;`.
+3. **Mantenha os tokens de fácil leitura**: Utilize nomes semânticos (`--color-fg-muted`, `--color-danger`, `--color-success`).
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A arquitetura em 3 níveis (Global, Semântico, Componente) está estabelecida?", checked: true },
+    { text: "Nenhum componente acessa valores primitivos brutos diretamente?", checked: true },
+    { text: "A escala de espaçamento utiliza a proporção consistente de tokens?", checked: true },
+    { text: "Os tokens de cor estão unificados com a função light-dark()?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Custom Properties](/css-moderno/custom-properties) — Variáveis e escopos no CSS.
+- [Color Scheme](/css-moderno/color-scheme) — Integração com o sistema operacional.
+- [Tipografia Fluida](/css-moderno/fluid-typography) — Escala de fontes e o axioma da medida.

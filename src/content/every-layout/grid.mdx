@@ -1,0 +1,99 @@
+---
+title: "The Grid"
+description: "Grade bidimensional responsiva intrínseca usando CSS Grid com repeat, auto-fill e minmax."
+draft: false
+publishDate: 2026-01-01
+tags: ["css-grid", "auto-fill", "minmax", "intrinsic-grid"]
+difficulty: "intermediate"
+order: 8
+primitive: "grid"
+problem: "Declarar número fixo de colunas (ex: 3 colunas) e tentar adaptá-las por media queries cria múltiplos breakpoints frágeis que não respeitam o tamanho real do container."
+solution: "Combinar repeat(auto-fill, minmax(min(250px, 100%), 1fr)) com a função nativa min() para criar colunas que fluem e quebram de maneira perfeitamente autônoma."
+cssProperties:
+  - "display: grid"
+  - "grid-template-columns"
+  - "repeat()"
+  - "auto-fill"
+  - "minmax()"
+  - "min()"
+propsApi:
+  - name: "min"
+    type: "string"
+    default: "16rem"
+    description: "Largura mínima de cada coluna da grade antes de colapsar para uma linha inferior."
+  - name: "space"
+    type: "string"
+    default: "var(--space-s)"
+    description: "Espaçamento entre as linhas e colunas (gap)."
+relatedContent:
+  - "switcher"
+  - "box"
+layoutPrimitives:
+  - "grid"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Grid from '@/components/layout/Grid.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Projetar uma grade no CSS moderno não significa desenhar uma tabela fixa de 12 colunas imaginárias. Significa dar ao navegador uma instrução declarativa: **"crie tantas colunas quantas couberem, desde que nenhuma seja mais estreita que X, e distribua o espaço restante igualmente entre elas"**.
+
+## 2. A Fórmula Definitiva com min()
+
+A fórmula clássica de Jen Simmons era:
+```css
+grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+```
+
+O problema dessa fórmula pura: se o container tiver menos de `250px` (ex: telas de relógio ou celulares antigos), a grade estoura horizontalmente porque `250px` era um limite mínimo rígido!
+
+A solução moderna e blindada do *Every Layout* introduz a função `min()` no limite inferior do `minmax`:
+
+```css
+.grid {
+  display: grid;
+  grid-template-columns: repeat(
+    auto-fill,
+    minmax(min(var(--grid-min, 16rem), 100%), 1fr)
+  );
+  gap: var(--space-s);
+}
+```
+
+Quando o container tem menos de `16rem`, `min(16rem, 100%)` retorna `100%`, fazendo o grid se comportar perfeitamente como uma coluna única segura!
+
+<AntiPattern
+  badCode={`/* Frágil: grid com 12 colunas e 5 breakpoints */\n.col-4 { width: 33.33%; }\n@media (max-width: 900px) { .col-4 { width: 50%; } }\n@media (max-width: 600px) { .col-4 { width: 100%; } }`}
+  goodCode={`/* Resiliente: uma única declaração sem breakpoints */\n.grid {\n  display: grid;\n  grid-template-columns: repeat(auto-fill, minmax(min(16rem, 100%), 1fr));\n}`}
+  explanation="A fórmula algorítmica recalcula colunas em tempo real para qualquer resolução, inclusive quando o componente é colocado dentro de uma aba ou painel lateral."
+/>
+
+## 3. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 4. Playground Interativo
+
+<Playground title="Demonstração do Grid com minmax()">
+  <Grid min="10rem" space="1rem">
+    <Box padding="1rem"><h4 class="text-sm font-semibold">Card A</h4></Box>
+    <Box padding="1rem"><h4 class="text-sm font-semibold">Card B</h4></Box>
+    <Box padding="1rem"><h4 class="text-sm font-semibold">Card C</h4></Box>
+    <Box padding="1rem"><h4 class="text-sm font-semibold">Card D</h4></Box>
+  </Grid>
+</Playground>
+
+## 5. Checklist de Qualidade
+
+<Checklist items={[
+  "Usa repeat(auto-fill, ...) para permitir que linhas incompletas mantenham a largura correta dos itens.",
+  "Incorpora min(X, 100%) para evitar qualquer risco de estouro de tela em containers ultracompactos.",
+  "Usa 1fr na extremidade máxima para que os itens cresçam harmonicamente e preencham a linha.",
+  "Evita definir larguras manuais nos itens filhos."
+]} />

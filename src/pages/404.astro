@@ -1,0 +1,120 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Center from '@/components/layout/Center.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Cluster from '@/components/layout/Cluster.astro';
+---
+
+<BaseLayout
+  title="404 — Página Não Encontrada"
+  description="A página ou recurso solicitado não foi encontrado no CSS Lab."
+>
+  <div class="error-container">
+    <Center max="640px" andText>
+      <Stack space="var(--space-l)">
+        <div class="error-badge font-mono text-xs">Erro 404</div>
+
+        <Stack space="var(--space-xs)">
+          <h1 class="error-title">Página Não Encontrada</h1>
+          <p class="text-lg text-muted">
+            O recurso ou laboratório que você tentou acessar não existe, foi reorganizado ou está em uma nova rota.
+          </p>
+        </Stack>
+
+        <div class="error-box stack" style="--stack-space: var(--space-s);">
+          <p class="text-sm text-fg">
+            Use a <strong>Busca Rápida</strong> para encontrar qualquer conceito, primitiva do Every Layout, componente ou snippet CSS:
+          </p>
+          <Cluster space="var(--space-s)" justify="center" align="center">
+            <button
+              type="button"
+              class="search-shortcut-btn cluster"
+              style="--cluster-space: var(--space-2xs); align-items: center;"
+              data-open-search
+              aria-label="Abrir busca rápida"
+            >
+              <span>Abrir Busca Rápida</span>
+              <kbd class="font-mono text-xs">⌘K</kbd>
+            </button>
+            <a href="/" class="home-btn font-medium">Voltar ao Início</a>
+          </Cluster>
+        </div>
+      </Stack>
+    </Center>
+  </div>
+</BaseLayout>
+
+<style>
+  .error-container {
+    padding-block: var(--space-2xl);
+    padding-inline: var(--space-m);
+    min-block-size: 60vh;
+    display: flex;
+    align-items: center;
+  }
+
+  .error-badge {
+    display: inline-block;
+    color: var(--color-accent);
+    background-color: var(--color-accent-muted);
+    border-radius: var(--radius-full);
+    padding-block: 0.2em;
+    padding-inline: 0.8em;
+    font-weight: 600;
+    align-self: center;
+  }
+
+  .error-title {
+    font-size: var(--step-4);
+    letter-spacing: -0.02em;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+
+  .error-box {
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    padding: var(--space-l);
+    text-align: center;
+  }
+
+  .search-shortcut-btn {
+    background-color: var(--color-accent);
+    color: var(--color-accent-contrast);
+    border: 1px solid transparent;
+    border-radius: var(--radius-md);
+    padding-block: 0.5rem;
+    padding-inline: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: filter var(--duration-fast) var(--ease-out);
+  }
+
+  .search-shortcut-btn:hover {
+    filter: brightness(1.1);
+  }
+
+  .search-shortcut-btn kbd {
+    background: rgba(0, 0, 0, 0.2);
+    padding-inline: 0.35em;
+    padding-block: 0.1em;
+    border-radius: var(--radius-sm);
+  }
+
+  .home-btn {
+    color: var(--color-fg);
+    background-color: var(--color-bg-raised);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    padding-block: 0.5rem;
+    padding-inline: 1rem;
+    text-decoration: none;
+    transition: border-color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .home-btn:hover {
+    border-color: var(--color-border-hover);
+    background-color: var(--color-bg-hover);
+  }
+</style>

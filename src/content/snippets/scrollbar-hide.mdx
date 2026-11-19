@@ -1,0 +1,28 @@
+---
+title: "Ocultação Limpa de Barra de Rolagem"
+description: "Permitir rolagem suave em carrosséis e reels horizontais escondendo a barra visual nativa."
+category: "utilities"
+tags: ["utilities", "scrollbar", "reel", "carousel"]
+draft: false
+order: 17
+language: "css"
+---
+
+### Problema
+Barras de rolagem cinzas nativas quebram a estética de carrosséis de produtos e reels horizontais modernos.
+
+### Código
+
+```css
+.scrollbar-none {
+  /* Firefox */
+  scrollbar-width: none;
+  /* IE and Edge */
+  -ms-overflow-style: none;
+}
+
+/* Chrome, Safari, Edge moderno */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+```

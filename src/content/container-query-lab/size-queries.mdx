@@ -1,0 +1,140 @@
+---
+title: "Size Queries & Unidades de Contêiner"
+description: "Consultas de tamanho dimensional, container-type: inline-size vs normal e as unidades cqi, cqw e cqb."
+draft: false
+publishDate: 2026-01-01
+tags: ["container-queries", "size-queries", "cqi", "cqw", "cqb", "units"]
+difficulty: "intermediate"
+order: 2
+relatedContent:
+  - "fundamentals"
+  - "naming-conventions"
+  - "real-world-patterns"
+layoutPrimitives:
+  - "container"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+As **Size Queries** são consultas baseadas nas dimensões físicas de um contêiner registrado. Elas permitem inspecionar a largura ou altura disponível para reestruturar visualmente os elementos.
+
+Para que um elemento seja consultado por tamanho, ele **precisa** definir explicitamente a propriedade `container-type`:
+
+```css
+.card-wrapper {
+  /* Habilita consultas ao longo do eixo inline (largura em LTR) */
+  container-type: inline-size;
+}
+```
+
+## 2. `inline-size` vs `size` vs `normal`
+
+A especificação define 3 valores principais para `container-type`:
+
+| Valor | O que faz? | Quando usar? |
+| :--- | :--- | :--- |
+| `inline-size` | Estabelece um contexto de contenção no eixo **horizontal** (inline). O contêiner pode ter altura livre determinada pelo conteúdo. | **Use em 98% dos casos.** Perfeito para componentes comuns. |
+| `size` | Estabelece contenção em **ambos os eixos** (largura E altura). Exige que o pai tenha altura fixa explícita, caso contrário ele colapsa a zero. | Raro. Use apenas para gráficos com proporções fixas ou painéis de dashboard com altura travada. |
+| `normal` | O padrão. O elemento não é um contêiner de tamanho (mas pode responder a consultas de estilo). | Para desativar a contenção de um elemento. |
+
+<Callout type="important" title="Por que container-type: size colapsa?">
+  Se você declarar `container-type: size` sem definir uma altura explícita (`block-size: 400px`), a altura do contêiner colapsa imediatamente para `0px`! Isso ocorre porque a contenção estrita impede que o tamanho do filho informe a altura do pai.
+</Callout>
+
+## 3. As Unidades do Contêiner (Container Query Units)
+
+Assim como temos `vw` e `vh` para a janela do navegador, as Container Queries introduziram unidades dinâmicas calculadas diretamente a partir do contêiner:
+
+| Unidade | Definição |
+| :--- | :--- |
+| `1cqw` | 1% da largura do contêiner |
+| `1cqh` | 1% da altura do contêiner |
+| `1cqi` | 1% da dimensão inline do contêiner |
+| `1cqb` | 1% da dimensão block do contêiner |
+| `1cqmin` | O menor valor entre `cqi` e `cqb` |
+| `1cqmax` | O maior valor entre `cqi` e `cqb` |
+
+### Tipografia Localizada com `cqi`
+
+```css
+.card-title {
+  /* O texto do título escala organicamente com a largura da coluna em que está inserido */
+  font-size: clamp(1.1rem, 0.8rem + 1.8cqi, 2.2rem);
+}
+```
+
+Se o card estiver em uma coluna larga, o título cresce. Se o card for arrastado para uma barra lateral estreita, o título encolhe suavemente sem estourar as margens.
+
+## 4. Range Syntax Moderna
+
+A sintaxe de comparação matemática elimina os antigos operadores verbosos:
+
+```css
+/* Consulta simples */
+@container (inline-size > 600px) {
+  .user-card {
+    display: flex;
+    gap: var(--space-l);
+  }
+}
+
+/* Consulta de intervalo (Range) */
+@container (350px <= inline-size <= 700px) {
+  .user-card {
+    padding: var(--space-s);
+  }
+}
+```
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Aplicar @container em um Filho sem container-type no Pai"
+  badCode={`/* Erro: esqueceu de registrar o pai como contêiner */
+.card-child {
+  @container (inline-size > 500px) {
+    color: red; /* Nunca será executado! */
+  }
+}`}
+  goodTitle="Declarar container-type: inline-size no Pai"
+  goodCode={`.card-host {
+  container-type: inline-size;
+}
+
+@container (inline-size > 500px) {
+  .card-child {
+    color: red;
+  }
+}`}
+  explanation="O navegador procura o ancestral mais próximo com container-type definido. Se nenhum ancestral tiver essa propriedade, o bloco @container é solenemente ignorado."
+/>
+
+## 6. Boas Práticas
+
+1. **Adote `container-type: inline-size` como padrão**: Praticamente nunca utilize `size` a não ser que tenha restrições rígidas de altura.
+2. **Use `cqi` para espaçamentos e fontes contextuais**: Permite micro-escalas proporcionais à área disponível.
+3. **Mantenha os limites numéricos em rem ou px seguros**: Teste a transição nos limites de quebra.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "container-type: inline-size foi configurado no elemento hospedeiro?", checked: true },
+    { text: "As unidades de texto utilizam cqi em vez de vw?", checked: true },
+    { text: "A sintaxe moderna de range (<, <=, >, >=) foi aplicada?", checked: true },
+    { text: "O contêiner não colapsou em altura por uso indevido de container-type: size?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Fundamentos de Container Queries](/container-query-lab/fundamentals) — O modelo mental.
+- [Contêineres Nomeados](/container-query-lab/naming-conventions) — Selecionando pais específicos.
+- [Tipografia Fluida](/css-moderno/fluid-typography) — Funções matemáticas com clamp().

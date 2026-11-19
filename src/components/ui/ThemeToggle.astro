@@ -1,0 +1,134 @@
+---
+// Theme Toggle component adhering to modern-web-guidance
+// Centralizes light/dark/system cycling, Shift+T shortcut, and View Transitions persistence
+---
+
+<button
+  type="button"
+  id="theme-toggle-btn"
+  class="theme-toggle"
+  aria-label="Alternar tema de cor (Sistema / Claro / Escuro)"
+>
+  <span class="theme-icon-light" aria-hidden="true">☀️</span>
+  <span class="theme-icon-dark" aria-hidden="true">🌙</span>
+</button>
+
+<script>
+  const THEME_STORAGE_KEY = 'css-lab-theme';
+
+  function applyStoredTheme(): void {
+    try {
+      const stored = localStorage.getItem(THEME_STORAGE_KEY);
+      const meta = document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]');
+      if (!meta) return;
+      if (stored === 'light' || stored === 'dark') {
+        meta.content = stored;
+      } else {
+        meta.content = 'light dark';
+      }
+    } catch {
+      // Storage indisponível
+    }
+  }
+
+  function cycleTheme(): void {
+    const meta = document.querySelector<HTMLMetaElement>('meta[name="color-scheme"]');
+    if (!meta) return;
+
+    const current = meta.content;
+    const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+    let nextTheme: 'light' | 'dark' | 'light dark';
+    if (current === 'light dark') {
+      nextTheme = systemIsDark ? 'light' : 'dark';
+    } else if (current === 'dark') {
+      nextTheme = systemIsDark ? 'light dark' : 'light';
+    } else {
+      nextTheme = systemIsDark ? 'dark' : 'light dark';
+    }
+
+    meta.content = nextTheme;
+    try {
+      if (nextTheme === 'light dark') {
+        localStorage.removeItem(THEME_STORAGE_KEY);
+      } else {
+        localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+      }
+    } catch {
+      // Storage indisponível
+    }
+  }
+
+  document.addEventListener('astro:after-swap', applyStoredTheme);
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    if (target?.closest('#theme-toggle-btn')) {
+      cycleTheme();
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    const target = e.target as HTMLElement | null;
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+      return;
+    }
+
+    if (e.shiftKey && e.key.toUpperCase() === 'T') {
+      e.preventDefault();
+      cycleTheme();
+    }
+  });
+</script>
+
+<style>
+  .theme-toggle {
+    background: transparent;
+    border: var(--border-thin) solid var(--color-border);
+    padding: 0.35rem 0.6rem;
+    border-radius: var(--radius-m);
+    color: var(--color-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .theme-toggle:hover {
+    background-color: var(--color-bg-hover);
+  }
+
+  /* Show appropriate icon based on active color-scheme */
+  :root:has(> head > meta[name="color-scheme"][content="light"]) .theme-icon-light {
+    display: inline-block;
+  }
+  :root:has(> head > meta[name="color-scheme"][content="light"]) .theme-icon-dark {
+    display: none;
+  }
+
+  :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-icon-light {
+    display: none;
+  }
+  :root:has(> head > meta[name="color-scheme"][content="dark"]) .theme-icon-dark {
+    display: inline-block;
+  }
+
+  /* Default behavior (light dark) */
+  :root:has(> head > meta[name="color-scheme"][content="light dark"]) .theme-icon-light {
+    display: none;
+  }
+  :root:has(> head > meta[name="color-scheme"][content="light dark"]) .theme-icon-dark {
+    display: inline-block;
+  }
+
+  @media (prefers-color-scheme: light) {
+    :root:has(> head > meta[name="color-scheme"][content="light dark"]) .theme-icon-light {
+      display: inline-block;
+    }
+    :root:has(> head > meta[name="color-scheme"][content="light dark"]) .theme-icon-dark {
+      display: none;
+    }
+  }
+</style>

@@ -1,0 +1,166 @@
+---
+title: "Accordions (<details> & <summary>)"
+description: "Padrão de acordeão 100% nativo com o elemento <details>, ícone animado e suporte moderno a ::details-content."
+draft: false
+publishDate: 2026-01-01
+tags: ["components", "accordions", "details", "summary", "details-content", "animation"]
+difficulty: "beginner"
+order: 5
+anatomy:
+  - "<details> (contêiner expansível nativo)"
+  - "<summary> (gatilho de clique com marcador)"
+  - "Conteúdo interno do acordeão"
+hasPlayground: true
+a11yNotes: "O elemento <details> é 100% acessível por padrão pelo navegador. Ele suporta a tecla Espaço/Enter e anuncia o estado aberto/fechado nativamente para tecnologias assistivas."
+relatedContent:
+  - "tabs"
+  - "modals"
+layoutPrimitives:
+  - "stack"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Durante anos, desenvolvedores escreveram dezenas de linhas de JavaScript e manipularam classes CSS para criar o efeito de **Acordeão** (perguntas frequentes, listas retráteis, menus colapsáveis).
+
+A plataforma web padronizou isso nativamente através dos elementos HTML:
+- `<details>`: O contêiner de expansão.
+- `<summary>`: O cabeçalho clicável que atua como gatilho.
+
+Não é necessário nenhum JavaScript. O navegador gerencia a abertura, o fechamento, o foco por teclado (`Tab`, `Enter`, `Espaço`) e o anúncio para leitores de tela sem uma única dependência!
+
+## 2. A Nova Pseudo-Elemento `::details-content` (Baseline 2024)
+
+Historicamente, o maior motivo pelo qual os desenvolvedores abandonavam o `<details>` nativo era a **impossibilidade de animar a altura suavemente**. Quando o usuário clicava, o conteúdo aparecia instantaneamente com um salto brusco.
+
+A nova especificação introduziu o pseudo-elemento **`::details-content`** e a propriedade `interpolate-size: allow-keywords`:
+
+```css
+:root {
+  /* Habilita animação suave de height: auto nativa no CSS! */
+  interpolate-size: allow-keywords;
+}
+
+details {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  overflow: hidden;
+  transition: border-color var(--duration-fast) ease;
+}
+
+/* O gatilho clicável */
+summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-s) var(--space-m);
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  list-style: none; /* Remove o triângulo padrão do navegador */
+}
+
+/* Remove o marcador nativo no Safari/WebKit */
+summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Ícone de seta personalizado */
+summary::after {
+  content: "›";
+  font-size: 1.25em;
+  line-height: 1;
+  transition: transform var(--duration-fast) ease;
+}
+
+/* Gira a seta quando o acordeão estiver aberto */
+details[open] summary::after {
+  transform: rotate(90deg);
+}
+
+/* Animação suave do conteúdo nativo */
+details::details-content {
+  opacity: 0;
+  block-size: 0;
+  overflow-y: clip;
+  transition: content-visibility var(--duration-normal) allow-discrete,
+              opacity var(--duration-normal) ease,
+              block-size var(--duration-normal) ease;
+}
+
+details[open]::details-content {
+  opacity: 1;
+  block-size: auto;
+}
+```
+
+<Callout type="info" title="Zero JavaScript, 100% Animação Fluida">
+  Com `::details-content` e `interpolate-size: allow-keywords`, a transição de altura para `auto` agora ocorre diretamente no motor de renderização do navegador, sem nenhum cálculo de `scrollHeight` via JS!
+</Callout>
+
+## 3. O Atributo `name` para Acordeões Exclusivos (Accordion Groups)
+
+E se você quiser que abrir um acordeão **feche automaticamente todos os outros** da mesma seção?
+
+Antes, isso exigia um loop de JavaScript. Agora, basta adicionar o atributo nativo **`name`**:
+
+```html
+<!-- Pertencem ao mesmo grupo: apenas um pode ficar aberto por vez! -->
+<details name="faq-group">
+  <summary>Como funciona a licença do projeto?</summary>
+  <p>O projeto é 100% aberto e pessoal sob a licença MIT.</p>
+</details>
+
+<details name="faq-group">
+  <summary>Quais navegadores são suportados?</summary>
+  <p>Todos os navegadores modernos com suporte a CSS Baseline.</p>
+</details>
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Construir Acordeões com divs e JavaScript Desnecessário"
+  badCode={`<!-- 50 linhas de JS para gerenciar cliques e classes is-open -->
+<div class="accordion" onclick="toggle()">
+  <div class="header">Pergunta</div>
+  <div class="content">Resposta</div>
+</div>`}
+  goodTitle="Usar <details> e <summary> Nativos da Plataforma"
+  goodCode={`<details>
+  <summary>Pergunta</summary>
+  <p>Resposta</p>
+</details>`}
+  explanation="O elemento <details> já possui toda a semântica de acessibilidade construída nativamente pelo sistema operacional do navegador com zero KB de JavaScript."
+/>
+
+## 5. Boas Práticas
+
+1. **Sempre use `<summary>` como primeiro filho direto**: Qualquer outro elemento que não seja `<summary>` não funcionará como gatilho clicável.
+2. **Utilize o atributo `name` para grupos exclusivos**: Elimine código JS de fechamento mútuo.
+3. **Adicione `overflow-y: clip` ao animar**: Previne que o texto vaze enquanto a caixa cresce verticalmente.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A tag semântica <details> e <summary> foi utilizada?", checked: true },
+    { text: "O marcador nativo ::-webkit-details-marker foi escondido para estilização personalizada?", checked: true },
+    { text: "O atributo name foi utilizado quando o comportamento exclusivo de FAQ for necessário?", checked: true },
+    { text: "O acordeão abre e fecha perfeitamente usando apenas o teclado (Espaço / Enter)?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Componentes: Tabs](/components/tabs) — Alternância horizontal de conteúdo.
+- [Componentes: Modals](/components/modals) — Diálogos nativos com `<dialog>`.
+- [Every Layout: Stack](/every-layout/stack) — Empilhamento vertical de itens de FAQ.

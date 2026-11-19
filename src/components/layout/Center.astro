@@ -1,0 +1,41 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { mergeVars } from '../../utils/style';
+
+type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{
+  as: Tag;
+  max?: string;
+  gutter?: string;
+  intrinsic?: boolean;
+  andText?: boolean;
+}>;
+
+const {
+  as: Tag = 'div',
+  max = 'var(--measure)',
+  gutter = 'var(--space-m)',
+  intrinsic = false,
+  andText = false,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Element = Tag as 'div';
+const computedStyle = mergeVars(
+  {
+    '--center-max': max,
+    '--center-gutter': gutter,
+  },
+  style,
+);
+---
+
+<Element
+  class:list={['center', { 'text-center': andText }, className]}
+  data-intrinsic={intrinsic ? '' : undefined}
+  style={computedStyle}
+  {...rest}
+>
+  <slot />
+</Element>

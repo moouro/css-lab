@@ -1,0 +1,814 @@
+---
+import ThemeToggle from '../ui/ThemeToggle.astro';
+
+const currentPath = Astro.url.pathname;
+const normalizedPath = currentPath.replace(/\/+$/, '') || '/';
+
+const labsItems = [
+  { href: '/grid-lab', label: 'Grid Lab', desc: 'Layout bidimensional & subgrid' },
+  { href: '/flexbox-lab', label: 'Flexbox Lab', desc: 'Distribuição linear & flex-basis' },
+  { href: '/container-query-lab', label: 'Container Queries', desc: 'Componentes autocontidos' },
+];
+
+const resourceItems = [
+  { href: '/snippets', label: 'Snippets', desc: 'Soluções prontas para o dia a dia' },
+  { href: '/cheatsheets', label: 'Cheatsheets', desc: 'Guias rápidos para impressão A4' },
+  { href: '/design-tokens', label: 'Design Tokens', desc: 'Variáveis e escalas do sistema' },
+];
+
+const isInSection = (prefix: string) => normalizedPath === prefix || normalizedPath.startsWith(`${prefix}/`);
+const isExactRoute = (href: string) => normalizedPath === href;
+
+const isLabsActive = labsItems.some((item) => isInSection(item.href));
+const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
+---
+
+<header class="site-header">
+  <div class="header-inner">
+    <!-- Brand / Logo -->
+    <a href="/" class="brand-link" aria-label="CSS Lab Início" aria-current={isExactRoute('/') ? 'page' : undefined}>
+      <span class="brand-symbol" aria-hidden="true">📐</span>
+      <span class="brand-title">CSS Lab</span>
+    </a>
+
+    <!-- Desktop Navigation (oculto em <= 1024px) -->
+    <nav aria-label="Navegação Principal" class="desktop-nav">
+      <ul class="nav-list">
+        <li>
+          <a
+            href="/every-layout"
+            class:list={['nav-link', { active: isInSection('/every-layout') }]}
+            aria-current={isExactRoute('/every-layout') ? 'page' : undefined}
+          >
+            Every Layout
+          </a>
+        </li>
+
+        <li>
+          <a
+            href="/css-moderno"
+            class:list={['nav-link', { active: isInSection('/css-moderno') }]}
+            aria-current={isExactRoute('/css-moderno') ? 'page' : undefined}
+          >
+            CSS Moderno
+          </a>
+        </li>
+
+        <!-- Dropdown Labs (posicionamento relativo, logo abaixo do botão) -->
+        <li class="dropdown-item" id="labs-dropdown-item">
+          <button
+            type="button"
+            class:list={['nav-link dropdown-trigger', { active: isLabsActive }]}
+            aria-expanded="false"
+            aria-controls="labs-menu"
+            id="labs-trigger-btn"
+          >
+            <span>Labs</span>
+            <span class="dropdown-arrow" aria-hidden="true">▾</span>
+          </button>
+
+          <div class="dropdown-menu" id="labs-menu">
+            <ul class="dropdown-list">
+              {labsItems.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    class="dropdown-link"
+                    aria-current={isExactRoute(item.href) ? 'page' : undefined}
+                  >
+                    <span class="dropdown-title">{item.label}</span>
+                    <span class="dropdown-desc">{item.desc}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </li>
+
+        <li>
+          <a
+            href="/components"
+            class:list={['nav-link', { active: isInSection('/components') }]}
+            aria-current={isExactRoute('/components') ? 'page' : undefined}
+          >
+            Componentes
+          </a>
+        </li>
+
+        <!-- Dropdown Recursos (posicionamento relativo) -->
+        <li class="dropdown-item" id="resources-dropdown-item">
+          <button
+            type="button"
+            class:list={['nav-link dropdown-trigger', { active: isResourcesActive }]}
+            aria-expanded="false"
+            aria-controls="resources-menu"
+            id="resources-trigger-btn"
+          >
+            <span>Recursos</span>
+            <span class="dropdown-arrow" aria-hidden="true">▾</span>
+          </button>
+
+          <div class="dropdown-menu" id="resources-menu">
+            <ul class="dropdown-list">
+              {resourceItems.map((item) => (
+                <li>
+                  <a
+                    href={item.href}
+                    class="dropdown-link"
+                    aria-current={isExactRoute(item.href) ? 'page' : undefined}
+                  >
+                    <span class="dropdown-title">{item.label}</span>
+                    <span class="dropdown-desc">{item.desc}</span>
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </li>
+      </ul>
+    </nav>
+
+    <!-- Header Actions (Search, Theme, Mobile Hamburger) -->
+    <div class="header-actions">
+      <button
+        type="button"
+        id="search-trigger"
+        class="search-button"
+        aria-label="Abrir busca rápida (Atalho: Ctrl+K ou Cmd+K)"
+      >
+        <svg class="search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" width="15" height="15" aria-hidden="true">
+          <circle cx="8.5" cy="8.5" r="5.75" stroke-width="1.5" />
+          <line x1="13" y1="13" x2="18" y2="18" stroke-width="1.5" stroke-linecap="round" />
+        </svg>
+        <span class="search-label">Buscar...</span>
+        <kbd class="search-kbd">⌘K</kbd>
+      </button>
+
+      <ThemeToggle />
+
+      <!-- Mobile Hamburger Button -->
+      <button
+        type="button"
+        id="mobile-menu-trigger"
+        class="mobile-menu-btn"
+        aria-label="Abrir menu de navegação"
+        aria-expanded="false"
+        aria-controls="mobile-menu-dialog"
+      >
+        <span class="hamburger-icon" aria-hidden="true">
+          <span class="line"></span>
+          <span class="line"></span>
+          <span class="line"></span>
+        </span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Mobile Menu Drawer (Native <dialog> com closedby="any" + fallback progressivo) -->
+  <dialog id="mobile-menu-dialog" closedby="any" class="mobile-drawer" aria-labelledby="mobile-menu-title">
+    <div class="mobile-drawer-content">
+      <div class="mobile-drawer-header">
+        <div class="cluster" style="--cluster-space: var(--space-2xs); align-items: center;">
+          <span class="brand-symbol" aria-hidden="true">📐</span>
+          <span id="mobile-menu-title" class="text-sm font-bold">Navegação CSS Lab</span>
+        </div>
+        <button type="button" id="mobile-menu-close" class="close-btn" aria-label="Fechar menu" autofocus>✕</button>
+      </div>
+
+      <nav class="mobile-drawer-nav" aria-label="Menu Mobile">
+        <div class="mobile-section">
+          <span class="mobile-section-title">Fundamentos</span>
+          <ul class="mobile-list">
+            <li>
+              <a
+                href="/every-layout"
+                class:list={['mobile-link', { active: isInSection('/every-layout') }]}
+                aria-current={isExactRoute('/every-layout') ? 'page' : undefined}
+              >
+                <div class="mobile-link-left">
+                  <span class="mobile-link-icon" aria-hidden="true">📐</span>
+                  <span class="mobile-link-title">Every Layout</span>
+                </div>
+                <span class="mobile-link-badge">13 Primitivas</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/css-moderno"
+                class:list={['mobile-link', { active: isInSection('/css-moderno') }]}
+                aria-current={isExactRoute('/css-moderno') ? 'page' : undefined}
+              >
+                <div class="mobile-link-left">
+                  <span class="mobile-link-icon" aria-hidden="true">⚡</span>
+                  <span class="mobile-link-title">CSS Moderno</span>
+                </div>
+                <span class="mobile-link-badge">11 Tópicos</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mobile-section">
+          <span class="mobile-section-title">Laboratórios Especializados</span>
+          <ul class="mobile-list">
+            <li>
+              <a
+                href="/grid-lab"
+                class:list={['mobile-link', { active: isInSection('/grid-lab') }]}
+                aria-current={isExactRoute('/grid-lab') ? 'page' : undefined}
+              >
+                <div class="mobile-link-left">
+                  <span class="mobile-link-icon" aria-hidden="true">⊞</span>
+                  <span class="mobile-link-title">Grid Lab</span>
+                </div>
+                <span class="mobile-link-badge">7 Tópicos</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/flexbox-lab"
+                class:list={['mobile-link', { active: isInSection('/flexbox-lab') }]}
+                aria-current={isExactRoute('/flexbox-lab') ? 'page' : undefined}
+              >
+                <div class="mobile-link-left">
+                  <span class="mobile-link-icon" aria-hidden="true">⇄</span>
+                  <span class="mobile-link-title">Flexbox Lab</span>
+                </div>
+                <span class="mobile-link-badge">6 Tópicos</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/container-query-lab"
+                class:list={['mobile-link', { active: isInSection('/container-query-lab') }]}
+                aria-current={isExactRoute('/container-query-lab') ? 'page' : undefined}
+              >
+                <div class="mobile-link-left">
+                  <span class="mobile-link-icon" aria-hidden="true">⧉</span>
+                  <span class="mobile-link-title">Container Queries</span>
+                </div>
+                <span class="mobile-link-badge">5 Tópicos</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="mobile-section">
+          <span class="mobile-section-title">Prática & Consulta</span>
+          <ul class="mobile-list">
+            <li>
+              <a
+                href="/components"
+                class:list={['mobile-link', { active: isInSection('/components') }]}
+                aria-current={isExactRoute('/components') ? 'page' : undefined}
+              >
+                <div class="mobile-link-left">
+                  <span class="mobile-link-icon" aria-hidden="true">❖</span>
+                  <span class="mobile-link-title">Componentes</span>
+                </div>
+                <span class="mobile-link-badge">10 Guias</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/snippets"
+                class:list={['mobile-link', { active: isInSection('/snippets') }]}
+                aria-current={isExactRoute('/snippets') ? 'page' : undefined}
+              >
+                <div class="mobile-link-left">
+                  <span class="mobile-link-icon" aria-hidden="true">✂</span>
+                  <span class="mobile-link-title">Snippets</span>
+                </div>
+                <span class="mobile-link-badge">25 Prontos</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/cheatsheets"
+                class:list={['mobile-link', { active: isInSection('/cheatsheets') }]}
+                aria-current={isExactRoute('/cheatsheets') ? 'page' : undefined}
+              >
+                <div class="mobile-link-left">
+                  <span class="mobile-link-icon" aria-hidden="true">📄</span>
+                  <span class="mobile-link-title">Cheatsheets</span>
+                </div>
+                <span class="mobile-link-badge">Print A4</span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="/design-tokens"
+                class:list={['mobile-link', { active: isInSection('/design-tokens') }]}
+                aria-current={isExactRoute('/design-tokens') ? 'page' : undefined}
+              >
+                <div class="mobile-link-left">
+                  <span class="mobile-link-icon" aria-hidden="true">🎨</span>
+                  <span class="mobile-link-title">Design Tokens</span>
+                </div>
+                <span class="mobile-link-badge">5 Guias</span>
+              </a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+
+      <div class="mobile-drawer-footer">
+        <span class="text-xs text-muted font-mono">Segunda Memória Profissional</span>
+      </div>
+    </div>
+  </dialog>
+</header>
+
+<script>
+  function closeAllDropdowns(): void {
+    document.querySelectorAll('.dropdown-item').forEach((item) => {
+      item.classList.remove('open');
+      const trigger = item.querySelector('.dropdown-trigger');
+      if (trigger) trigger.setAttribute('aria-expanded', 'false');
+    });
+  }
+
+  function closeMobileMenu(): void {
+    const dialog = document.getElementById('mobile-menu-dialog') as HTMLDialogElement | null;
+    if (dialog?.open) {
+      dialog.close();
+    }
+  }
+
+  function outsideDialog(e: PointerEvent, dialog: HTMLDialogElement): boolean {
+    const r = dialog.getBoundingClientRect();
+    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+  }
+
+  function bindHeaderDialogs(): void {
+    closeAllDropdowns();
+
+    const dialog = document.getElementById('mobile-menu-dialog') as HTMLDialogElement | null;
+    if (!dialog || dialog.dataset.bound === 'true') return;
+    dialog.dataset.bound = 'true';
+
+    dialog.addEventListener('close', () => {
+      const trigger = document.getElementById('mobile-menu-trigger');
+      trigger?.setAttribute('aria-expanded', 'false');
+    });
+
+    if (!('closedBy' in HTMLDialogElement.prototype)) {
+      let pressedOutside = false;
+      dialog.addEventListener('pointerdown', (e) => {
+        pressedOutside = outsideDialog(e, dialog);
+      });
+      dialog.addEventListener('pointerup', (e) => {
+        if (pressedOutside && outsideDialog(e, dialog)) {
+          dialog.close();
+        }
+      });
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    if (!target) return;
+
+    const dropdownTrigger = target.closest('.dropdown-trigger');
+    if (dropdownTrigger) {
+      e.stopPropagation();
+      const item = dropdownTrigger.closest('.dropdown-item');
+      const wasOpen = item?.classList.contains('open') ?? false;
+      closeAllDropdowns();
+      if (item && !wasOpen) {
+        item.classList.add('open');
+        dropdownTrigger.setAttribute('aria-expanded', 'true');
+      }
+      return;
+    }
+
+    if (!target.closest('.dropdown-item')) {
+      closeAllDropdowns();
+    }
+
+    const mobileTrigger = target.closest('#mobile-menu-trigger');
+    if (mobileTrigger) {
+      const dialog = document.getElementById('mobile-menu-dialog') as HTMLDialogElement | null;
+      if (dialog && !dialog.open) {
+        dialog.showModal();
+        mobileTrigger.setAttribute('aria-expanded', 'true');
+      }
+      return;
+    }
+
+    if (target.closest('#mobile-menu-close') || target.closest('#mobile-menu-dialog a')) {
+      closeMobileMenu();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      closeAllDropdowns();
+    }
+  });
+
+  document.addEventListener('astro:page-load', bindHeaderDialogs);
+</script>
+
+<style>
+  .site-header {
+    border-block-end: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
+  }
+
+  .header-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding-inline: var(--space-m);
+    padding-block: var(--space-xs);
+    max-inline-size: 1400px;
+    margin-inline: auto;
+  }
+
+  /* Brand */
+  .brand-link {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    text-decoration: none;
+    color: var(--color-fg);
+    font-weight: 700;
+    font-size: var(--step-0);
+    flex-shrink: 0;
+  }
+
+  .brand-symbol {
+    font-size: 1.15em;
+  }
+
+  .brand-title {
+    letter-spacing: -0.02em;
+  }
+
+  /* Desktop Navigation */
+  .desktop-nav {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-list {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: var(--step--1);
+    color: var(--color-fg-muted);
+    padding-inline: 0.65rem;
+    padding-block: 0.4rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+    font-weight: 500;
+    transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .nav-link:hover {
+    color: var(--color-fg);
+    background-color: var(--color-bg-hover);
+    text-decoration: none;
+  }
+
+  .nav-link.active,
+  .nav-link[aria-current="page"] {
+    color: var(--color-accent);
+    font-weight: 600;
+  }
+
+  .nav-link[aria-current="page"] {
+    background-color: var(--color-accent-muted);
+  }
+
+  .dropdown-arrow {
+    font-size: 0.7em;
+    opacity: 0.7;
+    transition: transform var(--duration-fast) var(--ease-out);
+  }
+
+  /* Dropdown posicionado relativamente sob o botão */
+  .dropdown-item {
+    position: relative;
+  }
+
+  .dropdown-menu {
+    position: absolute;
+    inset-block-start: calc(100% + 8px);
+    inset-inline-start: 0;
+    min-inline-size: 260px;
+    padding: var(--space-2xs);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    box-shadow: var(--shadow-lg), 0 0 0 1px var(--color-border);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-4px);
+    transition: opacity var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out), visibility var(--duration-fast);
+    z-index: 500;
+  }
+
+  .dropdown-item.open .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+  }
+
+  .dropdown-item.open .dropdown-arrow {
+    transform: rotate(180deg);
+  }
+
+  .dropdown-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .dropdown-link {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-2xs) var(--space-xs);
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--color-fg);
+    transition: background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .dropdown-link:hover {
+    background-color: var(--color-bg-hover);
+    text-decoration: none;
+  }
+
+  .dropdown-link[aria-current="page"] {
+    background-color: var(--color-accent-muted);
+  }
+
+  .dropdown-link[aria-current="page"] .dropdown-title {
+    color: var(--color-accent);
+  }
+
+  .dropdown-title {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-fg);
+  }
+
+  .dropdown-desc {
+    font-size: var(--step--2);
+    color: var(--color-fg-muted);
+  }
+
+  /* Header Actions */
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    flex-shrink: 0;
+  }
+
+  .search-button {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg-muted);
+    padding-inline: var(--space-xs);
+    padding-block: 0.35rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--step--1);
+    transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+    cursor: pointer;
+  }
+
+  .search-button:hover {
+    border-color: var(--color-border-hover);
+    color: var(--color-fg);
+  }
+
+  .search-kbd {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    background-color: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    padding-inline: 0.35em;
+    padding-block: 0.1em;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Mobile Hamburger */
+  .mobile-menu-btn {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    padding: 0.4rem;
+    color: var(--color-fg);
+    cursor: pointer;
+    align-items: center;
+    justify-content: center;
+    min-inline-size: 2.25rem;
+    min-block-size: 2.25rem;
+  }
+
+  .mobile-menu-btn:hover {
+    background-color: var(--color-bg-hover);
+  }
+
+  .hamburger-icon {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    inline-size: 16px;
+  }
+
+  .hamburger-icon .line {
+    inline-size: 100%;
+    block-size: 2px;
+    background-color: currentColor;
+    border-radius: 1px;
+  }
+
+  /* Mobile Menu Dialog Drawer */
+  .mobile-drawer {
+    position: fixed;
+    inset-block: 0;
+    inset-inline-end: 0;
+    inset-inline-start: auto;
+    margin: 0;
+    block-size: 100dvh;
+    max-block-size: 100dvh;
+    inline-size: min(88vw, 360px);
+    border: none;
+    border-inline-start: 1px solid var(--color-border);
+    background-color: var(--color-bg);
+    color: var(--color-fg);
+    padding: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
+    box-sizing: border-box;
+  }
+
+  .mobile-drawer::backdrop {
+    background-color: rgb(0 0 0 / 0.65);
+    backdrop-filter: blur(4px);
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+
+  .mobile-drawer-content {
+    display: flex;
+    flex-direction: column;
+    min-block-size: 100%;
+    padding: var(--space-m);
+    padding-bottom: calc(var(--space-2xl) + 2rem + env(safe-area-inset-bottom, 2rem));
+    gap: var(--space-m);
+    box-sizing: border-box;
+  }
+
+  .mobile-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-block-end: 1px solid var(--color-border);
+    padding-block-end: var(--space-s);
+  }
+
+  .close-btn {
+    background: transparent;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-fg-muted);
+    font-size: 1rem;
+    padding: 0.25rem 0.5rem;
+    cursor: pointer;
+  }
+
+  .close-btn:hover {
+    color: var(--color-fg);
+    background-color: var(--color-bg-hover);
+  }
+
+  .mobile-drawer-nav {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    flex-grow: 1;
+  }
+
+  .mobile-section-title {
+    font-size: var(--step--2);
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-fg-muted);
+    margin-block-end: var(--space-2xs);
+    display: block;
+  }
+
+  .mobile-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .mobile-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.55rem 0.75rem;
+    border-radius: var(--radius-sm);
+    text-decoration: none;
+    color: var(--color-fg);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  }
+
+  .mobile-link:hover {
+    background-color: var(--color-bg-hover);
+    border-color: var(--color-border-hover);
+    transform: translateX(2px);
+    text-decoration: none;
+  }
+
+  .mobile-link.active,
+  .mobile-link[aria-current="page"] {
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-muted);
+  }
+
+  .mobile-link-left {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+  }
+
+  .mobile-link-icon {
+    font-size: 1.1em;
+  }
+
+  .mobile-link-title {
+    font-size: var(--step--1);
+    font-weight: 600;
+  }
+
+  .mobile-link-badge {
+    font-size: var(--step--2);
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    background-color: var(--color-accent-muted);
+    padding: 0.1em 0.45em;
+    border-radius: var(--radius-sm);
+  }
+
+  .mobile-drawer-footer {
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: var(--space-s);
+    text-align: center;
+  }
+
+  /* Responsive Breakpoint for Mobile (<= 1024px) */
+  @media (max-width: 1024px) {
+    .desktop-nav {
+      display: none;
+    }
+    .mobile-menu-btn {
+      display: inline-flex;
+    }
+    .search-label,
+    .search-kbd {
+      display: none;
+    }
+    .search-button {
+      padding: 0.45rem;
+    }
+  }
+</style>

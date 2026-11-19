@@ -1,0 +1,136 @@
+---
+title: "Grid Template Areas"
+description: "Mapeamento visual do layout através de strings ASCII declarativas e semânticas diretamente no CSS."
+draft: false
+publishDate: 2026-01-01
+tags: ["grid", "template-areas", "ascii-layout", "architecture"]
+difficulty: "intermediate"
+order: 2
+relatedContent:
+  - "fundamentals"
+  - "auto-placement"
+  - "subgrid"
+layoutPrimitives:
+  - "grid"
+  - "box"
+  - "stack"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+A propriedade `grid-template-areas` permite que você "desenhe" literalmente o mapa do layout em seu arquivo CSS usando texto e nomes semânticos. É uma das sintaxes mais legíveis e expressivas de toda a história da web.
+
+Em vez de memorizar números de linhas (`grid-column: 1 / 3`), você associa nomes de áreas aos componentes e posiciona-os dentro de uma matriz visual.
+
+```css
+.site-shell {
+  display: grid;
+  grid-template-columns: 260px 1fr 200px;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header  header  header"
+    "nav     main    aside"
+    "footer  footer  footer";
+  min-block-size: 100vh;
+}
+```
+
+E nos elementos filhos:
+```css
+header { grid-area: header; }
+nav    { grid-area: nav; }
+main   { grid-area: main; }
+aside  { grid-area: aside; }
+footer { grid-area: footer; }
+```
+
+<Callout type="info" title="O Caractere Ponto (.)">
+  Se você desejar deixar uma célula vazia (sem nenhum elemento ocupando-a), utilize um ponto (`.`): `"header . profile"`.
+</Callout>
+
+## 2. Reorganização Instantânea em Media ou Container Queries
+
+A beleza suprema de `grid-template-areas` se manifesta na responsividade. Você **não precisa** alterar o CSS dos elementos filhos nos breakpoints! Basta redefinir a matriz no elemento pai:
+
+```css
+/* Layout Mobile (1 coluna linear) */
+.dashboard {
+  display: grid;
+  grid-template-columns: 1fr;
+  grid-template-areas:
+    "header"
+    "metrics"
+    "chart"
+    "activity";
+  gap: var(--space-s);
+}
+
+/* Layout Desktop (2D complexo) */
+@media (min-width: 64em) {
+  .dashboard {
+    grid-template-columns: 2fr 1fr;
+    grid-template-areas:
+      "header   header"
+      "metrics  activity"
+      "chart    activity";
+  }
+}
+```
+
+Observe que os elementos `metrics`, `chart` e `activity` se reposicionam automaticamente na nova geometria sem nenhuma linha de estilo modificada neles!
+
+## 3. Regras Estritas de Geometria da Especificação
+
+Para que uma matriz `grid-template-areas` seja válida pelo navegador:
+
+1. **Cada linha deve ter o mesmo número de colunas**: Se a primeira string tem 3 palavras, todas as outras strings devem ter exatamente 3 palavras.
+2. **As áreas devem ser retângulos perfeitos**: É estritamente proibido criar áreas em formato de "L", "T" ou em cruz. Se um nome de área se repetir em linhas e colunas adjacentes, ele deve formar um bloco contínuo retangular.
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Criar Formas Irregulares (ex: Formato de 'L')"
+  badCode={`/* INVÁLIDO no CSS! O layout inteiro será descartado */
+.grid {
+  grid-template-areas:
+    "sidebar content"
+    "sidebar sidebar"; /* Erro: não forma um retângulo simples com o content */
+}`}
+  goodTitle="Garantir Retângulos Contínuos para Cada Área"
+  goodCode={`/* VÁLIDO: retângulos perfeitos */
+.grid {
+  grid-template-areas:
+    "sidebar content"
+    "footer  footer";
+}`}
+  explanation="O algoritmo do Grid exige que cada área nomeada seja um retângulo euclidiano contíguo. Formas irregulares invalidam a regra inteira."
+/>
+
+## 5. Boas Práticas
+
+1. **Alinhe visualmente as strings no código**: Use espaços extras dentro das strings para manter as colunas alinhadas visualmente no editor de código, melhorando a legibilidade imediata para o time.
+2. **Combine com Container Queries**: Reorganize áreas quando a coluna for estreita.
+3. **Use nomes de áreas descritivos**: Evite nomes genéricos como `col1` ou `box2`. Prefira `hero`, `summary`, `actions`.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "Todas as strings de grid-template-areas possuem exatamente a mesma quantidade de colunas?", checked: true },
+    { text: "Todas as áreas formam retângulos contínuos e regulares?", checked: true },
+    { text: "Células vazias foram indicadas pelo caractere ponto (.)?", checked: true },
+    { text: "As áreas foram reposicionadas na responsividade sem tocar nos seletores dos filhos?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Fundamentos do Grid](/grid-lab/fundamentals) — Conceitos de linhas e faixas.
+- [Auto-placement](/grid-lab/auto-placement) — Algoritmo de fluxo automático.
+- [Every Layout: Cover](/every-layout/cover) — Estrutura clássica de header/body/footer.

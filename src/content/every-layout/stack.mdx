@@ -1,0 +1,139 @@
+---
+title: "The Stack"
+description: "Injeção de margem vertical sensível ao contexto entre elementos de fluxo contíguos."
+draft: false
+publishDate: 2026-01-01
+tags: ["spacing", "vertical-rhythm", "adjacent-sibling", "resilience"]
+difficulty: "beginner"
+order: 1
+primitive: "stack"
+problem: "Atribuir margem inferior (margin-bottom) a elementos individuais gera margens órfãs no último filho, dobrando o espaçamento interno do container pai."
+solution: "Estilizar o contexto em vez dos elementos individuais: aplicar margem superior apenas a elementos sucessivos via o seletor adjacent sibling combinator (* + *) ou gap em flex-column."
+cssProperties:
+  - "margin-block-start"
+  - "display: flex"
+  - "flex-direction: column"
+  - "justify-content: flex-start"
+propsApi:
+  - name: "space"
+    type: "string"
+    default: "var(--space-s)"
+    description: "Valor de espaçamento vertical entre os elementos sucessivos."
+  - name: "recursive"
+    type: "boolean"
+    default: "false"
+    description: "Se verdadeiro, aplica o espaçamento a todos os níveis aninhados sucessivos."
+  - name: "splitAfter"
+    type: "number"
+    default: "undefined"
+    description: "Índice do elemento filho que recebe margin-block-end: auto para criar um layout dividido (ex: cards)."
+relatedContent:
+  - "box"
+  - "center"
+  - "cover"
+layoutPrimitives:
+  - "stack"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Elementos de fluxo textual e estrutural necessitam de respiro vertical para delimitar e organizar a leitura hierárquica. O **Stack** é o padrão algorítmico do *Every Layout* para gerenciar o ritmo vertical contínuo entre elementos, eliminando a necessidade de classes utilitárias repetitivas de margem em cada tag.
+
+<Callout type="important" title="Princípio de Responsabilidade Única">
+  O Stack possui uma única responsabilidade: **injetar espaçamento vertical entre elementos irmãos**. Ele nunca deve aplicar bordas, preenchimento interno ou alinhamentos horizontais.
+</Callout>
+
+## 2. O Problema
+
+O método tradicional de aplicar `margin-bottom` a tags ou classes individuais é frágil e insensível ao contexto:
+
+```css
+p {
+  margin-bottom: 1.5rem;
+}
+```
+
+Quando esse parágrafo é o último elemento dentro de um container com padding (como um card ou dialog), a margem do parágrafo soma-se ao padding do container, distorcendo o equilíbrio visual (*margin doubling*).
+
+<AntiPattern
+  badCode={`/* Frágil: margem fixa no elemento */\nh2 { margin-bottom: 1rem; }\np { margin-bottom: 1.5rem; }\np:last-child { margin-bottom: 0; } /* Hack reativo */`}
+  goodCode={`/* Resiliente: o container pai dita o ritmo */\n.stack > * + * {\n  margin-block-start: var(--space-s);\n}`}
+  explanation="Margens aplicadas a elementos individuais criam acoplamento rígido. O combinador de irmãos adjacentes (* + *) garante que o primeiro elemento nunca tenha margem excedente e o último não sangre o container."
+/>
+
+## 3. A Solução
+
+A técnica fundamental do livro é estilizar o **contexto** através do seletor *Lobotomized Owl* (`* + *`) com propriedades lógicas modernas (`margin-block-start`):
+
+```css
+.stack {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+
+.stack > * {
+  margin-block: 0;
+}
+
+.stack > * + * {
+  margin-block-start: var(--stack-space, 1.5rem);
+}
+```
+
+### Por que propriedades lógicas?
+O uso de `margin-block-start` em vez de `margin-top` garante conformidade nativa e automática para idiomas com diferentes modos de escrita (`vertical-lr` como Mongol, ou `horizontal-tb` padrão).
+
+## 4. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 5. Playground Interativo
+
+Experimente ajustar a escala de espaçamento no canvas abaixo:
+
+<Playground title="Demonstração do Stack Primitivo">
+  <Stack space="1.5rem">
+    <Box padding="1rem">
+      <h3>Primeiro Elemento</h3>
+      <p class="text-sm text-muted">Não possui margem superior excedente.</p>
+    </Box>
+    <Box padding="1rem">
+      <h3>Segundo Elemento</h3>
+      <p class="text-sm text-muted">Recebe margem calculada via `margin-block-start`.</p>
+    </Box>
+    <Box padding="1rem">
+      <h3>Terceiro Elemento</h3>
+      <p class="text-sm text-muted">Mantém o mesmo ritmo vertical harmônico.</p>
+    </Box>
+  </Stack>
+</Playground>
+
+## 6. Variações Avançadas
+
+### Divisão de Pilha (Split Stack)
+Ao aplicar `margin-block-end: auto` no enésimo filho, flexbox empurra todos os itens subsequentes para a extremidade inferior da caixa disponível. É ideal para cartões com botões ou ações no rodapé:
+
+```css
+.stack > :nth-child(2) {
+  margin-block-end: auto;
+}
+```
+
+## 7. Checklist de Qualidade
+
+<Checklist items={[
+  "O primeiro elemento não empurra o topo do container pai.",
+  "O último filho não adiciona margem inferior que dobre o padding do pai.",
+  "Propriedades lógicas (margin-block-start) foram priorizadas sobre físicas (margin-top).",
+  "O componente não assume responsabilidades de cores, bordas ou padding.",
+  "Semanticamente mapeado como lista (role='list' e role='listitem') quando apropriado para leitores de tela."
+]} />

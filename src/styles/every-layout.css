@@ -1,0 +1,386 @@
+/* ═══════════════════════════════════════════════════════
+   CSS Lab — Every Layout Primitives
+   All 13 layout primitives from Every Layout (3rd Ed).
+   Scoped cleanly inside @layer primitives.
+   ═══════════════════════════════════════════════════════ */
+
+@layer primitives {
+  /* ─── 1. Stack ─────────────────────────────────────
+     Vertical spacing between flow elements.
+     Uses adjacent sibling combinator (* + *).
+     ────────────────────────────────────────────────── */
+  .stack {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+  }
+
+  .stack > * {
+    margin-block: 0;
+  }
+
+  .stack > * + * {
+    margin-block-start: var(--stack-space, var(--space-s));
+  }
+
+  /* Recursive variant */
+  .stack[data-recursive] * + * {
+    margin-block-start: var(--stack-space, var(--space-s));
+  }
+
+  /* Split variants (declarative data-split and data-split-after) */
+  .stack:has(> [data-split]) > [data-split] ~ * {
+    margin-block-end: 0;
+  }
+
+  .stack:has(> [data-split]) > [data-split] {
+    margin-block-end: auto;
+  }
+
+  .stack[data-split-after="1"] > :nth-child(1),
+  .stack[data-split-after="2"] > :nth-child(2),
+  .stack[data-split-after="3"] > :nth-child(3),
+  .stack[data-split-after="4"] > :nth-child(4),
+  .stack[data-split-after="5"] > :nth-child(5),
+  .stack[data-split-after="6"] > :nth-child(6) {
+    margin-block-end: auto;
+  }
+
+  .stack:only-child {
+    block-size: 100%;
+  }
+
+
+  /* ─── 2. Box ───────────────────────────────────────
+     Intrinsic padding and demarcation.
+     The simplest building block.
+     ────────────────────────────────────────────────── */
+  .box {
+    padding: var(--box-padding, var(--space-s));
+    border: var(--border-thin) solid var(--color-border);
+    border-radius: var(--radius-m);
+    outline: var(--border-thin) solid transparent;
+    outline-offset: calc(var(--border-thin) * -1);
+    background-color: var(--color-surface);
+  }
+
+  .box * {
+    color: inherit;
+  }
+
+  .box[data-invert] {
+    color: var(--color-bg);
+    background-color: var(--color-text);
+    border-color: var(--color-text);
+  }
+
+
+  /* ─── 3. Center ────────────────────────────────────
+     Horizontal centering with max-inline-size.
+     Uses content-box and auto margins.
+     ────────────────────────────────────────────────── */
+  .center {
+    box-sizing: content-box;
+    max-inline-size: var(--center-max, var(--measure));
+    margin-inline: auto;
+    padding-inline: var(--center-gutter, var(--space-m));
+  }
+
+  .center[data-intrinsic] {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+
+  /* ─── 4. Cluster ───────────────────────────────────
+     Horizontal wrapping of inline-like elements.
+     Uses flexbox wrap and gap.
+     ────────────────────────────────────────────────── */
+  .cluster {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--cluster-space, var(--space-s));
+    justify-content: var(--cluster-justify, flex-start);
+    align-items: var(--cluster-align, center);
+  }
+
+
+  /* ─── 5. Sidebar ───────────────────────────────────
+     Sidebar + main content that wraps on narrow viewports.
+     Intrinsically responsive without media queries.
+     ────────────────────────────────────────────────── */
+  .with-sidebar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sidebar-gap, var(--space-m));
+  }
+
+  .with-sidebar > :first-child {
+    flex-basis: var(--sidebar-width, 16rem);
+    flex-grow: 1;
+  }
+
+  .with-sidebar > :last-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-inline-size: var(--sidebar-threshold, 60%);
+  }
+
+  /* Flipped variant: sidebar on the right */
+  .with-sidebar[data-side="right"] > :first-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-inline-size: var(--sidebar-threshold, 60%);
+  }
+
+  .with-sidebar[data-side="right"] > :last-child {
+    flex-basis: var(--sidebar-width, 16rem);
+    flex-grow: 1;
+    min-inline-size: 0;
+  }
+
+
+  /* ─── 6. Switcher ──────────────────────────────────
+     Switches between horizontal and vertical layout
+     based on container width, without media queries.
+     The "calc trick" from Every Layout.
+     ────────────────────────────────────────────────── */
+  .switcher {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--switcher-space, var(--space-s));
+  }
+
+  .switcher > * {
+    flex-grow: 1;
+    flex-basis: calc((var(--switcher-threshold, 30rem) - 100%) * 999);
+  }
+
+  .switcher:not([data-limit]) > :nth-last-child(n+5),
+  .switcher:not([data-limit]) > :nth-last-child(n+5) ~ *,
+  .switcher[data-limit="4"] > :nth-last-child(n+5),
+  .switcher[data-limit="4"] > :nth-last-child(n+5) ~ *,
+  .switcher[data-limit="2"] > :nth-last-child(n+3),
+  .switcher[data-limit="2"] > :nth-last-child(n+3) ~ *,
+  .switcher[data-limit="3"] > :nth-last-child(n+4),
+  .switcher[data-limit="3"] > :nth-last-child(n+4) ~ *,
+  .switcher[data-limit="5"] > :nth-last-child(n+6),
+  .switcher[data-limit="5"] > :nth-last-child(n+6) ~ *,
+  .switcher[data-limit="6"] > :nth-last-child(n+7),
+  .switcher[data-limit="6"] > :nth-last-child(n+7) ~ * {
+    flex-basis: 100%;
+  }
+
+
+  /* ─── 7. Cover ─────────────────────────────────────
+     Vertically centered principal element within a
+     minimum-height container.
+     ────────────────────────────────────────────────── */
+  .cover {
+    display: flex;
+    flex-direction: column;
+    min-block-size: var(--cover-min-height, 100dvh);
+    padding: var(--cover-padding, var(--space-m));
+  }
+
+  .cover > * {
+    margin-block: var(--cover-space, var(--space-s));
+  }
+
+  .cover > :first-child:not([data-centered]) {
+    margin-block-start: 0;
+  }
+
+  .cover > :last-child:not([data-centered]) {
+    margin-block-end: 0;
+  }
+
+  .cover > [data-centered] {
+    margin-block: auto;
+  }
+
+
+  /* ─── 8. Grid ──────────────────────────────────────
+     Intrinsically responsive grid using CSS Grid,
+     auto-fill, and minmax. No media queries.
+     ────────────────────────────────────────────────── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(min(var(--grid-min, 16rem), 100%), 1fr)
+    );
+    gap: var(--grid-space, var(--space-s));
+  }
+
+
+  /* ─── 9. Frame ─────────────────────────────────────
+     Aspect ratio container for media.
+     Crops content via object-fit.
+     ────────────────────────────────────────────────── */
+  .frame {
+    aspect-ratio: var(--frame-ratio, 16 / 9);
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .frame > img,
+  .frame > video {
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: cover;
+  }
+
+
+  /* ─── 10. Reel ─────────────────────────────────────
+     Horizontal scrolling container.
+     Native CSS overflow, no JS carousel.
+     ────────────────────────────────────────────────── */
+  .reel {
+    display: flex;
+    overflow-x: auto;
+    overflow-y: hidden;
+    gap: var(--reel-space, var(--space-s));
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: var(--reel-space, var(--space-s));
+    scrollbar-color: var(--scrollbar-thumb) transparent;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .reel.scrollbar-none {
+    scrollbar-width: none;
+  }
+
+  .reel > * {
+    flex-shrink: 0;
+    flex-basis: var(--reel-item-width, auto);
+    scroll-snap-align: start;
+  }
+
+  .reel[data-overflowing] {
+    padding-block-end: var(--space-xs);
+  }
+
+
+  /* ─── 11. Imposter ─────────────────────────────────
+     Overlay/overlay-centered element via absolute
+     or fixed positioning and translate centering.
+     ────────────────────────────────────────────────── */
+  .imposter {
+    position: var(--imposter-position, absolute);
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    translate: -50% -50%;
+  }
+
+  .imposter[data-contain] {
+    --imposter-margin: var(--space-s);
+    overflow: auto;
+    max-inline-size: calc(100% - (var(--imposter-margin) * 2));
+    max-block-size: calc(100% - (var(--imposter-margin) * 2));
+  }
+
+  .imposter[data-fixed] {
+    --imposter-position: fixed;
+  }
+
+
+  /* ─── 12. Icon ─────────────────────────────────────
+     Inline icon + text alignment.
+     Matches icon to text height.
+     ────────────────────────────────────────────────── */
+  .icon {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--icon-space, 0.5ch);
+  }
+
+  .icon > svg {
+    block-size: var(--icon-size, 0.75em);
+    inline-size: var(--icon-size, 0.75em);
+    flex-shrink: 0;
+    fill: currentColor;
+  }
+
+
+  /* ─── 13. Container ────────────────────────────────
+     Container Query wrapper.
+     Establishes a containment context.
+     ────────────────────────────────────────────────── */
+  .container-query {
+    container-type: inline-size;
+  }
+
+  .container-query[data-name] {
+    container-name: var(--container-name);
+  }
+
+
+  /* ─── 14. Layout Inspector (Shift + L) ─────────────
+     Visually highlights and debugs Every Layout
+     primitives directly inside the live interface.
+     ────────────────────────────────────────────────── */
+  html[data-layout-inspector="true"] :is(
+    .stack, .box, .center, .cluster, .with-sidebar,
+    .switcher, .cover, .grid, .frame, .reel,
+    .imposter, .icon, .container-query
+  ) {
+    position: relative;
+    outline-offset: -1px;
+  }
+
+  html[data-layout-inspector="true"] .stack {
+    outline: 1px dashed rgb(59 130 246 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .box {
+    outline: 1px dashed rgb(168 85 247 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .center {
+    outline: 1px dashed rgb(34 197 94 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .cluster {
+    outline: 1px dashed rgb(234 179 8 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .with-sidebar {
+    outline: 1px dashed rgb(6 182 212 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .switcher {
+    outline: 1px dashed rgb(236 72 153 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .cover {
+    outline: 1px dashed rgb(132 204 22 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .grid {
+    outline: 1px dashed rgb(249 115 22 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .frame {
+    outline: 1px dashed rgb(20 184 166 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .reel {
+    outline: 1px dashed rgb(244 63 94 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .imposter {
+    outline: 1px dashed rgb(239 68 68 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .icon {
+    outline: 1px dashed rgb(99 102 241 / 0.65) !important;
+  }
+
+  html[data-layout-inspector="true"] .container-query {
+    outline: 1px dashed rgb(16 185 129 / 0.65) !important;
+  }
+}

@@ -1,0 +1,185 @@
+---
+title: "Padrões Clássicos de Flexbox"
+description: "Coleção de soluções prontas para o dia a dia: barra de navegação com agrupamentos, cards com rodapé colado e media objects."
+draft: false
+publishDate: 2026-01-01
+tags: ["flexbox", "patterns", "navbar", "card-footer", "media-object", "sticky-footer"]
+difficulty: "intermediate"
+order: 6
+relatedContent:
+  - "fundamentals"
+  - "flex-shorthand"
+  - "alignment"
+layoutPrimitives:
+  - "cluster"
+  - "stack"
+  - "sidebar"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+O Flexbox brilha quando aplicado a componentes de interface atômicos ou moleculares. Neste módulo, documentamos os 4 padrões mais utilizados e resilientes da web moderna.
+
+---
+
+## 2. Padrão 1: Barra de Navegação Tripartida
+
+Um dos maiores desafios de UX: colocar a **Logo à esquerda**, os **Links no centro** e os **Botões de Ação à direita**, mantendo o centro verdadeiramente no centro da tela.
+
+```css
+.navbar {
+  display: flex;
+  align-items: center;
+  padding: var(--space-s) var(--space-m);
+}
+
+.navbar-brand {
+  /* Ocupa a primeira fração à esquerda */
+  flex: 1;
+}
+
+.navbar-links {
+  /* Centralizado no meio da barra */
+  display: flex;
+  gap: var(--space-s);
+}
+
+.navbar-actions {
+  /* Ocupa a fração à direita e alinha os itens no final */
+  flex: 1;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-xs);
+}
+```
+
+<Callout type="info" title="Por que flex: 1 nos extremos?">
+  Ao dar `flex: 1` para o bloco da esquerda e para o bloco da direita simultaneamente, garantimos que ambos tenham rigorosamente a mesma largura, fazendo com que o bloco central fique matematicamente no centro perfeito da tela!
+</Callout>
+
+---
+
+## 3. Padrão 2: Card com Rodapé "Colado" na Base (Sticky Card Footer)
+
+Em uma lista de cartões com alturas desiguais (um cartão tem 2 linhas de texto e o outro tem 6 linhas), como garantir que o botão "Comprar" ou o rodapé de todos os cartões fique perfeitamente alinhado na base inferior?
+
+```css
+.card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--space-m);
+}
+
+.card-title {
+  font-size: var(--step-1);
+}
+
+.card-body {
+  /* Absorve todo o espaço vertical disponível, empurrando o footer */
+  flex-grow: 1;
+  margin-block-end: var(--space-m);
+}
+
+.card-footer {
+  /* Fica sempre no fundo da caixa */
+  margin-block-start: auto;
+}
+```
+
+---
+
+## 4. Padrão 3: O "Media Object" Clássico de Nicole Sullivan
+
+O padrão do comentário, post de rede social ou item de lista: um avatar ou miniatura fixo à esquerda, e um bloco de texto que se expande livremente à direita.
+
+```css
+.media-object {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-s);
+}
+
+.media-avatar {
+  /* O avatar NUNCA encolhe */
+  flex-shrink: 0;
+  inline-size: 48px;
+  block-size: 48px;
+  border-radius: var(--radius-full);
+}
+
+.media-content {
+  /* O texto absorve todo o restante e não transborda */
+  flex-grow: 1;
+  min-inline-size: 0; /* Previne overflow de palavras longas em flex children */
+}
+```
+
+<Callout type="important" title="O Segredo de min-inline-size: 0">
+  Por especificação, um *flex item* tem `min-width: auto` (que é o tamanho do seu maior conteúdo). Se houver uma URL longa ou bloco de código dentro do `.media-content`, ele estourará a tela para a direita! Adicionar `min-inline-size: 0` (ou `min-width: 0`) desativa essa trava e permite que o texto quebre linhas corretamente.
+</Callout>
+
+---
+
+## 5. Padrão 4: Rodapé Global Colado na Base da Página (Sticky Page Footer)
+
+Quando a página tem pouco conteúdo e a janela é grande, o rodapé não deve flutuar no meio da tela:
+
+```css
+body {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100vh;
+}
+
+main {
+  /* Empurra o rodapé para a borda inferior da tela */
+  flex: 1 0 auto;
+}
+
+footer {
+  flex-shrink: 0;
+}
+```
+
+## 6. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar position: fixed para Travar o Rodapé na Base"
+  badCode={`footer {
+  position: fixed;
+  bottom: 0; /* Cobre o conteúdo da página quando o usuário rola! */
+}`}
+  goodTitle="Usar Flexbox com min-block-size: 100vh no Body"
+  goodCode={`body {
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100dvh;
+}
+main { flex: 1 0 auto; }`}
+  explanation="Position fixed cobre o texto da página em telas pequenas. O padrão flex com min-block-size mantém o rodapé na base quando há pouco texto, mas rola naturalmente se houver muito texto."
+/>
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "min-inline-size: 0 foi aplicado em flex items que contêm textos longos ou URLs?", checked: true },
+    { text: "flex-shrink: 0 foi aplicado em avatares e miniaturas?", checked: true },
+    { text: "margin-block-start: auto foi utilizado em rodapés de cards para alinhamento na base?", checked: true },
+    { text: "O body utiliza min-block-size: 100dvh para evitar rodapés flutuantes?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Fundamentos do Flexbox](/flexbox-lab/fundamentals) — Direção e eixos.
+- [Alinhamento e margin: auto](/flexbox-lab/alignment) — A mecânica de distribuição.
+- [Every Layout: Sidebar](/every-layout/sidebar) — Layout de duas colunas assimétricas.

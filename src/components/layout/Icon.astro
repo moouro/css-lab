@@ -1,0 +1,40 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { mergeVars } from '../../utils/style';
+
+type Props<Tag extends HTMLTag = 'span'> = Polymorphic<{
+  as: Tag;
+  space?: string;
+  size?: string;
+  label?: string;
+}>;
+
+const {
+  as: Tag = 'span',
+  space = '0.5ch',
+  size = '0.85em',
+  label,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Element = Tag as 'span';
+const computedStyle = mergeVars(
+  {
+    '--icon-space': space,
+    '--icon-size': size,
+  },
+  style,
+);
+---
+
+<Element
+  class:list={['icon', className]}
+  style={computedStyle}
+  role={label ? 'img' : undefined}
+  aria-label={label}
+  {...rest}
+>
+  <slot />
+</Element>

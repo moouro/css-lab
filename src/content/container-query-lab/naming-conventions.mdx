@@ -1,0 +1,148 @@
+---
+title: "Contêineres Nomeados (container-name)"
+description: "Como nomear contêineres e consultar ancestrais específicos em árvores de componentes profundamente aninhadas."
+draft: false
+publishDate: 2026-01-01
+tags: ["container-queries", "container-name", "architecture", "nested-containers"]
+difficulty: "intermediate"
+order: 4
+relatedContent:
+  - "fundamentals"
+  - "size-queries"
+  - "real-world-patterns"
+layoutPrimitives:
+  - "container"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Por padrão, quando você escreve uma Container Query anônima:
+
+```css
+@container (inline-size > 500px) { ... }
+```
+
+O navegador procura **o ancestral mais próximo na árvore do DOM** que possui `container-type` definido.
+
+Porém, em aplicações reais com múltiplos contêineres aninhados (por exemplo, uma grade de layout que contém colunas, que contém cartões, que contêm widgets internos), você frequentemente precisa que um elemento ignore o contêiner imediato (o cartão) e consulte diretamente o contêiner da página ou da coluna lateral.
+
+Para resolver esse conflito de escopo, utilizamos **Contêineres Nomeados** (`container-name`).
+
+```css
+.sidebar {
+  container-type: inline-size;
+  container-name: sidebar;
+}
+
+.card {
+  container-type: inline-size;
+  container-name: card;
+}
+```
+
+Ou usando a propriedade shorthand `container`:
+```css
+.sidebar {
+  container: sidebar / inline-size;
+}
+
+.card {
+  container: card / inline-size;
+}
+```
+
+## 2. A Consulta Direcionada
+
+Agora o componente filho pode especificar com precisão cirúrgica qual ancestral ele deseja consultar:
+
+```css
+/* Consulta o ancestral 'card' mais próximo */
+@container card (inline-size > 400px) {
+  .card-body {
+    padding: var(--space-m);
+  }
+}
+
+/* Consulta o ancestral 'sidebar', ignorando o 'card' intermediário! */
+@container sidebar (inline-size < 300px) {
+  .card-icon {
+    display: none; /* Oculta ícones apenas se toda a sidebar for muito estreita */
+  }
+}
+```
+
+<Callout type="info" title="Múltiplos Nomes no Mesmo Contêiner">
+  Um elemento pode possuir mais de um nome de contêiner separado por espaços: `container-name: layout panel widget;`. O filho pode consultar qualquer um desses três identificadores!
+</Callout>
+
+## 3. Boas Práticas de Nomenclatura
+
+Para evitar colisões em Design Systems corporativos, adote uma convenção hierárquica clara:
+
+1. **Nível de Layout de Página**: `page`, `shell`, `sidebar`, `main`
+2. **Nível de Seção / Painel**: `section`, `panel`, `drawer`, `modal`
+3. **Nível de Componente Atômico**: `card`, `table`, `feed`, `nav`
+
+```css
+/* Exemplo padronizado */
+.app-sidebar {
+  container: sidebar / inline-size;
+}
+
+.dashboard-panel {
+  container: panel / inline-size;
+}
+
+.metric-card {
+  container: card / inline-size;
+}
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Consultas Anônimas em Árvores Profundamente Aninhadas"
+  badCode={`/* Frágil: se alguém adicionar um container-type intermediário, quebra */
+@container (inline-size > 600px) {
+  .sub-widget {
+    display: flex;
+  }
+}`}
+  goodTitle="Nomear Explicitamente o Contêiner Alvo"
+  goodCode={`@container panel (inline-size > 600px) {
+  .sub-widget {
+    display: flex;
+  }
+}`}
+  explanation="Consultas anônimas sempre pegam o pai mais próximo. Se outro desenvolvedor adicionar container-type em uma div intermediária semanas depois, a consulta anônima passará a ler a div intermediária, quebrando a regra silenciosamente."
+/>
+
+## 5. Boas Práticas
+
+1. **Nomeie contêineres reutilizáveis**: Especialmente componentes que podem ser embutidos dentro de outros (ex: painéis e cartões).
+2. **Evite nomes genéricos demais**: Como `box` ou `wrapper`. Prefira `panel`, `card`, `drawer`.
+3. **Mantenha consistência entre o time**: Documente os nomes de contêineres padrões disponíveis no Design System.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "Contêineres com finalidades específicas foram nomeados com container-name?", checked: true },
+    { text: "O shorthand container: nome / tipo foi utilizado?", checked: true },
+    { text: "Consultas aninhadas referenciam o nome explícito do ancestral pretendido?", checked: true },
+    { text: "Nenhum contêiner intermediário acidental quebrou consultas anônimas?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Fundamentos de Container Queries](/container-query-lab/fundamentals) — Contexto de contenção.
+- [Size Queries](/container-query-lab/size-queries) — Consultas de tamanho e range syntax.
+- [Padrões Reais de Container](/container-query-lab/real-world-patterns) — Componentes universais em produção.

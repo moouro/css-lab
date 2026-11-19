@@ -1,0 +1,114 @@
+---
+title: "O Shorthand flex: grow, shrink & basis"
+description: "Desmistificando a física dos 3 valores do Flexbox: flex-grow, flex-shrink e a verdadeira natureza de flex-basis."
+draft: false
+publishDate: 2026-01-01
+tags: ["flexbox", "flex-shorthand", "flex-grow", "flex-shrink", "flex-basis"]
+difficulty: "intermediate"
+order: 2
+relatedContent:
+  - "fundamentals"
+  - "alignment"
+  - "wrapping"
+layoutPrimitives:
+  - "cluster"
+  - "sidebar"
+  - "switcher"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+O shorthand `flex` combina três propriedades que controlam a elasticidade de cada item:
+
+```css
+flex: <flex-grow> <flex-shrink> <flex-basis>;
+```
+
+Apesar de ser uma das propriedades mais comuns do CSS moderno, quase 80% dos desenvolvedores utilizam combinações aleatórias sem compreender o que o motor de renderização calcula por baixo dos panos.
+
+## 2. A Tríade da Flexibilidade
+
+### 1. `flex-grow` (Fator de Crescimento)
+Define qual proporção do **espaço positivo restante** (o espaço vazio sobrando na linha) o item absorverá.
+- `0` (padrão): O item não cresce além do seu tamanho intrínseco.
+- `1`: O item cresce para preencher o espaço livre disponível.
+
+### 2. `flex-shrink` (Fator de Encolhimento)
+Define qual proporção do **espaço negativo** (o espaço que falta quando os itens somados ultrapassam o tamanho do contêiner) o item cederá para não estourar a tela.
+- `1` (padrão): O item encolhe suavemente.
+- `0`: O item **se recusa terminantemente a encolher** (essencial para ícones e avatares que não podem ser esmagados!).
+
+### 3. `flex-basis` (Tamanho Ideal de Partida)
+O tamanho inicial do item **antes** de o algoritmo de crescimento ou encolhimento ser executado.
+- `auto`: O navegador olha para `inline-size` (width) ou para o tamanho natural do conteúdo.
+- `0%` ou `0`: O item não tem tamanho de partida; todo o espaço do contêiner é tratado como espaço livre distribuído estritamente pela proporção do `flex-grow`.
+
+## 3. Os 4 Valores Canônicos
+
+| Declaração | Expansão Completa | Comportamento Prático |
+| :--- | :--- | :--- |
+| `flex: 1` | `flex: 1 1 0%` | **Colunas perfeitamente iguais**: divide a linha em partes matematicamente idênticas, ignorando o tamanho do conteúdo interno. |
+| `flex: auto` | `flex: 1 1 auto` | **Crescimento proporcional ao conteúdo**: itens com mais texto recebem proporcionalmente mais espaço que itens com menos texto. |
+| `flex: initial` | `flex: 0 1 auto` | **Padrão do navegador**: não cresce, mas encolhe se faltar espaço. |
+| `flex: none` | `flex: 0 0 auto` | **Totalmente rígido**: não cresce, não encolhe, mantém rigorosamente seu tamanho natural ou largura fixa. |
+
+```css
+/* Exemplo de layout Sidebar clássico do Every Layout */
+.sidebar {
+  /* Não encolhe abaixo de 240px, mas cresce se houver sobra */
+  flex: 1 0 240px;
+}
+
+.content {
+  /* O conteúdo principal ocupa o dobro do espaço que sobrar */
+  flex: 2 1 0%;
+}
+```
+
+<Callout type="important" title="Dica de Ouro: flex-shrink: 0 para Ícones">
+  Quantas vezes você já viu um ícone SVG ou avatar ficar achatado e espremido em uma linha de texto longa? A causa é o `flex-shrink: 1` padrão! Sempre aplique `flex-shrink: 0` (ou `flex: none`) em ícones e imagens complementares.
+</Callout>
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar flex-grow: 1 com width: 100% ou width Manual"
+  badCode={`.item {
+  width: 250px;
+  flex-grow: 1; /* Propriedades competindo entre si */
+}`}
+  goodTitle="Usar o Shorthand flex com flex-basis Explícito"
+  goodCode={`.item {
+  flex: 1 1 250px;
+}`}
+  explanation="Evite misturar declarações manuais de width com flex-grow solto. O shorthand 'flex: 1 1 250px' expressa a intenção completa de forma atômica e inequívoca para o motor do navegador."
+/>
+
+## 5. Boas Práticas
+
+1. **Sempre utilize o shorthand `flex`**: A especificação W3C recomenda fortemente usar `flex: ...` em vez de propriedades soltas como `flex-grow: 1;` porque o shorthand define defaults seguros para `shrink` e `basis`.
+2. **Use `flex: 1` para colunas idênticas**: Quando você quer colunas de larguras rigorosamente iguais (ex: abas de navegação).
+3. **Use `flex-shrink: 0` para elementos decorativos**: Garante que avatares, badges e botões de ação nunca colapsem.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "O shorthand flex foi preferido em relação a declarações isoladas de flex-grow?", checked: true },
+    { text: "Ícones, badges e avatares possuem flex-shrink: 0 para evitar esmagamento?", checked: true },
+    { text: "A diferença entre flex: 1 (base 0%) e flex: auto (base auto) foi considerada?", checked: true },
+    { text: "O valor de flex-basis substitui width onde aplicável?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Fundamentos do Flexbox](/flexbox-lab/fundamentals) — Os eixos fundamentais.
+- [Every Layout: Sidebar](/every-layout/sidebar) — A física do layout de duas colunas assimétricas.
+- [Every Layout: Switcher](/every-layout/switcher) — Como flex-basis governa o ponto de quebra.

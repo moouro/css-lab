@@ -1,0 +1,116 @@
+---
+title: "The Box"
+description: "Demarcação e espaçamento interno intrínseco (padding) com inversão tonal de tema."
+draft: false
+publishDate: 2026-01-01
+tags: ["padding", "box-model", "borders", "theme-inversion"]
+difficulty: "beginner"
+order: 2
+primitive: "box"
+problem: "Aplicar paddings assimétricos em elementos individuais tenta resolver problemas de proximidade que pertencem aos pais ou gera sobreposição inconsistente de bordas."
+solution: "Criar uma primitiva de caixa pura com preenchimento uniforme derivado da escala modular e suporte a alto contraste e inversão de cores por herança."
+cssProperties:
+  - "padding"
+  - "box-sizing: border-box"
+  - "border"
+  - "outline"
+propsApi:
+  - name: "padding"
+    type: "string"
+    default: "var(--space-s)"
+    description: "Valor uniforme de preenchimento interno em todas as direções."
+  - name: "borderWidth"
+    type: "string"
+    default: "var(--border-thin)"
+    description: "Espessura da borda da caixa."
+  - name: "invert"
+    type: "boolean"
+    default: "false"
+    description: "Inverte as cores de texto e fundo da caixa."
+relatedContent:
+  - "stack"
+  - "center"
+layoutPrimitives:
+  - "box"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Box from '@/components/layout/Box.astro';
+import Stack from '@/components/layout/Stack.astro';
+
+## 1. Conceito
+
+No CSS, tudo é uma caixa (*box*). A primitiva **Box** encapsula propriedades intrínsecas ao próprio elemento: preenchimento interno (**padding**), demarcação de borda e cores de fundo/texto.
+
+<Callout type="tip" title="Axioma do Box">
+  Se você não tem nada para colocar em uma caixa, você não precisa de uma caixa. O Box só existe para empacotar e delimitar conteúdo.
+</Callout>
+
+## 2. O Problema
+
+Muitos desenvolvedores usam padding assimétrico (`padding: 10px 20px 30px 40px`) para empurrar elementos vizinhos. Isso viola a separação de conceitos:
+- **Margin** é para afastar irmãos (pertence ao contexto, gerenciado por *Stack* ou *Cluster*).
+- **Padding** é introspectivo: afasta o conteúdo das bordas internas da própria caixa.
+
+<AntiPattern
+  badCode={`/* Frágil: padding assimétrico para posicionar outros itens */\n.card-content {\n  padding-top: 40px;\n  padding-bottom: 10px;\n}`}
+  goodCode={`/* Resiliente: padding uniforme derivado da escala */\n.box {\n  padding: var(--space-s);\n}`}
+  explanation="Paddings irregulares desorganizam a escala visual e dificultam a reutilização do componente em novos contextos de design."
+/>
+
+## 3. Implementação Resiliente
+
+```css
+.box {
+  padding: var(--space-s);
+  border: var(--border-thin) solid var(--color-border);
+  outline: var(--border-thin) solid transparent;
+  outline-offset: calc(var(--border-thin) * -1);
+  background-color: var(--color-surface);
+}
+
+.box * {
+  color: inherit;
+}
+
+.box[data-invert] {
+  color: var(--color-bg);
+  background-color: var(--color-text);
+}
+```
+
+<Callout type="important" title="Suporte a Windows High Contrast Mode">
+  A propriedade `outline: var(--border-thin) solid transparent` associada ao `outline-offset` negativo garante que a caixa permaneça visível em modos de alto contraste do sistema operacional, sem alterar a largura calculada pelo modelo de caixa.
+</Callout>
+
+## 4. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 5. Playground Interativo
+
+<Playground title="Demonstração do Box">
+  <Stack space="1rem">
+    <Box padding="1.5rem">
+      <h4>Caixa Padrão</h4>
+      <p class="text-sm text-muted">Borda sutil e preenchimento uniforme.</p>
+    </Box>
+    <Box padding="1.5rem" invert={true}>
+      <h4>Caixa Invertida</h4>
+      <p class="text-sm">Inversão de alto contraste por herança de cores.</p>
+    </Box>
+  </Stack>
+</Playground>
+
+## 6. Checklist de Qualidade
+
+<Checklist items={[
+  "O padding é aplicado uniformemente em todos os lados.",
+  "Possui outline transparente para garantir contraste em temas assistivos.",
+  "As cores dos filhos herdam (color: inherit) por padrão para permitir temas invertidos com segurança.",
+  "Não define larguras fixas ou margens externas próprias."
+]} />

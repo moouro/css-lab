@@ -1,0 +1,112 @@
+---
+title: "The Cover"
+description: "Container vertical de altura mínima (viewport) com elemento principal centralizado e cabeçalho/rodapé opcionais."
+draft: false
+publishDate: 2026-01-01
+tags: ["cover", "hero", "vertical-centering", "min-block-size"]
+difficulty: "intermediate"
+order: 7
+primitive: "cover"
+problem: "Criar heros de 100vh com elementos fixos frequentemente quebra quando o conteúdo do centro cresce ou o teclado virtual do celular é exibido."
+solution: "Usar min-block-size (min-height) associado a margem automática (margin-block: auto) no elemento principal, permitindo expansão natural do container."
+cssProperties:
+  - "min-block-size"
+  - "display: flex"
+  - "flex-direction: column"
+  - "margin-block: auto"
+propsApi:
+  - name: "minHeight"
+    type: "string"
+    default: "100vh"
+    description: "Altura mínima do container (usar 100dvh para mobile moderno)."
+  - name: "padding"
+    type: "string"
+    default: "var(--space-m)"
+    description: "Preenchimento interno do container."
+  - name: "space"
+    type: "string"
+    default: "var(--space-s)"
+    description: "Espaçamento vertical entre os elementos quando há cabeçalho ou rodapé."
+relatedContent:
+  - "center"
+  - "stack"
+layoutPrimitives:
+  - "cover"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Cover from '@/components/layout/Cover.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Páginas de apresentação inicial (*splash screens*, heros ou capas de apresentação de slides) exigem que um elemento principal gravite para o centro da área visível, mantendo itens secundários (como uma barra de navegação no topo ou um botão "Saiba Mais" na base) ancorados nas bordas.
+
+O **Cover** realiza essa composição de maneira tolerante a conteúdo dinâmico.
+
+## 2. A Mecânica: min-block-size vs height: 100vh
+
+Nunca force `height: 100vh` em uma capa! Se o usuário abrir a página em um dispositivo com tela reduzida ou fonte ampliada, o conteúdo transbordará sem que o usuário consiga rolar para ler.
+
+A regra correta:
+```css
+.cover {
+  display: flex;
+  flex-direction: column;
+  min-block-size: var(--cover-min-height, 100vh);
+  padding: var(--space-m);
+}
+
+.cover > * {
+  margin-block: var(--space-s);
+}
+
+/* O elemento central empurra tudo acima e abaixo com auto */
+.cover > [data-centered] {
+  margin-block: auto;
+}
+
+.cover > :first-child:not([data-centered]) {
+  margin-block-start: 0;
+}
+
+.cover > :last-child:not([data-centered]) {
+  margin-block-end: 0;
+}
+```
+
+<AntiPattern
+  badCode={`/* Desastroso: altura fixa rígida */\n.hero {\n  height: 100vh; /* Se o texto crescer, corta ou sobrepõe! */\n  display: flex;\n  align-items: center;\n}`}
+  goodCode={`/* Resiliente: altura mínima com expansão permitida */\n.hero {\n  min-block-size: 100dvh;\n  display: flex;\n  flex-direction: column;\n}`}
+  explanation="Usar min-block-size garante que se o conteúdo do centro for maior que a janela, o container simplesmente expandirá e o usuário poderá rolar verticalmente."
+/>
+
+## 3. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 4. Playground Interativo
+
+<Playground title="Demonstração do Cover">
+  <Cover minHeight="320px" padding="1.5rem">
+    <header class="text-xs font-mono text-muted text-center">Cabeçalho Superior (Topo)</header>
+    <div data-centered class="text-center">
+      <h2 class="text-2xl font-bold">Título de Destaque</h2>
+      <p class="text-sm text-muted">Gravita para o centro matemático da área livre disponível.</p>
+    </div>
+    <footer class="text-xs text-subtle text-center">Rodapé Inferior (Base)</footer>
+  </Cover>
+</Playground>
+
+## 5. Checklist de Qualidade
+
+<Checklist items={[
+  "Usa min-block-size em vez de height para prevenir corte de conteúdo.",
+  "O elemento principal recebe margin-block: auto para afastar topo e base.",
+  "Primeiro e último elementos têm suas margens externas zeradas contextualmente.",
+  "Contempla unidades de viewport dinâmicas modernas (100dvh) para navegadores mobile."
+]} />

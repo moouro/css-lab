@@ -1,0 +1,51 @@
+---
+title: "Tokens de Cor & Superfícies"
+description: "Paleta neutra, acentos estratégicos, modo escuro nativo com light-dark() e conformidade de contraste WCAG AA."
+category: "colors"
+order: 1
+draft: false
+---
+
+## 1. Filosofia de Cores do Sistema
+
+A paleta de cores do CSS Lab segue o princípio editorial minimalista de ferramentas como Linear, Raycast e Vercel:
+- **Base Neutra de Alto Contraste**: Fundos pretos profundos e cinzas frios no Dark Mode; brancos puros e cinzas suaves no Light Mode.
+- **Acentos Cirúrgicos**: O azul elétrico (`--color-accent`) é reservado exclusivamente para indicar interatividade, foco e âncoras.
+- **Sem Gradientes Excessivos**: Sem fundos arco-íris de IA. Apenas legibilidade cristalina e descanso visual.
+
+## 2. Tokens Semânticos de Superfície
+
+```css
+:root {
+  color-scheme: light dark;
+
+  /* Fundos */
+  --color-bg: light-dark(#ffffff, #0d1117);
+  --color-bg-subtle: light-dark(#f6f8fa, #161b22);
+  --color-bg-surface: light-dark(#ffffff, #161b22);
+  --color-bg-hover: light-dark(#f3f4f6, #21262d);
+
+  /* Textos */
+  --color-fg: light-dark(#1f2328, #f0f6fc);
+  --color-fg-muted: light-dark(#656d76, #8b949e);
+  --color-fg-subtle: light-dark(#8c959f, #6e7681);
+
+  /* Bordas */
+  --color-border: light-dark(#d0d7de, #30363d);
+  --color-border-hover: light-dark(#8c959f, #8b949e);
+
+  /* Acento de Interatividade */
+  --color-accent: light-dark(#0969da, #2f81f7);
+  --color-accent-hover: light-dark(#0550ae, #58a6ff);
+  --color-accent-subtle: light-dark(rgba(9, 105, 218, 0.1), rgba(47, 129, 247, 0.15));
+  --color-accent-muted: light-dark(#ddf4ff, #0c2d6b);
+}
+```
+
+## 3. Cores Semânticas de Feedback
+
+| Token | Propósito | Valor Light | Valor Dark |
+| :--- | :--- | :--- | :--- |
+| `--color-success` | Confirmação e online | `#1a7f37` | `#3fb950` |
+| `--color-warning` | Atenção e pendências | `#9a6700` | `#d29922` |
+| `--color-danger` | Erro crítico e destrutivo | `#cf222e` | `#f85149` |

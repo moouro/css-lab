@@ -1,0 +1,45 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { mergeVars } from '../../utils/style';
+
+type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{
+  as: Tag;
+  side?: 'left' | 'right';
+  sideWidth?: string;
+  contentMin?: string;
+  gap?: string;
+  noStretch?: boolean;
+}>;
+
+const {
+  as: Tag = 'div',
+  side = 'left',
+  sideWidth = '18rem',
+  contentMin = '50%',
+  gap = 'var(--space-m)',
+  noStretch = false,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Element = Tag as 'div';
+const computedStyle = mergeVars(
+  {
+    '--sidebar-width': sideWidth,
+    '--sidebar-threshold': contentMin,
+    '--sidebar-gap': gap,
+    'align-items': noStretch ? 'flex-start' : 'stretch',
+  },
+  style,
+);
+---
+
+<Element
+  class:list={['with-sidebar', className]}
+  data-side={side}
+  style={computedStyle}
+  {...rest}
+>
+  <slot />
+</Element>

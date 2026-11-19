@@ -1,0 +1,119 @@
+---
+title: "Fundamentos das Container Queries"
+description: "Por que Media Queries falham em arquiteturas de componentes e como o modelo de contenção redefine o design responsivo."
+draft: false
+publishDate: 2026-01-01
+tags: ["container-queries", "fundamentals", "containment", "responsive-components"]
+difficulty: "beginner"
+order: 1
+relatedContent:
+  - "size-queries"
+  - "naming-conventions"
+  - "real-world-patterns"
+layoutPrimitives:
+  - "container"
+  - "box"
+  - "stack"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. O Problema Histórico das Media Queries
+
+Durante mais de uma década, a responsividade na web operou sob uma suposição falha: que a largura da tela do dispositivo (o *viewport*) dita a aparência de cada componente dentro dela.
+
+Considere um componente simples de **Card de Produto**:
+- Em um smartphone (360px), o card deve ser **vertical** (imagem no topo, texto embaixo).
+- Em um desktop (1200px), o card deve ser **horizontal** (imagem à esquerda, texto à direita).
+
+O que acontece quando você reutiliza esse mesmo card na **barra lateral** (sidebar) do desktop que tem apenas 280px de largura?
+Com `@media (min-width: 1024px)`, o card pensa que está em um desktop gigante e renderiza seu layout horizontal dentro de uma coluna minúscula de 280px, **destruindo o layout e transbordando o texto**.
+
+```
+Viewport 1200px (Desktop):
+┌─────────────────────────────────┬──────────────────┐
+│ Área Principal (850px)          │ Barra Lateral    │
+│ [Card Horizontal: Funciona bem] │ [Card Quebrado!] │
+└─────────────────────────────────┴──────────────────┘
+```
+
+## 2. A Mudança de Paradigma
+
+Com **Container Queries**, viramos a responsabilidade de cabeça para baixo:
+
+> Um componente **não deve saber** qual é a resolução do monitor do usuário. Ele deve saber apenas **quanto espaço seu contêiner pai lhe forneceu**.
+
+```css
+/* O pai cria o contexto de contenção */
+.sidebar-slot {
+  container-type: inline-size;
+}
+
+/* O card responde ao contêiner, não à tela! */
+@container (inline-size > 500px) {
+  .product-card {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+  }
+}
+```
+
+Agora, se o card estiver na área principal (850px), ele se torna horizontal. Se for movido para a barra lateral (280px), ele automaticamente se recolhe para vertical, **mesmo em um monitor de 4K!**
+
+<Callout type="info" title="Baseline Universal">
+  Container Queries de dimensão possuem suporte nativo de 100% em todas as engines modernas de navegadores desde 2023.
+</Callout>
+
+## 3. O Conceito de Contenção (CSS Containment)
+
+Por que a W3C levou tantos anos para implementar Container Queries?
+A resposta é: **loops infinitos de renderização** (*Layout Trashing*).
+
+Se um componente filho muda de tamanho com base no pai, mas o tamanho do filho altera a altura ou largura do pai, o navegador entraria em um loop eterno recalculando o layout 60 vezes por segundo.
+
+Para resolver isso, a especificação exige que contêineres ativem a **Contenção de Layout** (`contain: layout` ou `container-type: inline-size`). Isso informa ao motor C++ do navegador que as mudanças geométricas internas do contêiner não devem vazar para o documento externo.
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Criar Classes Modificadoras Manuais para Cada Contexto"
+  badCode={`<!-- Frágil e cria centenas de variações de componentes -->
+<div class="product-card product-card--sidebar">
+<div class="product-card product-card--modal">
+<div class="product-card product-card--wide">`}
+  goodTitle="Usar Container Queries para Adaptação Totalmente Autônoma"
+  goodCode={`<!-- O mesmo componente se adapta organicamente a qualquer pai -->
+<div class="product-card">
+
+<style>
+  @container (inline-size > 400px) { .product-card { /* ... */ } }
+</style>`}
+  explanation="Classes modificadoras manuais forçam os desenvolvedores a criar lógica condicional no backend ou em templates para cada lugar onde o card for inserido. Container Queries tornam o componente verdadeiramente autocontido."
+/>
+
+## 5. Boas Práticas
+
+1. **Separe o contêiner do componente**: O elemento hospedeiro (*host*) declara `container-type: inline-size`, e o elemento filho consome `@container`.
+2. **Utilize sempre `inline-size`**: Permite que o contêiner cresça livremente em altura enquanto responde apenas à largura horizontal.
+3. **Evite acoplamento com a árvore global**: Nenhum seletor dentro de um `@container` deve referenciar IDs globais de páginas.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "O elemento pai possui container-type: inline-size configurado?", checked: true },
+    { text: "O componente foi testado dentro de colunas estreitas e largas?", checked: true },
+    { text: "Classes manuais de contexto (--sidebar, --modal) foram substituídas por @container?", checked: true },
+    { text: "A contenção de layout evita loops infinitos de redimensionamento?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Size Queries](/container-query-lab/size-queries) — Consultas de tamanho e range syntax.
+- [Contêineres Nomeados](/container-query-lab/naming-conventions) — Identificando contêineres específicos.
+- [Padrões Reais de Container](/container-query-lab/real-world-patterns) — O card universal em ação.

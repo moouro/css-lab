@@ -1,0 +1,39 @@
+---
+export interface Props {
+  items: string[];
+}
+
+const { items = [] } = Astro.props;
+---
+
+<div class="checklist-card stack" style="--stack-space: var(--space-xs);">
+  <h4 class="text-sm font-semibold tracking-caps text-muted">Checklist de Resiliência</h4>
+  <ul class="checklist stack" style="--stack-space: var(--space-3xs);">
+    {items.map((item) => (
+      <li class="checklist-item cluster" style="--cluster-space: var(--space-xs);">
+        <span class="check-icon" aria-hidden="true">✓</span>
+        <span class="text-sm">{item}</span>
+      </li>
+    ))}
+  </ul>
+</div>
+
+<style>
+  .checklist-card {
+    border: var(--border-thin) solid var(--color-border);
+    border-radius: var(--radius-m);
+    padding: var(--space-s);
+    background-color: var(--color-bg-inset);
+    margin-block: var(--space-m);
+  }
+
+  .checklist-item {
+    align-items: flex-start;
+  }
+
+  .check-icon {
+    color: var(--color-success);
+    font-weight: var(--weight-bold);
+    line-height: 1.4;
+  }
+</style>

@@ -1,0 +1,15 @@
+/* ═══════════════════════════════════════════════════════
+   CSS Lab — Main Entry Point
+   Cascade layers & import order:
+   theme → base → primitives → components → utilities
+   ═══════════════════════════════════════════════════════ */
+
+@layer theme, base, primitives, components, utilities;
+
+@import "tailwindcss";
+
+@import "./tokens.css";
+@import "./typography.css";
+@import "./global.css";
+@import "./every-layout.css";
+@import "./utilities.css";

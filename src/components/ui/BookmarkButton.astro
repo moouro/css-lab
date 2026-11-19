@@ -1,0 +1,135 @@
+---
+// BookmarkButton.astro
+export interface Props {
+  title: string;
+  url: string;
+}
+
+const { title, url } = Astro.props;
+---
+
+<button
+  type="button"
+  class="bookmark-btn cluster"
+  data-bookmark-url={url}
+  data-bookmark-title={title}
+  aria-pressed="false"
+>
+  <span class="bookmark-icon" aria-hidden="true">★</span>
+  <span class="bookmark-label font-mono text-xs">Salvar na Memória</span>
+</button>
+
+<script>
+  const STORAGE_KEY = 'css-lab-bookmarks';
+
+  interface BookmarkItem {
+    title: string;
+    url: string;
+  }
+
+  function isValidBookmark(item: unknown): item is BookmarkItem {
+    if (!item || typeof item !== 'object') return false;
+    const candidate = item as Record<string, unknown>;
+    return (
+      typeof candidate.url === 'string' &&
+      candidate.url.startsWith('/') &&
+      !candidate.url.startsWith('//') &&
+      typeof candidate.title === 'string'
+    );
+  }
+
+  function getBookmarks(): BookmarkItem[] {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter(isValidBookmark) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveBookmarks(items: BookmarkItem[]): void {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      // Storage indisponível
+    }
+  }
+
+  function applyButtonState(btn: HTMLButtonElement, isSaved: boolean): void {
+    const label = btn.querySelector('.bookmark-label');
+    btn.setAttribute('aria-pressed', isSaved ? 'true' : 'false');
+    btn.classList.toggle('bookmarked', isSaved);
+    if (label) {
+      label.textContent = isSaved ? 'Salvo na Memória' : 'Salvar na Memória';
+    }
+  }
+
+  function syncBookmarkButtons(): void {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.bookmark-btn');
+    if (buttons.length === 0) return;
+
+    const bookmarks = getBookmarks();
+    buttons.forEach((btn) => {
+      const url = btn.getAttribute('data-bookmark-url') || window.location.pathname;
+      const isSaved = bookmarks.some((b) => b.url === url);
+      applyButtonState(btn, isSaved);
+    });
+  }
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    const btn = target?.closest<HTMLButtonElement>('.bookmark-btn');
+    if (!btn) return;
+
+    const rawUrl = btn.getAttribute('data-bookmark-url') || window.location.pathname;
+    if (!rawUrl.startsWith('/') || rawUrl.startsWith('//')) return;
+
+    const title = btn.getAttribute('data-bookmark-title') || document.title;
+    let current = getBookmarks();
+    const exists = current.some((b) => b.url === rawUrl);
+
+    if (exists) {
+      current = current.filter((b) => b.url !== rawUrl);
+      applyButtonState(btn, false);
+    } else {
+      current = [{ title, url: rawUrl }, ...current].slice(0, 30);
+      applyButtonState(btn, true);
+    }
+
+    saveBookmarks(current);
+  });
+
+  document.addEventListener('astro:page-load', syncBookmarkButtons);
+</script>
+
+<style>
+  .bookmark-btn {
+    align-items: center;
+    gap: var(--space-2xs);
+    background-color: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg-muted);
+    padding: var(--space-3xs) var(--space-xs);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    font-size: var(--step--2);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .bookmark-btn:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-fg);
+    border-color: var(--color-border-hover);
+  }
+
+  .bookmark-btn.bookmarked {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-muted);
+  }
+
+  .bookmark-btn.bookmarked .bookmark-icon {
+    color: #eab308;
+  }
+</style>

@@ -1,0 +1,220 @@
+---
+title: "Padrões Reais de Container Queries"
+description: "O Card Universal definitivo: adaptação visual para 3 cenários distintos (coluna estreita, coluna média e banner largo)."
+draft: false
+publishDate: 2026-01-01
+tags: ["container-queries", "patterns", "universal-card", "adaptive-components"]
+difficulty: "advanced"
+order: 5
+relatedContent:
+  - "fundamentals"
+  - "size-queries"
+  - "naming-conventions"
+layoutPrimitives:
+  - "container"
+  - "box"
+  - "stack"
+  - "cluster"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. O Desafio do "Card Universal"
+
+Um dos maiores triunfos da arquitetura frontend moderna é construir um único componente que se adapte graciosamente a qualquer lugar onde for renderizado:
+
+1. **Modo Compacto (< 380px)**: Em uma barra lateral ou lista de notificações. Disposição vertical simples, imagem pequena, apenas título e preço.
+2. **Modo Padrão (380px – 650px)**: Em uma grade de produtos com 2 ou 3 colunas. Imagem de destaque no topo, título, descrição curta e botão de compra.
+3. **Modo Expandido / Banner (> 650px)**: No topo de uma página ou em uma linha inteira. Disposição horizontal com imagem à esquerda, texto rico e metadados completos.
+
+Com Container Queries, **o mesmo bloco de HTML** se transforma nesses 3 designs sem uma única classe de modificador!
+
+```html
+<div class="card-host">
+  <article class="universal-card">
+    <div class="card-media">
+      <img src="/product.jpg" alt="Produto" />
+    </div>
+    <div class="card-content">
+      <span class="card-tag">Novo</span>
+      <h3 class="card-title">Fone de Ouvido Noise-Cancelling</h3>
+      <p class="card-desc">Áudio de alta fidelidade com cancelamento ativo de ruído de última geração.</p>
+      <div class="card-footer">
+        <span class="card-price">R$ 1.299</span>
+        <button class="card-btn">Comprar</button>
+      </div>
+    </div>
+  </article>
+</div>
+```
+
+## 2. A Implementação CSS Completa
+
+```css
+/* 1. O Host define o contexto de contenção */
+.card-host {
+  container-type: inline-size;
+  container-name: card;
+}
+
+/* 2. Estilos Base (Mobile / Compacto < 380px) */
+.universal-card {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  gap: var(--space-xs);
+  padding: var(--space-s);
+}
+
+.card-media img {
+  inline-size: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: var(--radius-sm);
+}
+
+.card-desc {
+  display: none; /* Oculta descrição em espaços compactos */
+}
+
+.card-title {
+  font-size: var(--step-0);
+}
+
+/* 3. Modo Padrão (Entre 380px e 650px) */
+@container card (inline-size >= 380px) {
+  .universal-card {
+    padding: var(--space-m);
+    gap: var(--space-s);
+  }
+
+  .card-desc {
+    display: block; /* Revela a descrição */
+    font-size: var(--step--1);
+    color: var(--color-fg-muted);
+  }
+
+  .card-title {
+    font-size: var(--step-1);
+  }
+
+  .card-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-block-start: var(--space-s);
+  }
+}
+
+/* 4. Modo Expandido / Banner (> 650px) */
+@container card (inline-size > 650px) {
+  .universal-card {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    gap: var(--space-m);
+    align-items: center;
+  }
+
+  .card-media img {
+    block-size: 100%;
+    aspect-ratio: 4 / 3;
+  }
+
+  .card-title {
+    font-size: var(--step-2);
+  }
+
+  .card-desc {
+    font-size: var(--step-0);
+  }
+}
+```
+
+<Callout type="info" title="Zero Media Queries Globais">
+  Observe que este componente funciona perfeitamente dentro de qualquer resolução de tela (mobile, tablet, desktop ou smart TV) porque a sua adaptação visual depende única e exclusivamente do espaço do seu contêiner pai.
+</Callout>
+
+## 3. Padrão de Tabela Responsiva que Vira Lista
+
+Outro caso real magnífico: uma tabela de dados complexa que se transforma automaticamente em uma lista de cartões empilhados quando inserida em uma coluna estreita:
+
+```css
+.table-host {
+  container-type: inline-size;
+  container-name: table-container;
+}
+
+@container table-container (inline-size < 500px) {
+  /* Transforma a tabela em cartões empilhados */
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead tr {
+    display: none; /* Oculta cabeçalhos */
+  }
+
+  tr {
+    border: 1px solid var(--color-border);
+    margin-block-end: var(--space-s);
+    padding: var(--space-xs);
+    border-radius: var(--radius-sm);
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    padding-block: var(--space-3xs);
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: bold;
+    color: var(--color-fg-muted);
+  }
+}
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Criar Múltiplos Componentes Separados no Framework"
+  badCode={`// Três componentes para o mesmo dado
+<CompactCard product={p} />
+<GridCard product={p} />
+<BannerCard product={p} />`}
+  goodTitle="Um Único Componente Autônomo com Container Queries"
+  goodCode={`// Um único componente universal
+<UniversalCard product={p} />`}
+  explanation="Múltiplos componentes triplicam a manutenção, os testes e o bundle de JavaScript. Um componente universal com Container Queries resolve todos os layouts diretamente no CSS do navegador."
+/>
+
+## 5. Boas Práticas
+
+1. **Sempre adicione `data-label` em tabelas**: Garante que o modo compacto em lista exiba os rótulos de cada campo.
+2. **Defina pontos de quebra anatômicos**: Observe onde o conteúdo começa a parecer apertado (ex: títulos quebrando em 3 linhas) para escolher os valores de corte do `@container`.
+3. **Use proporções de aspect-ratio**: Garante que as imagens não pulem de tamanho durante as transições de largura.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "O componente foi testado nos 3 modos (compacto, padrão e expandido)?", checked: true },
+    { text: "Aspect-ratio foi configurado em imagens para prevenir Cumulative Layout Shift (CLS)?", checked: true },
+    { text: "Elementos secundários (descrições longas) ocultam suavemente em modos compactos?", checked: true },
+    { text: "Nenhuma classe modificadora manual de layout é exigida pelo componente?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Fundamentos de Container Queries](/container-query-lab/fundamentals) — Conceito e modelo mental.
+- [Size Queries](/container-query-lab/size-queries) — Range syntax e unidades.
+- [Contêineres Nomeados](/container-query-lab/naming-conventions) — Nomenclatura e múltiplos ancestrais.

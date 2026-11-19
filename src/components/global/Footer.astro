@@ -1,0 +1,81 @@
+---
+---
+
+<footer class="site-footer">
+  <div class="footer-inner cluster" style="--cluster-space: var(--space-m); --cluster-justify: space-between; --cluster-align: flex-start;">
+    <div class="stack" style="--stack-space: var(--space-3xs);">
+      <span class="footer-brand">📐 CSS Lab</span>
+      <p class="text-sm text-muted">
+        Segunda memória profissional de arquitetura frontend e design de layout intrínseco.
+      </p>
+      <p class="text-xs text-subtle">
+        Inspirado pelos princípios de <em>Every Layout (3ª Edição)</em> de Heydon Pickering & Andy Bell.
+      </p>
+    </div>
+
+    <div class="cluster" style="--cluster-space: var(--space-l);">
+      <div class="stack" style="--stack-space: var(--space-3xs);">
+        <span class="text-xs font-semibold tracking-caps text-muted">Pilares</span>
+        <a href="/every-layout" class="footer-link">Every Layout</a>
+        <a href="/css-moderno" class="footer-link">CSS Moderno</a>
+        <a href="/grid-lab" class="footer-link">Grid Lab</a>
+        <a href="/flexbox-lab" class="footer-link">Flexbox Lab</a>
+        <a href="/container-query-lab" class="footer-link">Container Queries</a>
+      </div>
+
+      <div class="stack" style="--stack-space: var(--space-3xs);">
+        <span class="text-xs font-semibold tracking-caps text-muted">Prática</span>
+        <a href="/components" class="footer-link">Componentes</a>
+        <a href="/snippets" class="footer-link">Snippets</a>
+        <a href="/cheatsheets" class="footer-link">Cheatsheets</a>
+        <a href="/design-tokens" class="footer-link">Design Tokens</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p class="text-xs text-subtle">
+      100% estático. Zero tracking. Construído com composição algorítmica e CSS moderno.
+    </p>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    border-block-start: var(--border-thin) solid var(--color-border);
+    background-color: var(--color-bg-raised);
+    margin-block-start: var(--space-2xl);
+  }
+
+  .footer-inner {
+    max-inline-size: 1400px;
+    margin-inline: auto;
+    padding-inline: var(--space-s);
+    padding-block: var(--space-xl);
+  }
+
+  .footer-brand {
+    font-weight: var(--weight-bold);
+    color: var(--color-text-strong);
+  }
+
+  .footer-link {
+    font-size: var(--step--1);
+    color: var(--color-text-muted);
+    text-decoration: none;
+  }
+
+  .footer-link:hover {
+    color: var(--color-text-strong);
+    text-decoration: underline;
+  }
+
+  .footer-bottom {
+    border-block-start: var(--border-thin) solid var(--color-border);
+    max-inline-size: 1400px;
+    margin-inline: auto;
+    padding-inline: var(--space-s);
+    padding-block: var(--space-xs);
+    text-align: center;
+  }
+</style>

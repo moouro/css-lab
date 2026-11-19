@@ -1,0 +1,22 @@
+---
+title: "Centralização em Ambos os Eixos (place-items)"
+description: "A solução definitiva de 2 linhas para centralizar qualquer caixa na horizontal e na vertical simultaneamente."
+category: "layout"
+tags: ["layout", "grid", "centering", "place-items"]
+draft: false
+order: 4
+language: "css"
+---
+
+### Problema
+Eliminar as 4 linhas legadas de `position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%)` que causavam desfoque subpixel em monitores de baixa resolução.
+
+### Código
+
+```css
+.center-box {
+  display: grid;
+  place-items: center;
+  min-block-size: 100%;
+}
+```

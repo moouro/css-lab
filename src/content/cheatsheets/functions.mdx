@@ -1,0 +1,51 @@
+---
+title: "Funções Matemáticas & Cores Cheatsheet"
+description: "Guia de bolso das funções nativas do CSS: clamp(), min(), max(), calc(), light-dark() e color-mix()."
+tags: ["functions", "cheatsheet", "clamp", "light-dark", "color-mix", "calc"]
+draft: false
+order: 6
+printable: true
+---
+
+## 1. Funções de Comparação & Limites
+
+| Função | Sintaxe | Comportamento |
+| :--- | :--- | :--- |
+| `clamp(MIN, VAL, MAX)` | `clamp(1rem, 2vw, 2.5rem)` | Mantém o valor entre um piso mínimo e um teto máximo |
+| `min(A, B)` | `min(100%, 600px)` | Retorna o **menor** valor (evita estouro de tela em caixas fixas) |
+| `max(A, B)` | `max(1rem, 2vw)` | Retorna o **maior** valor (garante um tamanho mínimo de respiro) |
+| `calc(expressão)` | `calc(100% - var(--space-m))` | Realiza cálculos matemáticos entre unidades heterogêneas |
+
+## 2. Funções de Cores Modernas
+
+### `light-dark(claro, escuro)`
+Retorna a primeira cor se `color-scheme` computado for `light`, ou a segunda se for `dark`:
+```css
+:root {
+  color-scheme: light dark;
+  --bg-surface: light-dark(#ffffff, #161b22);
+  --text-primary: light-dark(#1f2328, #f0f6fc);
+}
+```
+
+### `color-mix(in espaço, cor1 proporção, cor2)`
+Mistura duas cores no espaço de cor especificado (ex: `srgb` ou `oklch`):
+```css
+/* Cria uma versão 20% translúcida da cor de destaque */
+.badge-subtle {
+  background-color: color-mix(in srgb, var(--color-accent) 20%, transparent);
+}
+
+/* Clareia ou escurece uma cor semanticamente */
+.btn-hover {
+  background-color: color-mix(in srgb, var(--color-accent) 85%, #000000);
+}
+```
+
+## 3. Funções de Ângulo e Houdini
+
+| Função / Atributo | Sintaxe | Uso |
+| :--- | :--- | :--- |
+| `conic-gradient()` | `conic-gradient(from var(--angle), ...)` | Bordas brilhantes rotativas e gráficos de pizza |
+| `attr()` | `content: attr(data-label)` | Pega valores de atributos do HTML sem JavaScript |
+| `anchor()` | `inset-block-start: anchor(bottom)` | Posicionamento ancorado em botões |

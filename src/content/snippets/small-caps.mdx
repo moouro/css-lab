@@ -1,0 +1,24 @@
+---
+title: "Versaletes Verdadeiros (font-variant-caps)"
+description: "Ativar versaletes reais (small caps) projetados pelo tipógrafo sem usar text-transform: uppercase distorcido."
+category: "typography"
+tags: ["typography", "small-caps", "opentype", "editorial"]
+draft: false
+order: 8
+language: "css"
+---
+
+### Problema
+Usar `text-transform: uppercase; font-size: 0.8em;` gera letras maiúsculas artificiais com espessura de traço mais fina do que o restante da fonte, parecendo amador.
+
+### Código
+
+```css
+.lead-caption,
+.kicker {
+  /* Ativa os glifos OpenType desenhados pelo designer da fonte */
+  font-variant-caps: all-small-caps;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+}
+```

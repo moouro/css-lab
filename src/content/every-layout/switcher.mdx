@@ -1,0 +1,114 @@
+---
+title: "The Switcher"
+description: "Alternador automático de linha para coluna baseado em limite (threshold) via cálculo flex-basis."
+draft: false
+publishDate: 2026-01-01
+tags: ["switcher", "holy-albatross", "flexbox", "algorithmic-layout"]
+difficulty: "intermediate"
+order: 6
+primitive: "switcher"
+problem: "Grades flexíveis tradicionais quebram elementos em linhas ímpares intermediárias indesejadas (ex: 2 em cima, 1 embaixo esticado), desvalorizando visualmente os itens."
+solution: "A técnica 'The Flexbox Holy Albatross': usar uma expressão calc() que gera números positivos ou negativos extremos multiplicados por 999 para alternar diretamente entre N colunas e 1 coluna vertical."
+cssProperties:
+  - "flex-basis: calc((threshold - 100%) * 999)"
+  - "flex-grow: 1"
+  - "display: flex"
+  - "flex-wrap: wrap"
+propsApi:
+  - name: "threshold"
+    type: "string"
+    default: "35rem"
+    description: "Largura do container no qual o layout alterna instantaneamente de horizontal para vertical."
+  - name: "space"
+    type: "string"
+    default: "var(--space-s)"
+    description: "Espaçamento entre os itens."
+  - name: "limit"
+    type: "number"
+    default: "4"
+    description: "Quantidade máxima de itens antes de forçar empilhamento vertical via seletor de quantidade (quantity query)."
+relatedContent:
+  - "sidebar"
+  - "grid"
+layoutPrimitives:
+  - "switcher"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Switcher from '@/components/layout/Switcher.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Quando temos 3 ou 4 cartões de preço ou passos numerados, queremos que eles fiquem perfeitamente em uma linha horizontal. Se o espaço for insuficiente, não queremos um layout intermediário estranho com 2 itens em uma linha e 1 item gigante ocupando a linha de baixo.
+
+Queremos que eles alternem diretamente de **1 linha horizontal** para **1 coluna vertical**. O **Switcher** resolve isso sem nenhuma media query.
+
+## 2. A Fórmula "Holy Albatross"
+
+A fórmula matemática criada por Heydon Pickering usa o tratamento de valores inválidos do CSS:
+
+```css
+.switcher {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s);
+}
+
+.switcher > * {
+  flex-grow: 1;
+  flex-basis: calc((var(--switcher-threshold, 35rem) - 100%) * 999);
+}
+```
+
+### Como funciona:
+1. `100%` representa a largura atual do container pai.
+2. Se o container tiver `40rem` (maior que o threshold de `35rem`):
+   - `35rem - 40rem = -5rem`
+   - `-5rem * 999 = -4995rem`
+   - Uma `flex-basis` negativa é inválida no CSS, então o browser descarta e assume `0`.
+   - Com `flex-basis: 0` e `flex-grow: 1`, todos os itens dividem o espaço horizontal em partes perfeitamente iguais!
+3. Se o container tiver `30rem` (menor que o threshold de `35rem`):
+   - `35rem - 30rem = +5rem`
+   - `+5rem * 999 = +4995rem`
+   - Cada item passa a pedir uma largura gigantesca, o que força imediatamente cada um a ocupar 100% da linha e empilhar verticalmente!
+
+<Callout type="tip" title="O Ponto Alto do CSS Algorítmico">
+  Esse é o exemplo mais puro de layout governado pelo browser: o autor apenas define uma restrição matemática (*threshold*) e o motor de renderização toma a decisão ideal em tempo real.
+</Callout>
+
+## 3. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 4. Playground Interativo
+
+<Playground title="Demonstração do Switcher">
+  <Switcher threshold="30rem" space="1rem">
+    <Box padding="1rem">
+      <h4>Plano Starter</h4>
+      <p class="text-xs text-muted">R$ 29/mês</p>
+    </Box>
+    <Box padding="1rem">
+      <h4>Plano Pro</h4>
+      <p class="text-xs text-muted">R$ 89/mês</p>
+    </Box>
+    <Box padding="1rem">
+      <h4>Plano Enterprise</h4>
+      <p class="text-xs text-muted">Sob consulta</p>
+    </Box>
+  </Switcher>
+</Playground>
+
+## 5. Checklist de Qualidade
+
+<Checklist items={[
+  "Usa a expressão calc() multiplicada por número alto (ex: 999) para alternância binária limpa.",
+  "Threshold expresso preferencialmente em rem ou ch para respeitar a escala de fonte do usuário.",
+  "Itens filhos configurados com max-inline-size: 100% para evitar overflow em conteúdos de texto longos.",
+  "Não gera layouts intermediários quebrados com elementos assimétricos."
+]} />

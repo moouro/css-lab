@@ -1,0 +1,53 @@
+---
+title: "Tabela que Vira Lista de Cartões no Mobile"
+description: "Transformar uma tabela HTML de dados tradicional em cartões empilhados verticais responsivos sem duplicar HTML."
+category: "patterns"
+tags: ["patterns", "tables", "responsive", "mobile"]
+draft: false
+order: 21
+language: "css"
+---
+
+### Problema
+Tabelas largas quebram telas de smartphones ou forçam rolagem horizontal desconfortável.
+
+### Código
+
+```css
+@media (max-width: 640px) {
+  table, thead, tbody, th, td, tr {
+    display: block;
+  }
+
+  thead tr {
+    position: absolute;
+    top: -9999px;
+    left: -9999px;
+  }
+
+  tr {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    margin-block-end: var(--space-s);
+    padding: var(--space-xs);
+  }
+
+  td {
+    display: flex;
+    justify-content: space-between;
+    padding-block: var(--space-3xs);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  td:last-child {
+    border-block-end: none;
+  }
+
+  td::before {
+    content: attr(data-label);
+    font-weight: 600;
+    color: var(--color-fg-muted);
+  }
+}
+```
+*No HTML:* Adicione `<td data-label="Nome do Campo">` em cada célula.

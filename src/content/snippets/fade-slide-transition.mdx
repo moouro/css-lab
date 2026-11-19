@@ -1,0 +1,30 @@
+---
+title: "Fade & Slide de Alta Performance (GPU)"
+description: "Transições de entrada fluidas a 60fps usando exclusivamente opacity e transform (GPU-accelerated)."
+category: "animation"
+tags: ["animation", "gpu", "transform", "opacity", "transitions"]
+draft: false
+order: 13
+language: "css"
+---
+
+### Problema
+Animar propriedades que acionam recálculo de layout (*reflow*) e repintura (*repaint*) como `top`, `left`, `margin` ou `width` causa engasgos visuais (*jank*).
+
+### Código
+
+```css
+.reveal-item {
+  opacity: 0;
+  transform: translateY(12px);
+  will-change: opacity, transform;
+  transition:
+    opacity 250ms cubic-bezier(0.16, 1, 0.3, 1),
+    transform 250ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+```

@@ -1,0 +1,81 @@
+---
+export interface Props {
+  badCode: string;
+  goodCode: string;
+  explanation: string;
+}
+
+const { badCode, goodCode, explanation } = Astro.props;
+---
+
+<div class="antipattern-box stack" style="--stack-space: var(--space-xs);">
+  <div class="antipattern-header">
+    <span class="bad-tag">❌ Anti-pattern</span>
+    <span class="vs">vs</span>
+    <span class="good-tag">✅ Solução Resiliente</span>
+  </div>
+
+  <div class="code-comparison">
+    <div class="code-pane bad">
+      <div class="pane-label">Frágil / Imperativo</div>
+      <pre><code>{badCode}</code></pre>
+    </div>
+    <div class="code-pane good">
+      <div class="pane-label">Resiliente / Intrínseco</div>
+      <pre><code>{goodCode}</code></pre>
+    </div>
+  </div>
+
+  <p class="explanation text-sm text-muted">
+    <strong>Por que evitar:</strong> {explanation}
+  </p>
+</div>
+
+<style>
+  .antipattern-box {
+    border: var(--border-thin) solid var(--color-border);
+    border-radius: var(--radius-m);
+    padding: var(--space-s);
+    background-color: var(--color-bg-raised);
+    margin-block: var(--space-m);
+  }
+
+  .antipattern-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-xs);
+    font-size: var(--step--1);
+    font-weight: var(--weight-semibold);
+  }
+
+  .bad-tag { color: var(--color-error); }
+  .good-tag { color: var(--color-success); }
+  .vs { color: var(--color-text-subtle); }
+
+  .code-comparison {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(18rem, 100%), 1fr));
+    gap: var(--space-xs);
+  }
+
+  .code-pane {
+    border-radius: var(--radius-s);
+    overflow: hidden;
+    border: var(--border-thin) solid var(--color-border);
+  }
+
+  .pane-label {
+    font-size: var(--step--2);
+    font-family: var(--font-mono);
+    padding: 0.25rem 0.5rem;
+    background-color: var(--color-bg-inset);
+    border-block-end: var(--border-thin) solid var(--color-border);
+    color: var(--color-text-muted);
+  }
+
+  .code-pane pre {
+    margin: 0;
+    border: none;
+    border-radius: 0;
+  }
+</style>

@@ -1,0 +1,96 @@
+---
+title: "The Container"
+description: "Isolamento de contexto e container queries (@container) como meta-utilitário de layout."
+draft: false
+publishDate: 2026-01-01
+tags: ["container-queries", "container-type", "cqw", "cqh", "meta-layout"]
+difficulty: "advanced"
+order: 13
+primitive: "container"
+problem: "Adotar container queries indiscriminadamente para todo componente adiciona complexidade desnecessária quando soluções intrínsecas (Flexbox/Grid) já resolveriam."
+solution: "Estabelecer contextos nomeados ou anônimos via container-type: inline-size estritamente como 'válvula de escape' para variações de componentes que layouts intrínsecos não conseguem derivar sozinhos."
+cssProperties:
+  - "container-type: inline-size"
+  - "container-name"
+  - "@container"
+  - "cqw | cqh | cqi"
+propsApi:
+  - name: "name"
+    type: "string"
+    default: "undefined"
+    description: "Nome do container caso você precise referenciá-lo explicitamente com @container name (width < ...)."
+relatedContent:
+  - "sidebar"
+  - "grid"
+layoutPrimitives:
+  - "container"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Container from '@/components/layout/Container.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+No Every Layout 3ª Edição, os autores respondem à grande dúvida da comunidade: *"Agora que temos Container Queries, o Every Layout está obsoleto?"*
+
+A resposta enfática é **não**. Container Queries continuam sendo uma forma de intervenção manual (um *disjuntor*). Onde você pode usar Flexbox, Grid ou Switcher intrínsecos com matemática do browser, você escreve menos código e com maior compatibilidade retroativa. O **Container** serve como a nossa **válvula de escape definitiva** quando a resiliência intrínseca pura não for suficiente.
+
+## 2. A Sintaxe Moderna
+
+```css
+.container-query {
+  container-type: inline-size;
+}
+
+.container-query[data-name] {
+  container-name: var(--container-name);
+}
+
+/* Consultando o container */
+@container (width > 400px) {
+  .card-media {
+    display: flex;
+  }
+}
+```
+
+<Callout type="warning" title="Cuidado com Loops de Contenção">
+  Sempre use `container-type: inline-size` em vez de `size` completo, a não ser que o container tenha uma altura explicitamente fixada. Usar `size` faz o elemento ignorar a altura do seu próprio conteúdo!
+</Callout>
+
+<AntiPattern
+  badCode={`/* Desnecessário: usar CQ para o que o Flexbox já faz sozinho */\n.box { container-type: inline-size; }\n@container (max-width: 400px) {\n  .item { width: 100%; }\n}`}
+  goodCode={`/* Resiliente: Flex-wrap nativo sem consultas */\n.cluster {\n  display: flex;\n  flex-wrap: wrap;\n}`}
+  explanation="Reserve Container Queries para casos onde o estilo visual dos filhos precisa mudar drasticamente (ex: alterar tamanho de fonte ou trocar ordem de exibição estrutural), e não para mero empilhamento de fluxo."
+/>
+
+## 3. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 4. Playground Interativo
+
+<Playground title="Demonstração de Container Queries">
+  <Container class="demo-cq">
+    <Box padding="1.5rem">
+      <h4 class="text-lg font-bold">Elemento Sensível ao Container</h4>
+      <p class="text-sm text-muted">
+        Arraste a alça horizontal do canvas. O layout e as cores reagem à largura deste container específico, e não à tela inteira do computador!
+      </p>
+    </Box>
+  </Container>
+</Playground>
+
+## 5. Checklist de Qualidade
+
+<Checklist items={[
+  "Usa container-type: inline-size por padrão para evitar colapso vertical.",
+  "Nomeia containers (@container nome (...)) quando houver aninhamento múltiplo para evitar capturas ambíguas.",
+  "Utiliza unidades de container (cqw, cqi) para tipografia estritamente quando contextual.",
+  "Não utiliza CQ para layouts que o Flexbox com wrap resolve com menos código."
+]} />

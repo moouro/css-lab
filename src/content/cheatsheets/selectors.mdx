@@ -1,0 +1,61 @@
+---
+title: "Seletores CSS Modernos Cheatsheet"
+description: "Tabela de referência para pseudo-classes modernas: :has(), :is(), :where(), :user-invalid, combinadores e especificidade."
+tags: ["selectors", "cheatsheet", "has", "is", "where", "specificity"]
+draft: false
+order: 3
+printable: true
+---
+
+## 1. Pseudo-classes Lógicas & Relacionais
+
+| Seletor | O que faz? | Especificidade |
+| :--- | :--- | :--- |
+| `:has(seletor)` | **Seletor pai**: Estiliza o elemento SE ele contiver o descendente | Especificidade do argumento mais forte |
+| `:is(A, B, C)` | Agrupa seletores com tolerância a falhas (*forgiving*) | Especificidade do argumento mais forte |
+| `:where(A, B, C)` | Agrupa seletores com tolerância a falhas (*forgiving*) | **SEMPRE ZERO (0,0,0,0)** |
+| `:not(seletor)` | Negação: estiliza se NÃO corresponder ao seletor | Especificidade do argumento |
+
+## 2. Pseudo-classes de Estados de Formulário
+
+| Seletor | Momento de Ativação | Caso de Uso |
+| :--- | :--- | :--- |
+| `:user-invalid` | Ativa após o usuário cometer um erro e sair do campo | Validação amigável sem estresse inicial |
+| `:user-valid` | Ativa após o usuário preencher corretamente e sair do campo | Confirmação de campo concluído |
+| `:placeholder-shown` | Ativa enquanto o campo estiver vazio e exibindo o placeholder | Rótulos flutuantes (floating labels) |
+| `:focus-visible` | Ativa quando o foco é disparado via teclado (Tab) | Anéis de foco para acessibilidade |
+| `:focus-within` | Ativa no elemento pai quando qualquer filho receber foco | Destacar o grupo de formulário inteiro |
+
+## 3. Combinadores Modernos
+
+```css
+/* 1. Adjacent Sibling (Irmão Adjacente Direto) - A base do Stack */
+* + * {
+  margin-block-start: var(--space-s);
+}
+
+/* 2. Subsequent Sibling (Qualquer Irmão Posterior) */
+h2 ~ p {
+  line-height: 1.6;
+}
+
+/* 3. Child Combinator (Filho Imediato) */
+.list > li {
+  padding-block: var(--space-2xs);
+}
+
+/* 4. Relacional Pai Condicional */
+form:has(:user-invalid) button[type="submit"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+```
+
+## 4. Cálculo de Especificidade Rápido
+
+```text
+ID (1,0,0)  >  Classe, Pseudo-classe, Atributo (0,1,0)  >  Tag, Pseudo-elemento (0,0,1)
+```
+
+- `:where()` tem especificidade `(0, 0, 0)`: ideal para resets e bibliotecas.
+- `@layer` vence antes mesmo de o cálculo de especificidade ser executado!

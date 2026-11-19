@@ -1,0 +1,117 @@
+---
+title: "The Icon"
+description: "Alinhamento inline microscópico e escalonamento proporcional de ícones SVG com texto."
+draft: false
+publishDate: 2026-01-01
+tags: ["svg", "icons", "inline-flex", "cap-unit", "typography"]
+difficulty: "beginner"
+order: 12
+primitive: "icon"
+problem: "Ícones SVG desalinhados verticalmente com a linha de base do texto, com tamanhos estáticos em pixels que não acompanham a mudança de fonte ou modo de leitura."
+solution: "Usar display: inline-flex com align-items: center, unidades relativas em em ou a unidade moderna cap, e currentColor para herança de paleta."
+cssProperties:
+  - "display: inline-flex"
+  - "align-items: center"
+  - "block-size: 0.75em"
+  - "inline-size: 0.75em"
+  - "fill: currentColor"
+propsApi:
+  - name: "space"
+    type: "string"
+    default: "0.5ch"
+    description: "Espaçamento horizontal entre o ícone e o texto que o acompanha."
+  - name: "size"
+    type: "string"
+    default: "0.85em"
+    description: "Dimensão da caixa do SVG, proporcional ao font-size do texto circundante."
+  - name: "label"
+    type: "string"
+    default: "undefined"
+    description: "Se fornecido, transforma o ícone em imagem acessível com role='img' e aria-label para leitores de tela."
+relatedContent:
+  - "cluster"
+  - "box"
+layoutPrimitives:
+  - "icon"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Icon from '@/components/layout/Icon.astro';
+import Cluster from '@/components/layout/Cluster.astro';
+
+## 1. Conceito
+
+Ícones são a menor unidade de layout no design system. Eles compartilham o espaço imediatamente adjacente a nós de texto. Se o ícone não acompanhar o tamanho do texto quando o usuário der zoom ou mudar a escala de fonte, a interface parecerá amadora e descalibrada.
+
+O **Icon** trata o SVG como se fosse um caractere tipográfico de primeira classe.
+
+## 2. A Fórmula Proporcional em EM e CAP
+
+Por que não usar `1em`?
+`1em` corresponde ao *em-square* da tipografia inteira (incluindo ascendentes e descendentes). Letras maiúsculas medem tipicamente cerca de `0.75em` a `0.85em` da caixa de texto.
+
+```css
+.icon {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--icon-space, 0.5ch);
+}
+
+.icon > svg {
+  block-size: var(--icon-size, 0.85em);
+  inline-size: var(--icon-size, 0.85em);
+  flex-shrink: 0;
+  fill: currentColor;
+}
+```
+
+<Callout type="tip" title="A Unidade Moderna 'cap'">
+  Em navegadores modernos, a unidade CSS `cap` representa a altura exata das letras maiúsculas da fonte atual. Quando suportada, `height: 1cap` fornece um casamento óptico 100% perfeito com a tipografia!
+</Callout>
+
+<AntiPattern
+  badCode={`/* Frágil: pixels estáticos e cor desacoplada */\n.btn-icon {\n  width: 16px;\n  height: 16px;\n  fill: #3b82f6; /* Não muda quando o botão fica disabled ou hovered! */\n  vertical-align: middle; /* Falso alinhamento */\n}`}
+  goodCode={`/* Resiliente: proporcional e reativo por herança */\n.icon > svg {\n  inline-size: 0.85em;\n  block-size: 0.85em;\n  fill: currentColor;\n}`}
+  explanation="Usar currentColor faz o ícone adotar automaticamente a mesma cor do texto em estados hover, focus, disabled e temas escuros, sem nenhuma linha extra de CSS."
+/>
+
+## 3. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 4. Playground Interativo
+
+<Playground title="Demonstração do Icon Proporcional">
+  <Cluster space="1.5rem">
+    <button type="button" class="search-button cluster">
+      <Icon size="1em">
+        <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" width="16" height="16">
+          <circle cx="8" cy="8" r="6" stroke-width="2" />
+          <line x1="12" y1="12" x2="18" y2="18" stroke-width="2" stroke-linecap="round" />
+        </svg>
+      </Icon>
+      <span>Pesquisar</span>
+    </button>
+    <span class="text-2xl cluster" style="--cluster-space: 0.5ch;">
+      <Icon size="0.85em">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="20" height="20">
+          <path d="M10 2l2.5 5.5H18l-4.5 3.5 1.7 5.5L10 13.5 4.8 16.5l1.7-5.5L2 7.5h5.5z" />
+        </svg>
+      </Icon>
+      <strong>Título Gigante com Ícone Fluido</strong>
+    </span>
+  </Cluster>
+</Playground>
+
+## 5. Checklist de Qualidade
+
+<Checklist items={[
+  "Usa em ou cap para dimensões proporcionais à tipografia.",
+  "fill ou stroke configurados como currentColor para herança tonal automática.",
+  "flex-shrink: 0 no SVG para evitar que ele seja esmagado em espaços exíguos.",
+  "aria-hidden='true' no SVG caso acompanhado de texto visível, ou aria-label no container caso isolado."
+]} />

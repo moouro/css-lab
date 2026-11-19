@@ -1,0 +1,164 @@
+/* ═══════════════════════════════════════════════════════
+   CSS Lab — Design Tokens (Modern Baseline & Spec)
+   - Uses @theme for Tailwind CSS v4 typography integration
+   - Uses light-dark() for automatic color-scheme resolution
+   - Root declares color-scheme: light dark
+   ═══════════════════════════════════════════════════════ */
+
+@theme {
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+
+:root {
+  /* ─── Mandatory: Native browser color-scheme ───────── */
+  color-scheme: light dark;
+
+  /* ─── Neutral Scale ────────────────────────────────── */
+  --gray-0: #09090b;
+  --gray-1: #111113;
+  --gray-2: #18181b;
+  --gray-3: #222226;
+  --gray-4: #2c2c32;
+  --gray-5: #3a3a44;
+  --gray-6: #52525b;
+  --gray-7: #71717a;
+  --gray-8: #a1a1aa;
+  --gray-9: #b4b4bd;
+  --gray-10: #d4d4d8;
+  --gray-11: #e4e4e7;
+  --gray-12: #fafafa;
+
+  /* Light Scale Equivalents */
+  --light-bg: #fafafa;
+  --light-bg-raised: #ffffff;
+  --light-bg-hover: #f4f4f5;
+  --light-bg-inset: #f0f0f2;
+  --light-border: #e4e4e7;
+  --light-border-hover: #d4d4d8;
+  --light-text: #27272a;
+  --light-text-strong: #09090b;
+  --light-text-muted: #52525b;
+  --light-text-subtle: #71717a;
+
+  /* ─── Accent Colors ────────────────────────────────── */
+  --color-accent-light: #2563eb;
+  --color-accent-dark: #3b82f6;
+  --color-accent: light-dark(var(--color-accent-light), var(--color-accent-dark));
+  --color-accent-hover: light-dark(#1d4ed8, #60a5fa);
+  --color-accent-muted: light-dark(oklch(0.55 0.18 250 / 0.12), oklch(0.65 0.15 250 / 0.18));
+  --accent-muted: var(--color-accent-muted);
+
+  /* ─── Semantic Tokens using light-dark() ────────────── */
+  --color-bg: light-dark(var(--light-bg), var(--gray-1));
+  --color-bg-raised: light-dark(var(--light-bg-raised), var(--gray-2));
+  --color-bg-hover: light-dark(var(--light-bg-hover), var(--gray-3));
+  --color-bg-inset: light-dark(var(--light-bg-inset), var(--gray-0));
+  --color-bg-subtle: var(--color-bg-inset);
+
+  --color-border: light-dark(var(--light-border), var(--gray-4));
+  --color-border-hover: light-dark(var(--light-border-hover), var(--gray-5));
+  --color-border-subtle: light-dark(#ececef, #26262b);
+
+  --color-text: light-dark(var(--light-text), var(--gray-11));
+  --color-text-strong: light-dark(var(--light-text-strong), var(--gray-12));
+  --color-text-muted: light-dark(var(--light-text-muted), var(--gray-8));
+  --color-text-subtle: light-dark(var(--light-text-subtle), var(--gray-7));
+  --color-text-code: light-dark(var(--light-text-strong), var(--gray-12));
+
+  --color-surface: light-dark(var(--light-bg-raised), var(--gray-2));
+  --color-surface-hover: light-dark(var(--light-bg-hover), var(--gray-3));
+
+  /* ─── Universal Semantic Aliases ───────────────────── */
+  --color-fg: var(--color-text);
+  --color-fg-muted: var(--color-text-muted);
+  --color-fg-subtle: var(--color-text-subtle);
+  --color-bg-surface: var(--color-bg-raised);
+
+  --color-success: light-dark(#1a7f37, #3fb950);
+  --color-success-subtle: light-dark(rgb(26 127 55 / 0.15), rgb(63 185 80 / 0.15));
+  --color-success-muted: var(--color-success-subtle);
+
+  --color-warning: light-dark(#9a6700, #d29922);
+  --color-warning-subtle: light-dark(rgb(154 103 0 / 0.15), rgb(210 153 34 / 0.15));
+  --color-warning-muted: var(--color-warning-subtle);
+
+  --color-danger: light-dark(#cf222e, #f85149);
+  --color-danger-subtle: light-dark(rgb(207 34 46 / 0.15), rgb(248 81 73 / 0.15));
+  --color-error: var(--color-danger);
+  --color-error-muted: var(--color-danger-subtle);
+
+  /* ─── Transitions & Motion ─────────────────────────── */
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --duration-slow: 400ms;
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ─── Adaptive Elevation Shadows ───────────────────── */
+  --shadow-sm: 0 1px 2px 0 light-dark(rgb(0 0 0 / 0.05), rgb(0 0 0 / 0.3));
+  --shadow-md: 0 4px 12px -2px light-dark(rgb(0 0 0 / 0.08), rgb(0 0 0 / 0.45));
+  --shadow-lg: 0 16px 36px -8px light-dark(rgb(0 0 0 / 0.16), rgb(0 0 0 / 0.65));
+
+  /* ─── System UI Accents ────────────────────────────── */
+  accent-color: var(--color-accent);
+  --z-nav: 100;
+
+  /* ─── Fluid Spacing Modular Scale ──────────────────── */
+  --space-3xs: clamp(0.25rem, 0.22rem + 0.13vw, 0.3125rem);
+  --space-2xs: clamp(0.5rem, 0.45rem + 0.25vw, 0.625rem);
+  --space-xs:  clamp(0.75rem, 0.68rem + 0.38vw, 0.9375rem);
+  --space-s:   clamp(1rem, 0.91rem + 0.45vw, 1.25rem);
+  --space-m:   clamp(1.5rem, 1.36rem + 0.68vw, 1.875rem);
+  --space-l:   clamp(2rem, 1.82rem + 0.91vw, 2.5rem);
+  --space-xl:  clamp(3rem, 2.73rem + 1.36vw, 3.75rem);
+  --space-2xl: clamp(4rem, 3.64rem + 1.82vw, 5rem);
+  --space-3xl: clamp(6rem, 5.45rem + 2.73vw, 7.5rem);
+
+  /* ─── Borders & Radii ──────────────────────────────── */
+  --border-thin: 1px;
+  --border-thick: 2px;
+  --radius-s: 4px;
+  --radius-m: 8px;
+  --radius-l: 12px;
+  --radius-sm: var(--radius-s);
+  --radius-md: var(--radius-m);
+  --radius-lg: var(--radius-l);
+  --radius-full: 9999px;
+
+  /* ─── Pagefind UI Theme Bridge ─────────────────────── */
+  --pagefind-ui-scale: 0.9;
+  --pagefind-ui-primary: var(--color-accent);
+  --pagefind-ui-text: var(--color-text);
+  --pagefind-ui-background: var(--color-bg-inset);
+  --pagefind-ui-border: var(--color-border);
+  --pagefind-ui-tag: var(--color-bg-hover);
+  --pagefind-ui-font: var(--font-sans);
+
+  /* ─── Standard Scrollbar Colors (Baseline >= 3:1) ──── */
+  --scrollbar-thumb: light-dark(#71717a, #71717a);
+  --scrollbar-track: light-dark(#f4f4f5, #18181b);
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+
+  /* ─── Overrides based on <meta name="color-scheme"> ── */
+  &:has(> head > meta[name="color-scheme"][content="dark"]) {
+    color-scheme: dark;
+  }
+  &:has(> head > meta[name="color-scheme"][content="light"]) {
+    color-scheme: light;
+  }
+}
+
+/* Fallback for browsers without scrollbar-color */
+@supports not (scrollbar-color: auto) {
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb);
+    border-radius: var(--radius-full);
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--scrollbar-track);
+  }
+}

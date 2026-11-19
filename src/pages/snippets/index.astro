@@ -1,0 +1,270 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Center from '@/components/layout/Center.astro';
+import { getPublishedCollection } from '@/utils/collections';
+
+const entries = await getPublishedCollection('snippets');
+
+const categoryLabels: Record<string, { title: string; desc: string }> = {
+  layout: { title: 'Layout & Posicionamento', desc: 'Soluções para alinhamento, centralização, quebras e arquiteturas espaciais.' },
+  typography: { title: 'Tipografia & Texto', desc: 'Controle micro-tipográfico, hifenação, capitulares e clamp fluído.' },
+  animation: { title: 'Animações & Transições', desc: 'Efeitos performáticos acelerados por hardware sem dependência de JS.' },
+  utilities: { title: 'Utilitários & Resets', desc: 'Classes e helpers universais para acessibilidade, foco e customização.' },
+  patterns: { title: 'Padrões de Interface', desc: 'Componentes reativos, cards responsivos e interfaces semânticas.' },
+};
+
+const categories = ['layout', 'typography', 'animation', 'utilities', 'patterns'] as const;
+---
+
+<BaseLayout
+  title="Snippets — Soluções Prontas para o Cotidiano"
+  description="Biblioteca pesquisável de códigos CSS modernos, truques de layout, utilitários semânticos e padrões prontos para copiar e colar."
+>
+  <div class="hub-container">
+    <Center max="1100px">
+      <div class="stack" style="--stack-space: var(--space-xl);">
+        <header class="hub-header stack" style="--stack-space: var(--space-xs);">
+          <div class="cluster" style="--cluster-space: var(--space-xs); align-items: center;">
+            <span class="hub-badge font-mono text-xs">Pilar de Produtividade</span>
+            <span class="text-xs text-muted">Snippets Copiáveis & Otimizados</span>
+          </div>
+          <h1 class="hub-title">Snippets Library</h1>
+          <p class="hub-desc text-lg text-muted">
+            Coleção curada de 25 soluções CSS modernas para problemas recorrentes do dia a dia frontend. Sem dependências externas, pronto para aplicar em produção.
+          </p>
+        </header>
+
+        <div class="axiom-banner">
+          <span class="text-xs font-semibold tracking-caps text-muted">Axioma de Produtividade</span>
+          <blockquote class="axiom-quote">
+            "Não reinvente a roda. Mantenha soluções testadas, acessíveis e à prova de regressão visual catalogadas e ao alcance de um atalho de teclado."
+          </blockquote>
+        </div>
+
+        <!-- Categorias com Grid Proporcional -->
+        {categories.map((cat) => {
+          const catEntries = entries.filter((e) => e.data.category === cat);
+          if (catEntries.length === 0) return null;
+          const meta = categoryLabels[cat] || { title: cat, desc: '' };
+
+          return (
+            <section class="category-section stack" style="--stack-space: var(--space-m);">
+              <div class="category-header stack" style="--stack-space: var(--space-3xs);">
+                <div class="cluster" style="--cluster-space: var(--space-xs); align-items: center;">
+                  <h2 class="category-title">{meta.title}</h2>
+                  <span class="category-count font-mono text-xs text-muted">{catEntries.length} snippets</span>
+                </div>
+                {meta.desc && <p class="text-sm text-muted">{meta.desc}</p>}
+              </div>
+
+              <div class="hub-cards-grid">
+                {catEntries.map((entry) => (
+                  <a href={`/snippets/${entry.id}`} class="hub-card-link">
+                    <article class="hub-card">
+                      <header class="hub-card-header">
+                        <span class="hub-card-order font-mono text-xs text-muted">#{String(entry.data.order).padStart(2, '0')}</span>
+                        <h3 class="hub-card-title">{entry.data.title}</h3>
+                      </header>
+                      <div class="hub-card-body">
+                        <p class="hub-card-desc text-sm text-muted">{entry.data.description}</p>
+                      </div>
+                      <footer class="hub-card-footer">
+                        <span class="badge-difficulty font-mono text-xs uppercase">{entry.data.language}</span>
+                        <span class="hub-card-arrow" aria-hidden="true">Ver snippet →</span>
+                      </footer>
+                    </article>
+                  </a>
+                ))}
+              </div>
+            </section>
+          );
+        })}
+      </div>
+    </Center>
+  </div>
+</BaseLayout>
+
+<style>
+  .hub-container {
+    padding-block: var(--space-xl);
+    padding-inline: var(--space-m);
+  }
+
+  .hub-badge {
+    color: var(--color-accent);
+    background-color: var(--color-accent-muted);
+    padding-inline: 0.6em;
+    padding-block: 0.15em;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+  }
+
+  .hub-title {
+    font-size: var(--step-3);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .hub-desc {
+    max-inline-size: 75ch;
+    line-height: 1.6;
+  }
+
+  .axiom-banner {
+    padding: var(--space-m);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-inline-start: 4px solid var(--color-accent);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  .axiom-quote {
+    margin: 0;
+    font-size: var(--step--1);
+    font-style: italic;
+    color: var(--color-fg);
+    line-height: 1.5;
+  }
+
+  .category-section {
+    padding-block-start: var(--space-m);
+    border-block-start: 1px solid var(--color-border);
+  }
+
+  .category-title {
+    font-size: var(--step-1);
+    font-weight: 700;
+    color: var(--color-fg);
+  }
+
+  .category-count {
+    padding-inline: 0.5em;
+    padding-block: 0.1em;
+    border-radius: var(--radius-full);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+  }
+
+  .hub-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: var(--space-m);
+  }
+
+  .hub-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    height: 100%;
+  }
+
+  .hub-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 100%;
+    padding: var(--space-m);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.25s ease,
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.25s ease;
+  }
+
+  .hub-card::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hub-card-link:hover .hub-card {
+    transform: translateY(-4px);
+    border-color: var(--color-accent-muted);
+    background-color: var(--color-bg-hover);
+    box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.2), 0 0 0 1px var(--color-accent-muted);
+  }
+
+  .hub-card-link:hover .hub-card::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .hub-card-header {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-xs);
+    margin-block-end: var(--space-2xs);
+  }
+
+  .hub-card-title {
+    font-size: var(--step-0);
+    font-weight: 700;
+    line-height: 1.3;
+    transition: color 0.2s ease;
+  }
+
+  .hub-card-link:hover .hub-card-title {
+    color: var(--color-accent);
+  }
+
+  .hub-card-body {
+    flex: 1;
+    margin-block-end: var(--space-s);
+  }
+
+  .hub-card-desc {
+    line-height: 1.5;
+  }
+
+  .hub-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-block-start: var(--space-xs);
+    border-block-start: 1px solid var(--color-border-subtle);
+  }
+
+  .badge-difficulty {
+    padding-inline: 0.5em;
+    padding-block: 0.15em;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-raised);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg-muted);
+    letter-spacing: 0.04em;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .hub-card-link:hover .badge-difficulty {
+    border-color: var(--color-accent-muted);
+    color: var(--color-fg);
+  }
+
+  .hub-card-arrow {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hub-card-link:hover .hub-card-arrow {
+    transform: translateX(6px);
+  }
+</style>

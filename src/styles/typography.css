@@ -1,0 +1,133 @@
+/* ═══════════════════════════════════════════════════════
+   CSS Lab — Typography
+   Fluid type scale using clamp().
+   Ratio: Major Third (1.25).
+   Measure axiom from Every Layout.
+   ═══════════════════════════════════════════════════════ */
+
+:root {
+  /* ─── Type scale (Major Third 1.25) ────────────── */
+  --step--2: clamp(0.6944rem, 0.6610rem + 0.1670vw, 0.8000rem);
+  --step--1: clamp(0.8333rem, 0.7754rem + 0.2899vw, 1.0000rem);
+  --step-0:  clamp(1.0000rem, 0.9091rem + 0.4545vw, 1.2500rem);
+  --step-1:  clamp(1.2000rem, 1.0636rem + 0.6818vw, 1.5625rem);
+  --step-2:  clamp(1.4400rem, 1.2418rem + 0.9909vw, 1.9531rem);
+  --step-3:  clamp(1.7281rem, 1.4473rem + 1.4036vw, 2.4414rem);
+  --step-4:  clamp(2.0738rem, 1.6835rem + 1.9509vw, 3.0518rem);
+  --step-5:  clamp(2.4881rem, 1.9548rem + 2.6668vw, 3.8147rem);
+
+  /* ─── Font families ────────────────────────────── */
+  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  /* ─── Line heights ─────────────────────────────── */
+  --leading-none:    1;
+  --leading-tight:   1.2;
+  --leading-snug:    1.35;
+  --leading-normal:  1.6;
+  --leading-relaxed: 1.75;
+
+  /* ─── Measure (Every Layout axiom) ─────────────── */
+  --measure: 65ch;
+
+  /* ─── Letter spacing ───────────────────────────── */
+  --tracking-tighter: -0.03em;
+  --tracking-tight:   -0.02em;
+  --tracking-normal:   0;
+  --tracking-wide:     0.025em;
+  --tracking-caps:     0.075em;
+
+  /* ─── Font weights ─────────────────────────────── */
+  --weight-normal:   400;
+  --weight-medium:   500;
+  --weight-semibold: 600;
+  --weight-bold:     700;
+}
+
+@layer base {
+  /* ─── Base typography ──────────────────────────── */
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--step-0);
+    line-height: var(--leading-normal);
+    font-weight: var(--weight-normal);
+    letter-spacing: var(--tracking-normal);
+    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ─── Headings ─────────────────────────────────── */
+  h1, h2, h3, h4, h5, h6 {
+    font-weight: var(--weight-semibold);
+    line-height: var(--leading-tight);
+    letter-spacing: var(--tracking-tight);
+    color: var(--color-text-strong);
+    text-wrap: balance;
+  }
+
+  h1 {
+    font-size: var(--step-4);
+    letter-spacing: var(--tracking-tighter);
+  }
+
+  h2 {
+    font-size: var(--step-3);
+  }
+
+  h3 {
+    font-size: var(--step-2);
+  }
+
+  h4 {
+    font-size: var(--step-1);
+  }
+
+  h5, h6 {
+    font-size: var(--step-0);
+    font-weight: var(--weight-medium);
+  }
+
+  /* ─── Prose elements ───────────────────────────── */
+  p {
+    text-wrap: pretty;
+  }
+
+  strong, b {
+    font-weight: var(--weight-semibold);
+  }
+
+  small {
+    font-size: var(--step--1);
+  }
+
+  /* ─── Code typography ──────────────────────────── */
+  code, kbd, samp, pre {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    font-feature-settings: 'liga' 1, 'calt' 1;
+  }
+
+  pre {
+    font-size: var(--step--1);
+    line-height: var(--leading-relaxed);
+  }
+
+  /* ─── Links ────────────────────────────────────── */
+  a {
+    color: var(--color-accent);
+    text-decoration: none;
+    text-underline-offset: 0.15em;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  a:hover {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}

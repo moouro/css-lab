@@ -1,0 +1,149 @@
+---
+title: "Movimento Reduzido (prefers-reduced-motion)"
+description: "Acessibilidade vestibular e cognitiva através da adaptação graciosa de transições e animações."
+draft: false
+publishDate: 2026-01-01
+tags: ["reduced-motion", "accessibility", "a11y", "animations", "transitions"]
+difficulty: "beginner"
+order: 10
+feature: "reduced-motion"
+browserSupport: "stable"
+canIUseId: "prefers-reduced-motion"
+relatedContent:
+  - "color-scheme"
+  - "design-tokens"
+  - "custom-properties"
+layoutPrimitives:
+  - "box"
+  - "stack"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Para a maioria dos usuários, animações e transições sutis tornam a interface fluida e agradável. No entanto, para pessoas com **transtornos vestibulares**, cinetose ou sensibilidade neurológica, animações de deslizamento amplo, rotações rápidas, parallax e zoom podem desencadear náusea severa, vertigem, tontura e enxaqueca.
+
+O recurso de mídia `prefers-reduced-motion` detecta se o usuário ativou a opção "Reduzir Movimento" nas configurações de acessibilidade do seu sistema operacional (Windows, macOS, iOS ou Android).
+
+<Callout type="important" title="Critério de Sucesso WCAG 2.1 (2.3.3)">
+  Interfaces modernas devem obrigatoriamente respeitar a preferência de movimento reduzido para animações desencadeadas por interação ou carregamento.
+</Callout>
+
+## 2. A Estratégia de Reset Global de Movimento
+
+Uma das abordagens mais difundidas na comunidade frontend é adicionar um bloco global que neutraliza animações:
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
+
+<Callout type="info" title="Por que 0.01ms em vez de 0s?">
+  Se você definir a duração como `0s`, alguns navegadores não disparam os eventos JavaScript `transitionend` ou `animationend`, o que pode travar bibliotecas e componentes de terceiros que aguardam esse evento para remover nós do DOM. Usar `0.01ms` conclui a animação imperceptivelmente sem quebrar o ciclo de vida do JavaScript.
+</Callout>
+
+## 3. Reduzir Movimento não Significa Eliminar Feedback
+
+Um equívoco comum é achar que "reduzir movimento" significa deixar a interface estática e sem vida. Pessoas com sensibilidade ao movimento ainda precisam entender se um botão foi clicado ou se um modal abriu.
+
+A solução de alto nível é **substituir movimento físico por transição de opacidade (fade)**:
+
+```css
+.dialog {
+  /* Animação padrão: desliza e escala */
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog {
+    /* Modo reduzido: apenas fade in/out suave, sem movimento espacial */
+    transition: opacity 0.15s ease;
+    transform: none;
+  }
+}
+```
+
+## 4. Gerenciamento via Variáveis de Design Tokens
+
+Em vez de espalhar dezenas de media queries pelos componentes, defina a duração das animações como tokens:
+
+```css
+:root {
+  --duration-fast: 150ms;
+  --duration-normal: 250ms;
+  --ease-standard: cubic-bezier(0.2, 0, 0, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0ms;
+    --duration-normal: 0ms;
+  }
+}
+
+/* O componente consome o token naturalmente */
+.dropdown-menu {
+  transition: opacity var(--duration-fast) var(--ease-standard);
+}
+```
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Manter Animações de Parallax e Rotação Infinita"
+  badCode={`/* Ignora totalmente as preferências do usuário */
+.spinning-hero {
+  animation: spin 10s infinite linear;
+}
+.parallax-bg {
+  transform: translateY(calc(var(--scroll) * 0.5px));
+}`}
+  goodTitle="Desativar Movimento Espacial Contínuo"
+  goodCode={`@media (prefers-reduced-motion: reduce) {
+  .spinning-hero {
+    animation: none;
+  }
+  .parallax-bg {
+    transform: none;
+  }
+}`}
+  explanation="Animações contínuas de rotação ou parallax são os maiores causadores de desconforto vestibular. Elas devem ser completamente neutralizadas."
+/>
+
+## 6. Boas Práticas
+
+1. **Evite Parallax e Zooms automáticos**: Se utilizar, forneça sempre a alternativa estática.
+2. **Desative `scroll-behavior: smooth`**: Usuários que pedem movimento reduzido preferem navegação por âncoras imediata.
+3. **Mantenha transições de cor e opacidade**: Pequenos fades não ativam o sistema vestibular e mantêm a percepção de refinamento visual.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "O reset global ou token de duração reduzida foi configurado?", checked: true },
+    { text: "Efeitos de parallax e rotação contínua são cancelados quando prefers-reduced-motion estiver ativo?", checked: true },
+    { text: "O scroll suave da página foi desabilitado para navegação rápida?", checked: true },
+    { text: "O feedback visual de interação (hover/focus) é mantido via opacidade ou cores?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Design Tokens](/css-moderno/design-tokens) — Tokens de tempo e easing functions.
+- [Color Scheme](/css-moderno/color-scheme) — Outra preferência de sistema operacional respeitada.
+- [Componentes: Modal](/components/modals) — Transições acessíveis em janelas modais.

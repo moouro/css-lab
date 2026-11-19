@@ -1,0 +1,185 @@
+---
+title: "Dropdowns & Popovers (Popover API)"
+description: "Menus suspensos e popovers sem JavaScript usando o atributo popover e Anchor Positioning CSS."
+draft: false
+publishDate: 2026-01-01
+tags: ["components", "dropdowns", "popover-api", "anchor-positioning", "top-layer"]
+difficulty: "advanced"
+order: 6
+anatomy:
+  - "<button popovertarget='...'>"
+  - "<div popover id='...'>"
+  - "Lista de ações do menu"
+hasPlayground: true
+a11yNotes: "A Popover API gerencia o fechamento automático ao clicar fora (light dismiss), o fechamento via tecla Escape e a camada superior (top-layer) sem z-index."
+relatedContent:
+  - "tooltips"
+  - "modals"
+layoutPrimitives:
+  - "box"
+  - "stack"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Historicamente, implementar um **Dropdown Menu** exigia bibliotecas pesadas (como Popper.js ou Floating UI), listeners de evento `click` globais no `window` para detectar "clique fora" (*light dismiss*), listeners de tecla `Escape` e constantes dores de cabeça com guerras de `z-index` e `overflow: hidden` cortando o menu em contêineres pais.
+
+A plataforma web moderna resolveu **100% desses problemas** através de duas adições fundamentais:
+1. **A Popover API** (atributo `popover` e `popovertarget`): Eleva o elemento para a **Top Layer** do navegador (acima de qualquer `z-index` existente!) e cuida do clique fora e do `Escape` nativamente.
+2. **CSS Anchor Positioning**: Ancora o menu flutuante exatamente na posição do botão que o disparou diretamente via CSS.
+
+<Callout type="info" title="Baseline 2024">
+  A Popover API é Baseline universal em todos os navegadores modernos (Chrome 114+, Safari 17+, Firefox 125+).
+</Callout>
+
+## 2. A Implementação Semântica sem JS
+
+```html
+<!-- O botão de disparo apenas aponta para o ID do popover -->
+<button type="button" class="btn" popovertarget="user-menu">
+  Opções da Conta
+</button>
+
+<!-- O menu suspenso nativo na Top Layer -->
+<div popover id="user-menu" class="dropdown-menu">
+  <ul class="dropdown-list">
+    <li><a href="/profile">Meu Perfil</a></li>
+    <li><a href="/settings">Configurações</a></li>
+    <li class="dropdown-divider"></li>
+    <li><button type="button" class="dropdown-danger">Sair</button></li>
+  </ul>
+</div>
+```
+
+E no CSS:
+```css
+/* O popover começa invisível por padrão pelo navegador */
+.dropdown-menu {
+  /* Reseta os estilos nativos do navegador */
+  margin: 0;
+  padding: var(--space-xs);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-bg-surface);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+  color: var(--color-fg);
+  min-inline-size: 200px;
+
+  /* Transição suave de abertura */
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: opacity var(--duration-fast) ease,
+              transform var(--duration-fast) ease,
+              overlay var(--duration-fast) allow-discrete,
+              display var(--duration-fast) allow-discrete;
+}
+
+/* Quando o popover estiver aberto */
+.dropdown-menu:popover-open {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Efeito no backdrop se desejado */
+.dropdown-menu::backdrop {
+  background-color: transparent;
+}
+
+.dropdown-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.dropdown-list a,
+.dropdown-list button {
+  display: block;
+  inline-size: 100%;
+  padding: var(--space-2xs) var(--space-xs);
+  text-decoration: none;
+  color: inherit;
+  font-size: var(--step--1);
+  border-radius: var(--radius-sm);
+  background: none;
+  border: none;
+  text-align: start;
+  cursor: pointer;
+}
+
+.dropdown-list a:hover,
+.dropdown-list button:hover {
+  background-color: var(--color-bg-hover);
+  color: var(--color-accent);
+}
+```
+
+## 3. Posicionamento Automático com CSS Anchor Positioning
+
+Para colar o popover exatamente embaixo do botão sem JavaScript:
+
+```css
+/* 1. Nomeia o botão como âncora */
+.btn[popovertarget="user-menu"] {
+  anchor-name: --menu-trigger;
+}
+
+/* 2. O popover ancora na posição do botão */
+#user-menu {
+  position-anchor: --menu-trigger;
+  position: absolute;
+  inset-block-start: anchor(bottom);
+  inset-inline-start: anchor(start);
+  margin-block-start: var(--space-2xs);
+}
+```
+
+<Callout type="important" title="Fim do Problema de overflow: hidden">
+  Como o popover vive na **Top Layer**, nenhum contêiner pai com `overflow: hidden`, `overflow: scroll` ou `transform` cortará o menu suspenso! Ele renderiza livremente no topo absoluto da viewport.
+</Callout>
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar div com position: absolute dentro de overflow: hidden"
+  badCode={`<!-- O menu é cortado pela borda do card pai -->
+<div class="card" style="overflow: hidden;">
+  <button onclick="toggle()">Menu</button>
+  <div class="menu" style="position: absolute;">...</div>
+</div>`}
+  goodTitle="Usar a Popover API Nativa"
+  goodCode={`<button popovertarget="my-menu">Menu</button>
+<div popover id="my-menu">...</div>`}
+  explanation="Elementos com popover residem na Top Layer e nunca sofrem corte por overflow: hidden de ancestrais nem exigem bibliotecas externas de posicionamento."
+/>
+
+## 5. Boas Práticas
+
+1. **Use `popover="auto"` (padrão)**: Garante fechamento ao clicar fora (*light dismiss*) e fecha outros popovers abertos.
+2. **Use `popover="manual"` apenas quando o fechamento deve ser explícito**: Ex: notificações toast ou alertas persistentes.
+3. **Mantenha os itens focáveis no teclado**: Todos os links e botões dentro do dropdown devem ser acessíveis via `Tab`.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "O atributo popovertarget no botão aponta para o ID correto do popover?", checked: true },
+    { text: "O fechamento via tecla Escape funciona nativamente sem código extra?", checked: true },
+    { text: "O clique fora da área (light dismiss) fecha o menu automaticamente?", checked: true },
+    { text: "O menu não é cortado por ancestrais com overflow: hidden?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Componentes: Tooltips](/components/tooltips) — Posicionamento de micro-dicas flutuantes.
+- [Componentes: Modals](/components/modals) — Diálogos com a tag `<dialog>`.
+- [Every Layout: Imposter](/every-layout/imposter) — Sobreposição isolada de conteúdo.

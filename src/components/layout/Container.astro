@@ -1,0 +1,34 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { mergeVars } from '../../utils/style';
+
+type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{
+  as: Tag;
+  name?: string;
+}>;
+
+const {
+  as: Tag = 'div',
+  name,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Element = Tag as 'div';
+const computedStyle = mergeVars(
+  {
+    'container-name': name,
+  },
+  style,
+);
+---
+
+<Element
+  class:list={['container-query', className]}
+  data-name={name ? '' : undefined}
+  style={computedStyle}
+  {...rest}
+>
+  <slot />
+</Element>

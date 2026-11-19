@@ -1,0 +1,109 @@
+---
+title: "Ordem Visual no Flexbox & Acessibilidade"
+description: "A propriedade order, reordenação de itens e o abismo perigoso entre a ordem visual e a ordem de foco do DOM."
+draft: false
+publishDate: 2026-01-01
+tags: ["flexbox", "order", "accessibility", "a11y", "focus-management"]
+difficulty: "advanced"
+order: 5
+relatedContent:
+  - "fundamentals"
+  - "patterns"
+  - "alignment"
+layoutPrimitives:
+  - "cluster"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+A propriedade `order` permite alterar a ordem na qual os *flex items* são renderizados na tela, **sem modificar a ordem do código HTML no DOM**.
+
+Todos os flex items começam com `order: 0`. Você pode passar números inteiros positivos ou negativos:
+
+```css
+.card {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Move o botão de ação para o início visual da pilha */
+.card-action {
+  order: -1;
+}
+
+/* Move o rodapé para o final absoluto */
+.card-footer {
+  order: 99;
+}
+```
+
+<Callout type="warning" title="O Perigo Crítico de Acessibilidade (WCAG 1.3.2)">
+  A propriedade `order` altera **apenas a pintura visual** na tela. Ela **NÃO** altera a ordem de navegação do teclado (tecla `Tab`), nem a ordem em que leitores de tela (como NVDA ou VoiceOver) leem o documento para usuários com deficiência visual.
+</Callout>
+
+## 2. A Desconexão Cognitiva do Teclado
+
+Imagine um formulário onde você usou `order` para colocar o botão "Enviar" no topo da página por razões de design:
+
+1. O usuário que navega via teclado pressiona `Tab`.
+2. O cursor de foco pula para o primeiro campo de input no HTML (que está embaixo visualmente).
+3. O foco pula entre os campos e, apenas no final do formulário, o foco "voa" para o topo no botão de envio.
+
+Essa discrepância causa desorientação severa em usuários que dependem de teclado ou ampliadores de tela.
+
+## 3. Quando é Seguro Usar `order`?
+
+O uso da propriedade `order` é seguro apenas quando a mudança **não interfere na leitura sequencial com significado**:
+
+- **Elementos puramente decorativos**: Como ilustrações ou formas geométricas de fundo.
+- **Micro-ajustes em layouts reversos**: Quando a inversão é puramente estética (ex: alternar a imagem entre esquerda e direita em blocos alternados de uma página sobre nós via `flex-direction: row-reverse`).
+
+## 4. O Futuro: `reading-flow`
+
+A especificação CSS Display Module Level 4 está introduzindo a propriedade `reading-flow: flex-visual`, que instruirá o navegador a sincronizar a ordem de foco do teclado com a ordem visual renderizada por `order`. Até que ela atinja suporte universal, a ordem do DOM deve sempre ter prioridade.
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar order para Reorganizar Campos de Formulário"
+  badCode={`/* Altera a ordem de leitura do formulário */
+.input-name { order: 2; }
+.input-email { order: 1; }
+.btn-submit { order: 3; }`}
+  goodTitle="Organizar a Ordem Correta Diretamente no HTML"
+  goodCode={`<!-- O HTML reflete a ordem real de foco e leitura -->
+<input id="email" placeholder="Email" />
+<input id="name" placeholder="Nome" />
+<button type="submit">Enviar</button>`}
+  explanation="Nunca use 'order' para consertar HTML desordenado. Mantenha a ordem do HTML idêntica à ordem lógica de interação do usuário."
+/>
+
+## 6. Boas Práticas
+
+1. **A regra de ouro da acessibilidade**: O HTML deve fazer 100% de sentido na ordem de leitura caso o CSS seja desabilitado.
+2. **Prefira `flex-direction: row-reverse`** com semântica pensada para blocos alternados.
+3. **Teste com a tecla Tab**: Sempre navegue pela página usando apenas o teclado para verificar se o foco se desloca em linha reta previsível.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A propriedade order foi restrita a elementos sem impacto na navegação por foco?", checked: true },
+    { text: "A navegação por teclado (Tab) segue um fluxo visual intuitivo sem saltos bizarros?", checked: true },
+    { text: "A ordem do HTML faz sentido sem folhas de estilo aplicadas?", checked: true },
+    { text: "A conformidade com o critério WCAG 1.3.2 (Sequência Significativa) foi assegurada?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Fundamentos do Flexbox](/flexbox-lab/fundamentals) — Direção e eixos.
+- [Acessibilidade no CSS Moderno](/css-moderno/reduced-motion) — Considerações de acessibilidade.
+- [Padrões de Flexbox](/flexbox-lab/patterns) — Padrões ergonômicos recomendados.

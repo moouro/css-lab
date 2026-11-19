@@ -1,0 +1,31 @@
+---
+title: "Tokens de Bordas & Raios"
+description: "Raios de curvatura (border-radius) para botões, cards, modais e pílulas sem cantos exagerados."
+category: "borders"
+order: 4
+draft: false
+---
+
+## 1. Escala de Raios de Borda (Border Radius)
+
+Seguindo o design system sóbrio inspirado em ferramentas técnicas, evitamos arredondamentos plásticos de brinquedo e mantemos curvaturas refinadas:
+
+```css
+:root {
+  --radius-sm: 4px;      /* Botões pequenos, inputs, tags de código */
+  --radius-md: 8px;      /* Cards, dropdowns, blocos de código */
+  --radius-lg: 12px;     /* Diálogos modais, painéis de destaque */
+  --radius-xl: 16px;     /* Grandes contêineres de hero */
+  --radius-full: 9999px; /* Badges, pílulas e avatares circulares */
+}
+```
+
+## 2. Espessuras e Estilos de Borda
+
+```css
+:root {
+  --border-width-hairline: 1px;
+  --border-width-thick: 2px;
+  --border-width-accent: 4px; /* Linha de destaque em alerts e callouts */
+}
+```

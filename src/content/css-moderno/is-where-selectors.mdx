@@ -1,0 +1,135 @@
+---
+title: "Seletores :is() e :where()"
+description: "Agrupamento declarativo de seletores, tolerância a falhas sintáticas e manipulação cirúrgica da especificidade."
+draft: false
+publishDate: 2026-01-01
+tags: ["is-selector", "where-selector", "specificity", "forgiving-selectors"]
+difficulty: "beginner"
+order: 8
+feature: "is-where-selectors"
+browserSupport: "stable"
+canIUseId: "css-matches-pseudo"
+relatedContent:
+  - "has-selector"
+  - "cascade-layers"
+  - "nesting"
+layoutPrimitives:
+  - "box"
+  - "stack"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Tanto `:is()` quanto `:where()` recebem uma lista separada por vírgulas de seletores e aplicam as regras aos elementos que correspondem a qualquer um dos itens da lista.
+
+Antes deles, estilizar múltiplos elementos dentro de seções diferentes exigia uma matriz verbosa:
+
+```css
+/* Antigo e repetitivo */
+header h1, header h2, header h3,
+main h1, main h2, main h3,
+article h1, article h2, article h3 {
+  line-height: 1.2;
+}
+
+/* Moderno com agrupamento */
+:is(header, main, article) :is(h1, h2, h3) {
+  line-height: 1.2;
+}
+```
+
+## 2. A Diferença Crucial: Especificidade
+
+A única diferença fundamental entre `:is()` e `:where()` é como o algoritmo da cascata calcula a **especificidade**:
+
+| Pseudo-classe | Cálculo de Especificidade | Caso de Uso Ideal |
+| :--- | :--- | :--- |
+| `:is(...)` | Assume a especificidade do **seletor mais pesado** da lista | Componentes e seletores de aplicação |
+| `:where(...)` | Especificidade é **SEMPRE ZERO** (0, 0, 0, 0) | Resets, defaults de Design System e temas |
+
+### Exemplo Prático de Especificidade
+
+```css
+/* Especificidade de :is(): herda o peso do #special-button = (1, 0, 0) */
+:is(button, .btn, #special-button) {
+  padding: 1rem;
+}
+
+/* Especificidade de :where(): É ZERO! Qualquer classe sobrescreve com facilidade */
+:where(button, .btn, #special-button) {
+  padding: 1rem;
+}
+
+/* Esta classe simples (0, 1, 0) VENCE o seletor :where() acima, mesmo com ID dentro dele! */
+.custom-padding {
+  padding: 0.25rem;
+}
+```
+
+<Callout type="info" title="O Superpoder de :where() em Design Systems">
+  Criadores de Design Systems e bibliotecas usam `:where()` para fornecer estilos padrão que os consumidores da biblioteca conseguem sobrescrever com uma única classe simples, sem nenhuma guerra de especificidade.
+</Callout>
+
+## 3. Tolerância a Falhas (Forgiving Selector Parsing)
+
+Em seletores CSS clássicos, se um único item da lista for inválido ou não suportado pelo navegador, a **regra inteira é descartada**:
+
+```css
+/* Se o navegador não reconhecer ::-moz-focus-inner, NADA recebe estilo */
+button, button::-moz-focus-inner, button:focus-visible {
+  outline: 2px solid blue;
+}
+```
+
+Com `:is()` e `:where()`, o parsing é **indulgente** (*forgiving*):
+```css
+/* Se ::-moz-focus-inner for inválido, o navegador ignora apenas ele e estiliza o resto! */
+:is(button, button::-moz-focus-inner, button:focus-visible) {
+  outline: 2px solid blue;
+}
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar :is() em Regras de Reset ou Estilos Base"
+  badCode={`/* Problema: seletor ganha peso de elemento e dificulta overrides */
+:is(h1, h2, h3, h4) {
+  margin-block-start: 0;
+}`}
+  goodTitle="Usar :where() para Defaults com Especificidade Zero"
+  goodCode={`/* Vantagem: qualquer classe utilitária sobrescreve sem esforço */
+:where(h1, h2, h3, h4) {
+  margin-block-start: 0;
+}`}
+  explanation="Usar :where() em resets e estilos base garante que desenvolvedores não precisem recorrer a seletores hiper-específicos para alterar a margem de um título pontual."
+/>
+
+## 5. Boas Práticas
+
+1. **Use `:where()` para CSS Base e Resets**: Garanta especificidade 0 para tipografia padrão, botões e listas.
+2. **Use `:is()` para regras de componentes funcionais**: Onde você deseja agrupar sem abrir mão da precedência normal de cascata.
+3. **Aproveite a tolerância a falhas**: Agrupe seletores experimentais ou vendor-prefixed dentro de `:is()` para não quebrar navegadores modernos.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "Estilos base e resets foram encapsulados em :where() para especificidade zero?", checked: true },
+    { text: "Seletores repetitivos foram reduzidos usando a sintaxe compacta :is()?", checked: true },
+    { text: "A especificidade resultante do seletor mais pesado em :is() foi verificada?", checked: true },
+    { text: "Seletores experimentais foram protegidos com listas tolerantes a falhas?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Cascade Layers](/css-moderno/cascade-layers) — A forma arquitetural de controlar a cascata.
+- [Seletor :has()](/css-moderno/has-selector) — Combinação com :where() para neutralizar o alvo.
+- [CSS Nesting](/css-moderno/nesting) — Como o nesting nativo compila internamente para :is().

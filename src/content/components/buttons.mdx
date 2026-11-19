@@ -1,0 +1,177 @@
+---
+title: "Buttons (Botões)"
+description: "Engenharia de botões com HTML semântico, variantes de alto contraste, estados focáveis e suporte a ícones."
+draft: false
+publishDate: 2026-01-01
+tags: ["components", "buttons", "interactive", "accessibility", "focus-visible"]
+difficulty: "beginner"
+order: 1
+anatomy:
+  - "<button> nativo"
+  - "Ícone SVG complementar"
+  - "Rótulo de texto"
+hasPlayground: true
+a11yNotes: "Nunca utilize <div> ou <a> para ações sem navegação. Use a tag <button> nativa com type='button' explícito para evitar submissões acidentais de formulário."
+relatedContent:
+  - "inputs"
+  - "badges"
+layoutPrimitives:
+  - "cluster"
+  - "box"
+  - "icon"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+O **Botão** é o elemento interativo mais fundamental de uma interface de usuário. Ele dispara comandos, confirma intenções, envia dados e aciona estados.
+
+Apesar da simplicidade aparente, a construção de botões profissionais exige:
+- Semântica nativa (teclado `Enter` e `Espaço`, foco por `Tab`).
+- Gerenciamento rigoroso de estados (`:hover`, `:active`, `:focus-visible`, `:disabled`).
+- Eliminação do contorno de foco padrão em cliques de mouse enquanto preserva o anel nítido de foco para teclado via `:focus-visible`.
+- Alinhamento de ícones sem quebra de linha.
+
+## 2. Anatomia e Variantes no CSS
+
+```css
+/* Botão Base com Custom Properties como API */
+.btn {
+  --btn-bg: var(--color-bg-surface);
+  --btn-fg: var(--color-fg);
+  --btn-border: var(--color-border);
+  --btn-padding-block: var(--space-xs);
+  --btn-padding-inline: var(--space-s);
+  --btn-radius: var(--radius-sm);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2xs);
+
+  padding-block: var(--btn-padding-block);
+  padding-inline: var(--btn-padding-inline);
+  border-radius: var(--btn-radius);
+
+  background-color: var(--btn-bg);
+  color: var(--btn-fg);
+  border: 1px solid var(--btn-border);
+
+  font-family: inherit;
+  font-size: var(--step--1);
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+
+  transition:
+    background-color var(--duration-fast) ease,
+    border-color var(--duration-fast) ease,
+    box-shadow var(--duration-fast) ease,
+    transform var(--duration-fast) ease;
+}
+
+/* Anel de foco acessível apenas via teclado */
+.btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+/* Efeito de clique físico */
+.btn:active:not(:disabled) {
+  transform: translateY(1px);
+}
+
+/* Desabilitado */
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* Variante Primária */
+.btn-primary {
+  --btn-bg: var(--color-accent);
+  --btn-fg: #ffffff;
+  --btn-border: transparent;
+}
+.btn-primary:hover {
+  --btn-bg: var(--color-accent-hover, #0056b3);
+}
+
+/* Variante Destrutiva (Danger) */
+.btn-danger {
+  --btn-bg: var(--color-danger);
+  --btn-fg: #ffffff;
+  --btn-border: transparent;
+}
+
+/* Variante Ghost (Sem borda/fundo até o hover) */
+.btn-ghost {
+  --btn-bg: transparent;
+  --btn-border: transparent;
+}
+.btn-ghost:hover {
+  --btn-bg: var(--color-bg-hover);
+}
+```
+
+## 3. Ícones em Botões sem Quebra ou Achatamento
+
+Sempre garanta que os ícones internos possuam `flex-shrink: 0`:
+
+```css
+.btn svg {
+  inline-size: 1em;
+  block-size: 1em;
+  flex-shrink: 0;
+}
+```
+
+Usar `1em` garante que o ícone cresça e encolha proporcionalmente ao tamanho de fonte do botão!
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar div com onclick no Lugar de <button>"
+  badCode={`<!-- Péssimo para acessibilidade -->
+<div class="btn" onclick="handleClick()">
+  Salvar Alterações
+</div>`}
+  goodTitle="Usar o Elemento <button> Nativo"
+  goodCode={`<!-- Acessível, focável por teclado e semântico -->
+<button type="button" class="btn btn-primary">
+  Salvar Alterações
+</button>`}
+  explanation="Divs não recebem foco via Tab, não disparam eventos via Enter ou Espaço, e não são anunciadas como ações clicáveis por leitores de tela."
+/>
+
+## 5. Boas Práticas
+
+1. **Sempre declare `type="button"`**: Em tags `<button>`, o padrão do navegador dentro de um formulário é `type="submit"`. Se você esquecer, clicar no botão recarregará a página!
+2. **Use `:focus-visible` em vez de `:focus`**: Evita que o anel de foco apareça para usuários de mouse enquanto mantém 100% da acessibilidade para teclado.
+3. **Evite `line-height` excessivo**: Use `line-height: 1` e controle a altura exclusivamente via `padding-block`.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A tag utilizada é <button type='button'> (ou <a href> para navegação externa)?", checked: true },
+    { text: "outline: none NÃO foi utilizado sem um substituto em :focus-visible?", checked: true },
+    { text: "Ícones internos possuem flex-shrink: 0 e dimensões em 1em?", checked: true },
+    { text: "O estado :disabled impede cliques e possui contraste acessível?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Componentes: Inputs](/components/inputs) — Controles de formulário integrados.
+- [Every Layout: Cluster](/every-layout/cluster) — Agrupamento de botões de ação.
+- [Acessibilidade no CSS](/css-moderno/reduced-motion) — Transições respeitosas.

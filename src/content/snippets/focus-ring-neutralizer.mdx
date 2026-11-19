@@ -1,0 +1,27 @@
+---
+title: "Anel de Foco Elegante (:focus-visible)"
+description: "Eliminar a borda feia de clique de mouse preservando anéis de foco de alto contraste para navegação por teclado."
+category: "utilities"
+tags: ["utilities", "a11y", "focus-visible", "focus-ring"]
+draft: false
+order: 19
+language: "css"
+---
+
+### Problema
+Desenvolvedores adicionam `outline: none;` para agradar designers que não gostam do anel azul ao clicar com mouse, destruindo completamente a acessibilidade para quem navega via tecla `Tab`.
+
+### Código
+
+```css
+/* Remove contorno em cliques de mouse */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Fornece foco nítido e acessível apenas via teclado */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+```

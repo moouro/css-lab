@@ -1,0 +1,135 @@
+---
+title: "Tooltips & Dicas Flutuantes"
+description: "Dicas de contexto flutuantes com CSS Anchor Positioning nativo, acessibilidade de teclado e zero JS."
+draft: false
+publishDate: 2026-01-01
+tags: ["components", "tooltips", "anchor-positioning", "accessibility", "micro-copy"]
+difficulty: "advanced"
+order: 8
+anatomy:
+  - "Elemento âncora (botão ou link com aria-describedby)"
+  - "Contêiner da dica flutuante com role='tooltip'"
+  - "Seta indicadora direcional"
+hasPlayground: true
+a11yNotes: "Tooltips devem ser descartáveis com a tecla Escape, não devem desaparecer quando o mouse passar por cima deles e precisam ser acionados tanto por hover quanto por focus."
+relatedContent:
+  - "dropdowns"
+  - "buttons"
+layoutPrimitives:
+  - "box"
+  - "imposter"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Uma **Tooltip** (Dica de Tela) é um rótulo curto que aparece temporariamente quando o usuário passa o mouse (`:hover`) ou foca via teclado (`:focus-visible`) em um controle interativo, clarificando sua função (especialmente útil para botões que contêm apenas ícones, como "Editar", "Excluir" ou "Configurações").
+
+Historicamente, tooltips exigiam bibliotecas de posicionamento ou truques frágeis com pseudo-elementos `::after` e `position: absolute`.
+
+Com a chegada do **CSS Anchor Positioning** e da **Popover API**, tooltips podem ser renderizadas na **Top Layer** e ancoradas com segurança milimétrica sem uma única linha de JavaScript.
+
+## 2. A Implementação com CSS Anchor Positioning
+
+```html
+<button
+  type="button"
+  class="btn-icon"
+  aria-describedby="tooltip-copy"
+  id="copy-btn"
+>
+  <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor">
+    <rect x="9" y="9" width="13" height="13" rx="2" stroke-width="2" />
+    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" stroke-width="2" />
+  </svg>
+</button>
+
+<!-- Tooltip semântica -->
+<div role="tooltip" id="tooltip-copy" class="tooltip">
+  Copiar para a Área de Transferência
+</div>
+```
+
+E no CSS:
+```css
+/* 1. O botão define o nome da âncora */
+#copy-btn {
+  anchor-name: --copy-anchor;
+}
+
+/* 2. A tooltip se ancora no botão */
+.tooltip {
+  position-anchor: --copy-anchor;
+  position: absolute;
+  inset-block-end: anchor(top);
+  inset-inline-start: anchor(center);
+  transform: translateX(-50%);
+  margin-block-end: var(--space-2xs);
+
+  background-color: var(--color-fg);
+  color: var(--color-bg);
+  padding: var(--space-3xs) var(--space-xs);
+  border-radius: var(--radius-sm);
+  font-size: var(--step--2);
+  white-space: nowrap;
+  pointer-events: none;
+
+  /* Invisível por padrão */
+  opacity: 0;
+  transition: opacity var(--duration-fast) ease, transform var(--duration-fast) ease;
+}
+
+/* Revela no hover ou foco do botão associado */
+#copy-btn:hover + .tooltip,
+#copy-btn:focus-visible + .tooltip {
+  opacity: 1;
+}
+```
+
+<Callout type="info" title="A Regra de Ouro do WCAG 1.4.13 (Content on Hover or Focus)">
+  A especificação WCAG exige que o conteúdo que aparece no hover/focus:
+  1. **Seja descartável**: Tecla `Escape` fecha sem mover o ponteiro.
+  2. **Seja pairável (*hoverable*)**: O usuário pode mover o mouse sobre a tooltip sem que ela feche.
+  3. **Seja persistente**: Permanece visível até o usuário remover o foco ou o ponteiro.
+</Callout>
+
+## 3. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Colocar Informações Essenciais Apenas na Tooltip"
+  badCode={`<!-- O usuário mobile nunca verá a dica -->
+<input type="text" />
+<span class="tooltip">Obrigatório preencher este campo</span>`}
+  goodTitle="Usar Tooltips Apenas para Micro-copy Complementar"
+  goodCode={`<label for="pwd">Senha <small class="text-muted">(mínimo 8 caracteres)</small></label>
+<input id="pwd" type="password" />`}
+  explanation="Dispositivos sensíveis ao toque (smartphones e tablets) não possuem estado hover real. Informações essenciais para completar uma tarefa devem estar sempre visíveis no DOM."
+/>
+
+## 4. Boas Práticas
+
+1. **Sempre associe com `aria-describedby`**: Garante que leitores de tela leiam a dica flutuante quando o usuário der foco no botão.
+2. **Evite textos longos em tooltips**: Se o texto tiver mais de 10 palavras, use um modal ou popover, não uma tooltip.
+3. **Use cores de alto contraste**: Garanta que o fundo e o texto da tooltip sejam legíveis sobre qualquer conteúdo de fundo.
+
+## 5. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A tooltip foi associada ao botão via aria-describedby?", checked: true },
+    { text: "A dica aparece tanto no :hover quanto no :focus-visible?", checked: true },
+    { text: "O texto da tooltip é breve e puramente complementar?", checked: true },
+    { text: "Nenhuma informação vital para a conclusão da tarefa depende exclusivamente da tooltip?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Componentes: Dropdowns](/components/dropdowns) — Popovers interativos.
+- [Componentes: Botões](/components/buttons) — Botões com ícones complementares.
+- [Every Layout: Icon](/every-layout/icon) — Primitiva para ícones acessíveis.

@@ -1,0 +1,67 @@
+---
+title: "CSS Flexbox Cheatsheet"
+description: "Guia visual e de bolso de eixos, alinhamento, flex-basis e o shorthand flex."
+tags: ["flexbox", "cheatsheet", "reference", "print"]
+draft: false
+order: 2
+printable: true
+---
+
+## 1. Propriedades do Contêiner Flexível
+
+| Propriedade | Valores | Descrição |
+| :--- | :--- | :--- |
+| `display` | `flex \| inline-flex` | Habilita o contexto de formatação unidimensional |
+| `flex-direction` | `row \| column \| row-reverse \| column-reverse` | Define o Eixo Principal (Main Axis) |
+| `flex-wrap` | `nowrap \| wrap \| wrap-reverse` | Permite quebra de linha quando faltar espaço |
+| `flex-flow` | `row wrap` | Shorthand para `flex-direction` + `flex-wrap` |
+| `justify-content` | `flex-start \| flex-end \| center \| space-between \| space-around \| space-evenly` | Alinhamento ao longo do Eixo Principal |
+| `align-items` | `stretch \| flex-start \| flex-end \| center \| baseline` | Alinhamento ao longo do Eixo Transversal |
+| `align-content` | `flex-start \| flex-end \| center \| space-between \| stretch` | Distribuição de linhas em contêineres com `wrap` |
+| `gap` | `var(--space-s) \| 1rem 1.5rem` | Espaçamento entre itens (`row-gap` e `column-gap`) |
+
+## 2. O Shorthand `flex: <grow> <shrink> <basis>`
+
+| Shorthand | Expansão | Efeito Prático |
+| :--- | :--- | :--- |
+| `flex: 1` | `1 1 0%` | **Colunas idênticas**: divide o espaço por igual, ignorando tamanho do texto |
+| `flex: auto` | `1 1 auto` | **Proporcional ao conteúdo**: itens maiores recebem mais espaço livre |
+| `flex: initial` | `0 1 auto` | **Padrão do navegador**: não cresce, mas encolhe para não estourar |
+| `flex: none` | `0 0 auto` | **Rígido**: não cresce nem encolhe (ideal para ícones e botões fixos) |
+
+## 3. Propriedades dos Itens Individuais
+
+```css
+.flex-item {
+  /* Alinhamento Individual no Eixo Transversal */
+  align-self: flex-end;
+
+  /* Ordem de Pintura Visual (Cuidado com Acessibilidade!) */
+  order: 2;
+
+  /* Previne esmagamento de ícones e avatares */
+  flex-shrink: 0;
+
+  /* Permite quebra de texto longo sem transbordamento */
+  min-inline-size: 0;
+}
+```
+
+## 4. O Truque Canônico de `margin: auto`
+
+```css
+/* Empurrar ações para a ponta direita da barra */
+.navbar-actions {
+  margin-inline-start: auto;
+}
+
+/* Centralização em ambos os eixos no Flexbox */
+.centered-child {
+  margin: auto;
+}
+
+/* Rodapé colado na base do card */
+.card-footer {
+  margin-block-start: auto;
+}
+```

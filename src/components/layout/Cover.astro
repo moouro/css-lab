@@ -1,0 +1,39 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { mergeVars } from '../../utils/style';
+
+type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{
+  as: Tag;
+  minHeight?: string;
+  padding?: string;
+  space?: string;
+}>;
+
+const {
+  as: Tag = 'div',
+  minHeight = '100dvh',
+  padding = 'var(--space-m)',
+  space = 'var(--space-s)',
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Element = Tag as 'div';
+const computedStyle = mergeVars(
+  {
+    '--cover-min-height': minHeight,
+    '--cover-padding': padding,
+    '--cover-space': space,
+  },
+  style,
+);
+---
+
+<Element
+  class:list={['cover', className]}
+  style={computedStyle}
+  {...rest}
+>
+  <slot />
+</Element>

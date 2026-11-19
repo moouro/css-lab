@@ -1,0 +1,618 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Center from '@/components/layout/Center.astro';
+import { getPublishedCollection } from '@/utils/collections';
+
+const everyLayoutEntries = await getPublishedCollection('every-layout');
+
+const pillars = [
+  {
+    icon: '📐',
+    title: 'Every Layout Lab',
+    desc: 'As 13 primitivas universais do livro de Heydon Pickering & Andy Bell. Composição algorítmica e intrínseca.',
+    href: '/every-layout',
+    badge: '13 Primitivas',
+    highlight: true,
+  },
+  {
+    icon: '⚡',
+    title: 'CSS Moderno',
+    desc: 'Nesting nativo, Cascade Layers, :has(), Container Queries, light-dark() e propriedades lógicas sem JS.',
+    href: '/css-moderno',
+    badge: '11 Tópicos',
+  },
+  {
+    icon: '⊞',
+    title: 'Grid Lab',
+    desc: 'Desde minmax() com auto-fill e auto-fit até subgrid e mapeamento visual de template areas.',
+    href: '/grid-lab',
+    badge: '7 Tópicos',
+  },
+  {
+    icon: '⇄',
+    title: 'Flexbox Lab',
+    desc: 'Domínio de flex-basis, quebra de linha suave, Holy Albatross, eixos e margin: auto.',
+    href: '/flexbox-lab',
+    badge: '6 Tópicos',
+  },
+  {
+    icon: '⧉',
+    title: 'Container Query Lab',
+    desc: 'Size queries, style queries, unidades cqi/cqw e componentes universais verdadeiramente autocontidos.',
+    href: '/container-query-lab',
+    badge: '5 Tópicos',
+  },
+  {
+    icon: '❖',
+    title: 'Component Library',
+    desc: 'Buttons, Modals com <dialog>, Tabs nativas, Accordions com ::details-content e Cards com subgrid.',
+    href: '/components',
+    badge: '10 Componentes',
+  },
+  {
+    icon: '✂',
+    title: 'Snippets Library',
+    desc: 'Soluções rápidas de CSS moderno para layout, tipografia, animação, utilitários e padrões de produção.',
+    href: '/snippets',
+    badge: '25 Snippets',
+  },
+  {
+    icon: '📄',
+    title: 'Cheatsheets',
+    desc: 'Tabelas e guias rápidos para consulta instantânea no dia a dia, otimizados para impressão em folha A4.',
+    href: '/cheatsheets',
+    badge: '6 Guias A4',
+  },
+  {
+    icon: '🎨',
+    title: 'Design Tokens',
+    desc: 'A arquitetura de tokens e decisões de design codificadas em variáveis nativas e escalas matemáticas.',
+    href: '/design-tokens',
+    badge: '5 Guias',
+  },
+];
+---
+
+<BaseLayout title="Home — Segunda Memória de CSS & Layout">
+  <div class="home-container stack" style="--stack-space: var(--space-2xl);">
+    <!-- Hero Editorial (foco em tipografia, sem clichês de IA) -->
+    <section class="hero-section">
+      <Center max="80ch">
+        <div class="stack" style="--stack-space: var(--space-s); text-align: center; align-items: center;">
+          <h1 class="hero-title">
+            Como o layout responde ao conteúdo, e não à tela.
+          </h1>
+
+          <p class="hero-desc text-lg text-muted">
+            Uma plataforma pessoal viva para consulta, estudo e experimentação de CSS moderno e arquitetura de layout baseada em composição algorítmica. O próprio site é construído com as primitivas que ensina.
+          </p>
+
+          <div class="hero-actions cluster" style="--cluster-space: var(--space-s); padding-block-start: var(--space-xs); justify-content: center;">
+            <a href="/every-layout" class="btn btn-primary">
+              Explorar Every Layout
+            </a>
+            <a href="/every-layout/stack" class="btn btn-secondary">
+              Começar pelo The Stack →
+            </a>
+          </div>
+
+          <!-- Dica de Produtividade & Atalhos -->
+          <div class="shortcuts-legend cluster" style="--cluster-space: var(--space-xs); padding-block-start: var(--space-s); justify-content: center;">
+            <span class="text-xs text-muted">Atalhos Globais:</span>
+            <span class="shortcut-tag text-xs font-mono"><kbd>⌘K</kbd> Busca</span>
+            <span class="shortcut-tag text-xs font-mono"><kbd>⇧T</kbd> Tema</span>
+            <span class="shortcut-tag text-xs font-mono"><kbd>⇧L</kbd> Inspetor</span>
+          </div>
+        </div>
+      </Center>
+    </section>
+
+    <!-- Minha Segunda Memória (Favoritos do Usuário via LocalStorage) -->
+    <section class="bookmarks-section" id="bookmarks-section" style="display: none;">
+      <Center max="1200px">
+        <div class="stack" style="--stack-space: var(--space-s);">
+          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: center;">
+            <div>
+              <span class="text-xs font-semibold tracking-caps text-accent">⭐ Minha Segunda Memória</span>
+              <h2 class="text-xl font-bold">Conteúdos Favoritados</h2>
+            </div>
+            <span class="text-xs text-muted">Salvo no seu navegador (localStorage)</span>
+          </div>
+          <div id="bookmarks-container" class="cluster" style="--cluster-space: var(--space-xs);"></div>
+        </div>
+      </Center>
+    </section>
+
+    <script>
+      interface BookmarkItem {
+        title: string;
+        url: string;
+      }
+
+      function isValidBookmark(item: unknown): item is BookmarkItem {
+        if (!item || typeof item !== 'object') return false;
+        const candidate = item as Record<string, unknown>;
+        return (
+          typeof candidate.url === 'string' &&
+          candidate.url.startsWith('/') &&
+          !candidate.url.startsWith('//') &&
+          typeof candidate.title === 'string'
+        );
+      }
+
+      function renderBookmarks(): void {
+        try {
+          const raw = localStorage.getItem('css-lab-bookmarks');
+          const section = document.getElementById('bookmarks-section');
+          const container = document.getElementById('bookmarks-container');
+          if (!section || !container) return;
+
+          const parsed: unknown = raw ? JSON.parse(raw) : [];
+          const items = Array.isArray(parsed) ? parsed.filter(isValidBookmark) : [];
+
+          if (items.length === 0) {
+            section.style.display = 'none';
+            container.replaceChildren();
+            return;
+          }
+
+          section.style.display = 'block';
+          const chips = items.map((item) => {
+            const link = document.createElement('a');
+            link.href = item.url;
+            link.className = 'bookmark-chip';
+
+            const star = document.createElement('span');
+            star.className = 'star-icon';
+            star.setAttribute('aria-hidden', 'true');
+            star.textContent = '★';
+
+            const label = document.createElement('span');
+            label.textContent = item.title;
+
+            link.append(star, label);
+            return link;
+          });
+
+          container.replaceChildren(...chips);
+        } catch {
+          // Ignora JSON inválido ou bloqueio de storage
+        }
+      }
+
+      document.addEventListener('astro:page-load', renderBookmarks);
+    </script>
+
+    <!-- Pilares de Conhecimento (Cards Proporcionais) -->
+    <section class="pillars-section">
+      <Center max="1200px">
+        <div class="stack" style="--stack-space: var(--space-m);">
+          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: center;">
+            <div>
+              <span class="text-xs font-semibold tracking-caps text-muted">Arquitetura de Conhecimento</span>
+              <h2 class="text-xl font-bold">Pilares Fundamentais</h2>
+            </div>
+            <span class="text-xs text-muted">9 Áreas de Domínio Técnico</span>
+          </div>
+
+          <div class="pillars-grid">
+            {pillars.map((pillar) => (
+              <a href={pillar.href} class="pillar-card-link">
+                <article class:list={['pillar-card', { highlight: pillar.highlight }]}>
+                  <header class="pillar-header">
+                    <span class="pillar-icon" aria-hidden="true">{pillar.icon}</span>
+                    <span class="pillar-badge font-mono text-xs">{pillar.badge}</span>
+                  </header>
+                  <div class="pillar-body">
+                    <h3 class="pillar-title">{pillar.title}</h3>
+                    <p class="pillar-desc text-sm text-muted">{pillar.desc}</p>
+                  </div>
+                  <footer class="pillar-footer">
+                    <span class="pillar-action">Acessar pilar <span class="action-arrow">→</span></span>
+                  </footer>
+                </article>
+              </a>
+            ))}
+          </div>
+        </div>
+      </Center>
+    </section>
+
+    <!-- Every Layout: O Índice Central de Primitivas -->
+    <section class="primitives-section">
+      <Center max="1200px">
+        <div class="stack" style="--stack-space: var(--space-m);">
+          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: center;">
+            <div>
+              <span class="text-xs font-semibold tracking-caps text-muted">Primitivas Fundamentais</span>
+              <h2 class="text-xl font-bold">As 13 Primitivas de Layout</h2>
+            </div>
+            <span class="text-xs text-muted">Composição Algorítmica sem Breakpoints</span>
+          </div>
+
+          <div class="primitives-table" role="list">
+            {everyLayoutEntries.map((entry) => (
+              <a href={`/every-layout/${entry.id}`} class="primitive-row" role="listitem">
+                <span class="primitive-order font-mono text-xs text-muted">
+                  #{String(entry.data.order).padStart(2, '0')}
+                </span>
+                <div class="primitive-title-group">
+                  <strong class="primitive-name">{entry.data.title}</strong>
+                </div>
+                <div class="primitive-problem-group">
+                  <span class="primitive-desc text-sm text-muted">{entry.data.problem}</span>
+                </div>
+                <div class="primitive-meta-group">
+                  <span class="badge badge-difficulty">{entry.data.difficulty}</span>
+                  <span class="primitive-arrow" aria-hidden="true">→</span>
+                </div>
+              </a>
+            ))}
+          </div>
+        </div>
+      </Center>
+    </section>
+  </div>
+</BaseLayout>
+
+<style>
+  .home-container {
+    padding-block-start: var(--space-xl);
+    padding-block-end: var(--space-3xl);
+  }
+
+  .hero-section {
+    padding-block-end: var(--space-2xl);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  .hero-badge {
+    color: var(--color-accent);
+    background-color: var(--color-accent-muted);
+    padding-inline: 0.6em;
+    padding-block: 0.2em;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+  }
+
+  .hero-title {
+    font-size: var(--step-4);
+    letter-spacing: -0.03em;
+    line-height: 1.15;
+    margin-block: var(--space-xs);
+  }
+
+  .hero-desc {
+    max-inline-size: 65ch;
+    margin-inline: auto;
+    line-height: 1.6;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding-inline: var(--space-m);
+    padding-block: 0.65rem;
+    border-radius: var(--radius-sm);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-decoration: none;
+    transition: all var(--duration-fast) ease;
+  }
+
+  .btn-primary {
+    background-color: var(--color-accent);
+    color: #ffffff;
+  }
+  .btn-primary:hover {
+    background-color: var(--color-accent-hover);
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  .btn-secondary {
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg);
+  }
+  .btn-secondary:hover {
+    background-color: var(--color-bg-hover);
+    border-color: var(--color-border-hover);
+    text-decoration: none;
+    transform: translateY(-1px);
+  }
+
+  .shortcut-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    padding: 0.2em 0.5em;
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-fg-muted);
+  }
+
+  .shortcut-tag kbd {
+    font-size: 0.85em;
+    padding: 0.1em 0.35em;
+    background-color: var(--color-bg-subtle);
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg);
+  }
+
+  .bookmarks-section {
+    padding-block: var(--space-l);
+    border-block-end: 1px solid var(--color-border);
+  }
+
+  :global(.bookmark-chip) {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    padding: var(--space-3xs) var(--space-xs);
+    border-radius: var(--radius-full);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg);
+    text-decoration: none;
+    font-size: var(--step--1);
+    transition: all var(--duration-fast) ease;
+  }
+
+  :global(.bookmark-chip:hover) {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+    transform: translateY(-1px);
+    text-decoration: none;
+  }
+
+  :global(.bookmark-chip .star-icon) {
+    color: #eab308;
+  }
+
+  /* Pillars Grid: Cards perfeitamente proporcionais */
+  .pillars-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 340px), 1fr));
+    gap: var(--space-m);
+  }
+
+  .pillar-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    height: 100%;
+  }
+
+  .pillar-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    inline-size: 100%;
+    padding: var(--space-m);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.25s ease,
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.25s ease;
+  }
+
+  .pillar-card::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pillar-card-link:hover .pillar-card {
+    transform: translateY(-4px);
+    border-color: var(--color-accent-muted);
+    background-color: var(--color-bg-hover);
+    box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.2), 0 0 0 1px var(--color-accent-muted);
+  }
+
+  .pillar-card-link:hover .pillar-card::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .pillar-card.highlight {
+    border-color: var(--color-accent);
+    position: relative;
+  }
+
+  .pillar-card.highlight::after {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    block-size: 3px;
+    background-color: var(--color-accent);
+    border-start-start-radius: var(--radius-md);
+    border-start-end-radius: var(--radius-md);
+  }
+
+  .pillar-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-block-end: var(--space-xs);
+  }
+
+  .pillar-icon {
+    font-size: 1.35rem;
+  }
+
+  .pillar-badge {
+    color: var(--color-fg-muted);
+    background-color: var(--color-bg-subtle);
+    padding-inline: 0.45em;
+    padding-block: 0.15em;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+  }
+
+  .pillar-body {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+    margin-block-end: var(--space-m);
+  }
+
+  .pillar-title {
+    font-size: var(--step-0);
+    font-weight: 700;
+    color: var(--color-fg);
+    letter-spacing: -0.01em;
+    transition: color 0.2s ease;
+  }
+
+  .pillar-card-link:hover .pillar-title {
+    color: var(--color-accent);
+  }
+
+  .pillar-desc {
+    line-height: 1.5;
+  }
+
+  .pillar-footer {
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: var(--space-xs);
+  }
+
+  .pillar-action {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
+
+  .action-arrow {
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .pillar-card-link:hover .action-arrow {
+    transform: translateX(6px);
+  }
+
+  /* Primitives Table: Grid de 4 Colunas Alinhadas */
+  .primitives-table {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-2xs);
+  }
+
+  .primitive-row {
+    display: grid;
+    grid-template-columns: 3.5rem 12rem 1fr auto;
+    align-items: center;
+    gap: var(--space-s);
+    padding-inline: var(--space-m);
+    padding-block: var(--space-s);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    text-decoration: none;
+    color: inherit;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.2s ease,
+                background-color 0.2s ease,
+                box-shadow 0.22s ease;
+  }
+
+  .primitive-row:hover {
+    background-color: var(--color-bg-hover);
+    border-color: var(--color-accent-muted);
+    transform: translateX(4px);
+    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--color-accent-muted);
+    text-decoration: none;
+  }
+
+  .primitive-order {
+    font-size: var(--step--1);
+  }
+
+  .primitive-name {
+    font-size: var(--step-0);
+    color: var(--color-fg);
+    transition: color 0.2s ease;
+  }
+
+  .primitive-desc {
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .primitive-meta-group {
+    display: flex;
+    align-items: center;
+    gap: var(--space-s);
+  }
+
+  .badge-difficulty {
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    padding-inline: 0.5em;
+    padding-block: 0.15em;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg-muted);
+    text-transform: capitalize;
+  }
+
+  .primitive-arrow {
+    color: var(--color-fg-muted);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+  }
+
+  .primitive-row:hover .primitive-name,
+  .primitive-row:hover .primitive-arrow {
+    color: var(--color-accent);
+  }
+
+  .primitive-row:hover .primitive-arrow {
+    transform: translateX(5px);
+  }
+
+  /* Responsividade da Tabela de Primitivas para Mobile */
+  @media (max-width: 860px) {
+    .primitive-row {
+      grid-template-columns: 2.5rem 1fr auto;
+      gap: var(--space-xs);
+      padding: var(--space-s);
+    }
+
+    .primitive-problem-group {
+      display: none; /* Em telas menores, foca no nome e dificuldade */
+    }
+  }
+
+  @media (max-width: 520px) {
+    .primitive-row {
+      grid-template-columns: 1fr auto;
+    }
+    .primitive-order {
+      display: none;
+    }
+  }
+</style>

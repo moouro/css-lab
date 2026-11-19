@@ -1,0 +1,138 @@
+---
+title: "color-scheme & light-dark()"
+description: "A arquitetura definitiva de Dark Mode nativo sem duplicação de variáveis e sem dependência de JavaScript."
+draft: false
+publishDate: 2026-01-01
+tags: ["color-scheme", "light-dark", "dark-mode", "tokens", "baseline"]
+difficulty: "intermediate"
+order: 9
+feature: "color-scheme"
+browserSupport: "stable"
+canIUseId: "mdn-css_types_color_light-dark"
+relatedContent:
+  - "custom-properties"
+  - "design-tokens"
+  - "has-selector"
+layoutPrimitives:
+  - "box"
+  - "stack"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Historicamente, implementar um sistema de temas claro/escuro (Dark Mode) no CSS exigia uma das duas estratégias verbosas:
+
+1. Duplicar blocos de media query: `@media (prefers-color-scheme: dark) { :root { ... } }`
+2. Adicionar uma classe manual no HTML: `html.dark { ... }` duplicando todas as variáveis de cores.
+
+A plataforma web moderna padronizou a solução com duas ferramentas nativas extraordinárias:
+1. A propriedade `color-scheme: light dark;`
+2. A função de cor `light-dark(cor-clara, cor-escura)`
+
+<Callout type="info" title="Baseline 2024">
+  A função `light-dark()` é suportada em todos os motores de navegação modernos (Chrome 123+, Safari 17.5+, Firefox 120+).
+</Callout>
+
+## 2. A Função `light-dark()`
+
+A função `light-dark()` aceita exatamente dois valores de cor:
+- O primeiro valor é renderizado quando o `color-scheme` computado for `light`.
+- O segundo valor é renderizado quando o `color-scheme` computado for `dark`.
+
+```css
+:root {
+  /* Habilita o suporte a ambos os esquemas no documento */
+  color-scheme: light dark;
+
+  /* Definição de tokens de cor sem duplicação */
+  --color-bg: light-dark(#ffffff, #0d1117);
+  --color-fg: light-dark(#1f2328, #f0f6fc);
+  --color-border: light-dark(#d0d7de, #30363d);
+  --color-accent: light-dark(#0969da, #2f81f7);
+}
+```
+
+O navegador cuida da alternância de todas as variáveis automaticamente, de acordo com as preferências do sistema operacional do usuário!
+
+## 3. Override Manual do Usuário (Light / Dark Switch)
+
+Como permitir que o usuário force um tema específico (ex: um botão de alternância na barra de navegação) sem quebrar o suporte ao `light-dark()`?
+
+Basta alterar a propriedade `color-scheme` no elemento raiz ou na meta tag do documento!
+
+```css
+/* Quando o usuário escolhe tema escuro explicitamente */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Quando o usuário escolhe tema claro explicitamente */
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+```
+
+Todas as variáveis que utilizam `light-dark()` mudam instantaneamente, sem precisar redefinir `--color-bg`, `--color-fg`, nem criar novas classes!
+
+## 4. Estilização de Controles de Formulário e Scrollbars Nativos
+
+Declarar `color-scheme` no `:root` não serve apenas para `light-dark()`. Ele informa ao sistema operacional do navegador para:
+- Renderizar a barra de rolagem (*scrollbar*) nativa no tema escuro.
+- Renderizar caixas de seleção `<select>`, inputs e checkboxes no tema escuro.
+- Evitar o flash branco antes do carregamento da página (FOUC).
+
+```html
+<!-- Dica Pro: inclua a meta tag no <head> para evitar FOUC no carregamento -->
+<meta name="color-scheme" content="light dark" />
+```
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Duplicar Todas as Variáveis em Classes Separadas"
+  badCode={`/* Verboso, frágil e difícil de manter */
+:root {
+  --bg: #ffffff;
+  --text: #111111;
+}
+.dark-theme {
+  --bg: #111111;
+  --text: #ffffff;
+}`}
+  goodTitle="Declarar Uma Única Vez Usando light-dark()"
+  goodCode={`:root {
+  color-scheme: light dark;
+  --bg: light-dark(#ffffff, #111111);
+  --text: light-dark(#111111, #ffffff);
+}`}
+  explanation="Com light-dark(), você mantém os tokens de uma cor em uma única declaração contínua, reduzindo o CSS pela metade e eliminando esquecimentos ao adicionar novas cores."
+/>
+
+## 6. Boas Práticas
+
+1. **Sempre declare `color-scheme: light dark` no `:root`**: Sem isso, a função `light-dark()` não sabe qual ramo escolher e adota apenas o tema claro.
+2. **Defina cores acessíveis com contraste verificado**: Certifique-se de que a taxa de contraste (WCAG AA) entre `--color-fg` e `--color-bg` seja de no mínimo 4.5:1 em ambos os temas.
+3. **Use ilhas de tema**: Você pode aplicar `color-scheme: dark` em um único componente filho (como um card de destaque) para que ele seja sempre escuro, mesmo dentro de uma página clara.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A propriedade color-scheme: light dark está declarada no :root?", checked: true },
+    { text: "A meta tag color-scheme está presente no <head> para prevenção de FOUC?", checked: true },
+    { text: "Os tokens de cor foram declarados usando light-dark(claro, escuro)?", checked: true },
+    { text: "O contraste mínimo WCAG (4.5:1) foi verificado nos dois modos?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Design Tokens](/css-moderno/design-tokens) — A arquitetura completa dos tokens de cores.
+- [Custom Properties](/css-moderno/custom-properties) — Variáveis e escopo dinâmico.
+- [Seletor :has()](/css-moderno/has-selector) — Detecção de preferências e overrides.

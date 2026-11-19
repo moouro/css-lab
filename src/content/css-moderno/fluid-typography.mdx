@@ -1,0 +1,125 @@
+---
+title: "Tipografia Fluida com clamp()"
+description: "Cálculo matemático de escalas tipográficas contínuas que se adaptam suavemente entre limites sem saltos bruscos de media queries."
+draft: false
+publishDate: 2026-01-01
+tags: ["typography", "clamp", "fluid-type", "math", "accessibility"]
+difficulty: "intermediate"
+order: 6
+feature: "fluid-typography"
+browserSupport: "stable"
+canIUseId: "css-math-functions"
+relatedContent:
+  - "logical-properties"
+  - "container-queries"
+  - "design-tokens"
+layoutPrimitives:
+  - "stack"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+No design responsivo tradicional, títulos e textos alternavam de tamanho através de saltos bruscos acionados por `@media (min-width: 768px)` e `@media (min-width: 1024px)`. Isso criava textos desproporcionais em telas intermediárias (como tablets ou janelas divididas) e código duplicado.
+
+A **Tipografia Fluida** utiliza a função matemática nativa `clamp(min, val, max)` para interpolar o tamanho da fonte proporcionalmente à largura da tela (ou do contêiner) entre um valor mínimo aceitável e um teto máximo ergonômico.
+
+<Callout type="info" title="O Comportamento do clamp()">
+  `clamp(MIN, VALOR_IDEAL, MAX)` restringe um valor entre dois extremos. Enquanto o valor ideal estiver entre o mínimo e o máximo, ele varia suavemente com a tela.
+</Callout>
+
+## 2. A Fórmula Matemática da Taxa de Crescimento
+
+Para criar um valor fluido perfeito que respeite o zoom do usuário (requisito inegociável de acessibilidade WCAG), **nunca utilize `vw` puro**. É fundamental combinar uma base em `rem` com uma fração proporcional em `vw` ou `cqi`:
+
+```text
+Tamanho = Tamanho Mínimo + (Taxa × Largura do Viewport)
+```
+
+A fórmula para calcular a inclinação (*slope*) entre duas larguras de tela:
+
+```text
+Slope = (Tamanho Max - Tamanho Min) / (Viewport Max - Viewport Min)
+
+Intercept = Tamanho Min - (Viewport Min × Slope)
+```
+
+### Exemplo Prático de Escala Tipográfica (Major Third - 1.25)
+
+No nosso design system, os passos da escala tipográfica fluida são parametrizados da seguinte forma:
+
+```css
+:root {
+  /* Escala fluida entre 360px (mobile) e 1200px (desktop) */
+  --step--2: clamp(0.69rem, 0.65rem + 0.22vw, 0.8rem);
+  --step--1: clamp(0.83rem, 0.77rem + 0.31vw, 1rem);
+  --step-0:  clamp(1rem, 0.91rem + 0.43vw, 1.25rem);      /* Corpo */
+  --step-1:  clamp(1.2rem, 1.07rem + 0.63vw, 1.56rem);    /* H4 */
+  --step-2:  clamp(1.44rem, 1.26rem + 0.89vw, 1.95rem);   /* H3 */
+  --step-3:  clamp(1.73rem, 1.48rem + 1.24vw, 2.44rem);   /* H2 */
+  --step-4:  clamp(2.07rem, 1.73rem + 1.7vw, 3.05rem);    /* H1 */
+  --step-5:  clamp(2.49rem, 2.03rem + 2.31vw, 3.82rem);   /* Hero */
+}
+```
+
+## 3. O Axioma da Medida (The Measure)
+
+Segundo o livro *Every Layout*, definir o tamanho da fonte é apenas metade da ergonomia de leitura. A largura da linha de texto (o comprimento da linha) jamais deve exceder **65 a 75 caracteres**, caso contrário os olhos do leitor se cansam ao procurar o início da próxima linha:
+
+```css
+:root {
+  --measure: 65ch;
+}
+
+/* Axioma universal de leitura */
+p, li, blockquote {
+  max-inline-size: var(--measure);
+}
+```
+
+A unidade `ch` representa a largura do caractere `0` na fonte atual, tornando a restrição diretamente proporcional à família tipográfica escolhida!
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Apenas Unidades de Viewport (Ex: font-size: 4vw)"
+  badCode={`h1 {
+  /* Falha grave de acessibilidade WCAG! */
+  font-size: 5vw;
+}`}
+  goodTitle="Usar clamp() com Base em REM para Respeitar o Zoom"
+  goodCode={`h1 {
+  /* O rem garante que o zoom do navegador aumente o texto */
+  font-size: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+}`}
+  explanation="Se você definir o font-size apenas com 'vw', o recurso de zoom do navegador (Ctrl + / Cmd +) para pessoas com baixa visão NÃO aumentará o texto, violando o critério WCAG 1.4.4."
+/>
+
+## 5. Boas Práticas
+
+1. **Sempre combine rem com vw/cqi**: Garanta que o zoom de acessibilidade funcione em 200%.
+2. **Defina o ritmo vertical relativo**: Utilize `line-height: 1.5` no corpo de texto e `1.15` a `1.2` em títulos grandes.
+3. **Limite o comprimento com `ch`**: Garanta que colunas de texto não fiquem excessivamente largas em monitores ultrawide.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A tipografia utiliza clamp() com valores calculados?", checked: true },
+    { text: "O valor central do clamp() inclui unidades rem para suportar o zoom do navegador?", checked: true },
+    { text: "A largura de leitura (measure) está limitada a ~65ch?", checked: true },
+    { text: "Títulos grandes possuem line-height proporcionalmente mais ajustado (1.1 a 1.25)?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Design Tokens: Tipografia](/css-moderno/design-tokens) — Organização da escala modular.
+- [Every Layout: Center](/every-layout/center) — O uso de max-inline-size com a medida ideal.
+- [Container Queries](/css-moderno/container-queries) — Tipografia com unidades cqi.

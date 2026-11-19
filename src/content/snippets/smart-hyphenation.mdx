@@ -1,0 +1,24 @@
+---
+title: "Hifenização Inteligente em Colunas Estreitas"
+description: "Prevenir buracos visuais e quebras desagradáveis em títulos e colunas usando hyphens: auto e overflow-wrap."
+category: "typography"
+tags: ["typography", "hyphens", "overflow-wrap", "mobile"]
+draft: false
+order: 9
+language: "css"
+---
+
+### Problema
+Em telas de smartphone ou colunas estreitas, palavras longas (como "inconstitucionalissimamente" ou termos técnicos) estouram a tela ou quebram a linha deixando grandes vazios visuais.
+
+### Código
+
+```css
+/* Ativa quebra suave de palavras e hifenização no idioma da página */
+p, li {
+  overflow-wrap: break-word;
+  hyphens: auto;
+  hyphenate-limit-chars: 6 3 3; /* Tamanho mínimo da palavra, letras antes e depois */
+}
+```
+*Observação:* Para que `hyphens: auto` funcione, certifique-se de que a tag `<html lang="pt-BR">` esteja configurada.

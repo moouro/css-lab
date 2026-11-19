@@ -1,0 +1,123 @@
+---
+title: "Grid Auto-placement & Dense Packing"
+description: "O algoritmo nativo de empacotamento automático do CSS Grid para galerias, feeds e itens de tamanho assimétrico."
+draft: false
+publishDate: 2026-01-01
+tags: ["grid", "auto-placement", "dense", "packing", "gallery"]
+difficulty: "intermediate"
+order: 3
+relatedContent:
+  - "fundamentals"
+  - "minmax-auto-fill"
+  - "advanced-patterns"
+layoutPrimitives:
+  - "grid"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Quando você não define explicitamente onde cada elemento filho deve ficar através de coordenadas (`grid-column` ou `grid-area`), o motor do navegador executa o **Grid Auto-placement Algorithm** (algoritmo de posicionamento automático).
+
+Esse algoritmo lê a ordem do DOM e distribui os itens pelas células disponíveis no grid seguindo a direção indicada por `grid-auto-flow` (por padrão, `row`).
+
+```css
+.gallery {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-s);
+  /* Os itens fluem automaticamente linha por linha */
+  grid-auto-flow: row;
+}
+```
+
+## 2. O Algoritmo de Empacotamento Denso (`dense`)
+
+Quando alguns itens do grid possuem dimensões maiores (por exemplo, um card que se estende por duas colunas: `grid-column: span 2`), o fluxo padrão pode deixar **buracos visuais** vazios no grid, porque o próximo item não cabe na célula restante daquela linha.
+
+Para resolver isso, o CSS fornece o modificador **`dense`**:
+
+```css
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-m);
+  /* Preenche buracos anteriores com elementos menores subsequentes */
+  grid-auto-flow: dense;
+}
+
+/* Um card de destaque que ocupa 2 colunas e 2 linhas */
+.card-featured {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+```
+
+Com `grid-auto-flow: dense`, se um card grande pular para a linha de baixo deixando uma célula de 1 coluna livre atrás dele, o navegador buscará o próximo elemento simples do DOM e o encaixará no buraco deixado para trás!
+
+<Callout type="warning" title="Alerta Crítico de Acessibilidade">
+  O empacotamento denso altera a **ordem visual** dos elementos sem alterar a ordem do DOM. Usuários de leitores de tela ou que navegam via teclado (`Tab`) passarão pelos itens na ordem do código HTML, o que pode causar confusão se a discrepância visual for excessiva. Use com responsabilidade em galerias de mídia, mas evite em formulários ordenados.
+</Callout>
+
+## 3. Faixas Implícitas vs Explícitas
+
+Quando chegam mais itens do que a quantidade de linhas que você definiu em `grid-template-rows`, o navegador cria **linhas implícitas** automaticamente.
+
+Você controla o tamanho dessas novas linhas geradas dinamicamente com `grid-auto-rows`:
+
+```css
+.catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  /* Toda nova linha criada automaticamente terá no mínimo 180px e no máximo auto */
+  grid-auto-rows: minmax(180px, auto);
+}
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar JavaScript (Masonry.js) para Fechar Buracos Simples"
+  badCode={`// Dependência pesada de 40kb de JS para layout
+const masonry = new Masonry('.grid', {
+  itemSelector: '.grid-item',
+  columnWidth: 200
+});`}
+  goodTitle="Usar grid-auto-flow: dense Nativo do CSS"
+  goodCode={`.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-auto-flow: dense;
+  gap: var(--space-s);
+}`}
+  explanation="O navegador resolve o empacotamento nativamente no motor C++ em microssegundos com zero bytes de JavaScript."
+/>
+
+## 5. Boas Práticas
+
+1. **Use `dense` principalmente para galerias de fotos e dashboards visuais**: Onde a ordem exata de leitura do texto não é estrita.
+2. **Defina sempre `grid-auto-rows`**: Evite que linhas implícitas colapsem em alturas imprevisíveis com base em conteúdos vazios.
+3. **Teste a navegação por teclado**: Pressione `Tab` para verificar se a sequência de foco faz sentido cognitivo para o usuário.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "grid-auto-rows foi configurado para dimensionar faixas implícitas?", checked: true },
+    { text: "O uso de dense foi restrito a casos onde a ordem estrita de foco não é violada?", checked: true },
+    { text: "A navegação por teclado (Tab) foi testada e permanece compreensível?", checked: true },
+    { text: "A quantidade de colunas e spans foi balanceada para evitar colapsos?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Fundamentos do Grid](/grid-lab/fundamentals) — Linhas e faixas.
+- [Minmax e Auto-fill](/grid-lab/minmax-auto-fill) — Grids intrínsecos.
+- [Padrões Avançados](/grid-lab/advanced-patterns) — Camadas e Masonry nativo.

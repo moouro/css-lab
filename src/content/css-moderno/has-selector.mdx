@@ -1,0 +1,155 @@
+---
+title: "O Seletor Pai: :has()"
+description: "A pseudo-classe relacional que revolucionou o CSS, permitindo estilizar elementos com base em seus descendentes e irmãos."
+draft: false
+publishDate: 2026-01-01
+tags: ["has-selector", "relational-selector", "parent-selector", "logic"]
+difficulty: "intermediate"
+order: 7
+feature: "has-selector"
+browserSupport: "stable"
+canIUseId: "css-has"
+relatedContent:
+  - "nesting"
+  - "is-where-selectors"
+  - "color-scheme"
+layoutPrimitives:
+  - "box"
+  - "stack"
+  - "cluster"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Durante mais de 20 anos, o CSS funcionou estritamente em sentido unidirecional: um seletor só conseguia estilizar elementos para baixo na árvore do DOM (filhos e descendentes) ou para a direita (irmãos adjacentes). Jamais era possível estilizar um elemento pai com base no que existia dentro dele.
+
+O seletor `:has()` é a **pseudo-classe relacional** que preenche essa lacuna fundamental. Ele atua como um condicional "SE contém":
+
+```css
+/* Estilize o .card SE ele contiver uma tag <img> */
+.card:has(img) {
+  grid-template-columns: 200px 1fr;
+}
+```
+
+<Callout type="info" title="Baseline Universal">
+  O seletor `:has()` é suportado em todas as engines modernas desde o final de 2023. Elimina a necessidade de dezenas de `useEffect`, hooks do React ou scripts de manipulação de classes.
+</Callout>
+
+## 2. Casos Reais de Alto Impacto
+
+### 1. Detecção de Tema no Head (Zero FOUC sem JavaScript)
+
+Nosso próprio sistema de temas utiliza `:has()` no `:root` para inspecionar a meta tag no `<head>`:
+
+```css
+/* Se o head possuir a meta tag com content="dark", ativa o dark mode */
+:root:has(> head > meta[name="color-scheme"][content="dark"]) {
+  color-scheme: dark;
+}
+```
+
+### 2. Formulários Reativos: Estados de Validação Sem JS
+
+```css
+/* Se o formulário contiver um input inválido após o usuário interagir */
+form:has(input:invalid:not(:placeholder-shown)) button[type="submit"] {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* Destaca o fieldset quando o checkbox interno estiver marcado */
+fieldset:has(input[type="checkbox"]:checked) {
+  border-color: var(--color-accent);
+  background-color: var(--color-bg-subtle);
+}
+```
+
+### 3. Modais e Travamento de Scroll (`overflow: hidden`)
+
+Não é mais necessário adicionar `.modal-open` no `<body>` via JavaScript:
+
+```css
+/* O body bloqueia o scroll automaticamente quando um <dialog open> existir */
+body:has(dialog[open]) {
+  overflow: hidden;
+}
+```
+
+### 4. Layouts Adaptativos Baseados em Quantidade de Itens
+
+```css
+/* Estiliza o grid se houver exatamente 1 filho */
+.grid:has(> :only-child) {
+  grid-template-columns: 1fr;
+}
+
+/* Estiliza o grid se houver 4 ou mais filhos */
+.grid:has(> :nth-child(4)) {
+  grid-template-columns: repeat(4, 1fr);
+}
+```
+
+## 3. Especificidade do `:has()`
+
+A especificidade de `:has(A)` é determinada pelo **argumento mais específico** dentro de seus parênteses:
+
+```css
+/* Especificidade: 1 classe (.card) + 1 ID (#hero) = (0, 1, 1, 0) */
+.card:has(#hero) {}
+
+/* Especificidade: 1 classe (.card) + 1 tag (img) = (0, 0, 1, 1) */
+.card:has(img) {}
+```
+
+Para neutralizar a especificidade do argumento, combine com `:where()`:
+```css
+/* Especificidade é apenas a da classe .card */
+.card:has(:where(img, svg, picture)) {}
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar JavaScript para Alternar Classes de Estado no Pai"
+  badCode={`// JavaScript desnecessário
+const input = document.querySelector('#email');
+input.addEventListener('focus', () => {
+  input.closest('.form-group').classList.add('is-focused');
+});`}
+  goodTitle="Usar :has(:focus) Diretamente no CSS"
+  goodCode={`.form-group:has(input:focus) {
+  border-color: var(--color-accent);
+  box-shadow: 0 0 0 2px var(--color-accent-subtle);
+}`}
+  explanation="O :has() resolve nativamente no motor de renderização com performance otimizada, eliminando listeners de eventos de DOM no JavaScript."
+/>
+
+## 5. Boas Práticas e Performance
+
+1. **Evite `:has()` desnecessariamente amplo**: Evite seletores genéricos como `body:has(*)`. Sempre ancore o `:has()` no ancestral mais próximo possível (ex: `.card:has(...)`).
+2. **Use seletores diretos de filhos quando possível**: Prefira `.wrapper:has(> .active)` em vez de `.wrapper:has(.active)` se o elemento for filho direto.
+3. **Não aninhe `:has()` dentro de `:has()`**: `:has(:has(...))` é inválido por especificação para prevenir loops de cálculo de renderização.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A lógica de pai-filho foi resolvida com :has() em vez de classes manuais via JS?", checked: true },
+    { text: "O seletor :has() está ancorado em uma classe ou elemento específico (não no seletor universal)?", checked: true },
+    { text: "O seletor foi combinado com :where() quando a especificidade precisou ser contida?", checked: true },
+    { text: "Casos como dialogs abertos e estados de formulário foram simplificados?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Seletores :is() e :where()](/css-moderno/is-where-selectors) — Controle fino de listas e especificidade.
+- [CSS Nesting](/css-moderno/nesting) — Uso de &:has() no bloco do componente.
+- [Color Scheme](/css-moderno/color-scheme) — Como :has() detecta meta tags no head.

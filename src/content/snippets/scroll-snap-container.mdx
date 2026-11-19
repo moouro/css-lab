@@ -1,0 +1,32 @@
+---
+title: "Carrossel com Scroll Snap Nativo"
+description: "Criar carrosséis e feeds de slides que 'encaixam' magneticamente em cada item sem bibliotecas JS."
+category: "utilities"
+tags: ["utilities", "scroll-snap", "carousel", "reel"]
+draft: false
+order: 18
+language: "css"
+---
+
+### Problema
+Evitar bibliotecas gigantescas como Swiper.js quando você só precisa de um carrossel de cartões horizontal com toque fluido.
+
+### Código
+
+```css
+.snap-slider {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: var(--space-m);
+  gap: var(--space-m);
+  padding: var(--space-m);
+  overscroll-behavior-inline: contain;
+}
+
+.snap-item {
+  scroll-snap-align: start;
+  scroll-snap-stop: always;
+  flex: 0 0 min(80vw, 320px);
+}
+```

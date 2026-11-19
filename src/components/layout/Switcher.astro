@@ -1,0 +1,39 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { mergeVars } from '../../utils/style';
+
+type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{
+  as: Tag;
+  threshold?: string;
+  space?: string;
+  limit?: number;
+}>;
+
+const {
+  as: Tag = 'div',
+  threshold = '35rem',
+  space = 'var(--space-s)',
+  limit = 4,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Element = Tag as 'div';
+const computedStyle = mergeVars(
+  {
+    '--switcher-threshold': threshold,
+    '--switcher-space': space,
+  },
+  style,
+);
+---
+
+<Element
+  class:list={['switcher', className]}
+  data-limit={limit !== 4 ? String(limit) : undefined}
+  style={computedStyle}
+  {...rest}
+>
+  <slot />
+</Element>

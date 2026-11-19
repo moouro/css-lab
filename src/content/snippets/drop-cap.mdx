@@ -1,0 +1,26 @@
+---
+title: "Letra Capitular Editorial (initial-letter)"
+description: "Criar a clássica letra capitular de abertura de artigo sem hacks de float ou margins negativas."
+category: "typography"
+tags: ["typography", "drop-cap", "initial-letter", "editorial"]
+draft: false
+order: 10
+language: "css"
+---
+
+### Problema
+Tentar alinhar a primeira letra de um texto com 3 linhas de altura usando `float: left; font-size: 3rem; line-height: 0.8;` é extremamente frágil e quebra dependendo da família de fontes.
+
+### Código
+
+```css
+/* Seleciona a primeira letra do primeiro parágrafo */
+.article-lead > p:first-of-type::first-letter {
+  /* Ocupa exatamente 3 linhas de altura, descendo 3 linhas */
+  initial-letter: 3 3;
+  -webkit-initial-letter: 3 3;
+  margin-inline-end: var(--space-xs);
+  font-weight: bold;
+  color: var(--color-accent);
+}
+```

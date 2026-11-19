@@ -1,0 +1,48 @@
+---
+title: "Propriedades Lógicas Cheatsheet"
+description: "Dicionário completo de conversão de propriedades físicas antigas para propriedades lógicas modernas com suporte nativo a LTR e RTL."
+tags: ["logical-properties", "cheatsheet", "i18n", "rtl", "ltr"]
+draft: false
+order: 5
+printable: true
+---
+
+## 1. Dimensões de Caixa
+
+| Propriedade Física Antiga | Propriedade Lógica Moderna | Significado (Modo LTR) |
+| :--- | :--- | :--- |
+| `width` | `inline-size` | Largura da caixa |
+| `height` | `block-size` | Altura da caixa |
+| `min-width` / `max-width` | `min-inline-size` / `max-inline-size` | Limites de largura |
+| `min-height` / `max-height` | `min-block-size` / `max-block-size` | Limites de altura |
+
+## 2. Margens & Espaçamentos
+
+| Propriedade Física Antiga | Propriedade Lógica Moderna |
+| :--- | :--- |
+| `margin-left` / `margin-right` | `margin-inline-start` / `margin-inline-end` |
+| `margin-left` + `margin-right` | `margin-inline: <auto \| valor>;` |
+| `margin-top` + `margin-bottom` | `margin-block: <valor>;` |
+| `padding-left` / `padding-right` | `padding-inline-start` / `padding-inline-end` |
+| `padding-left` + `padding-right` | `padding-inline: <valor>;` |
+| `padding-top` + `padding-bottom` | `padding-block: <valor>;` |
+
+## 3. Bordas & Divisórias
+
+| Propriedade Física Antiga | Propriedade Lógica Moderna |
+| :--- | :--- |
+| `border-left` | `border-inline-start` |
+| `border-right` | `border-inline-end` |
+| `border-top` | `border-block-start` |
+| `border-bottom` | `border-block-end` |
+| `border-radius: 4px 0 0 4px` | `border-start-start-radius` / `border-end-start-radius` |
+
+## 4. Posicionamento Absoluto (Inset)
+
+| Propriedade Física Antiga | Propriedade Lógica Moderna |
+| :--- | :--- |
+| `top: 0; left: 0; right: 0; bottom: 0;` | `inset: 0;` |
+| `top: 10px;` | `inset-block-start: 10px;` |
+| `bottom: 10px;` | `inset-block-end: 10px;` |
+| `left: 10px;` | `inset-inline-start: 10px;` |
+| `right: 10px;` | `inset-inline-end: 10px;` |

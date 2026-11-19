@@ -1,0 +1,151 @@
+---
+title: "Style Queries no CSS"
+description: "Consultas de estilo no contêiner com @container style(), habilitando componentes reativos a variáveis CSS de seus ancestrais."
+draft: false
+publishDate: 2026-01-01
+tags: ["container-queries", "style-queries", "style-at-rule", "custom-properties"]
+difficulty: "advanced"
+order: 3
+relatedContent:
+  - "fundamentals"
+  - "size-queries"
+  - "naming-conventions"
+layoutPrimitives:
+  - "container"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Enquanto as *Size Queries* inspecionam a geometria (largura e altura) do contêiner, as **Style Queries** (`@container style(...)`) permitem que um componente filho consulte os **estilos computados ou variáveis CSS** do contêiner pai.
+
+Historicamente, passar um "tema" ou "variante" para um componente exigia classes manuais como `.theme-dark` ou atributos `data-variant="compact"`.
+
+Com Style Queries, um componente pode perguntar diretamente:
+> *"O meu contêiner pai possui a variável `--card-theme: featured` ativa?"*
+
+```css
+/* Se o contêiner tiver a variável definida */
+@container style(--card-theme: featured) {
+  .badge {
+    background-color: var(--color-accent);
+    color: #ffffff;
+    font-weight: bold;
+  }
+
+  .card-border {
+    border-color: var(--color-accent);
+  }
+}
+```
+
+<Callout type="info" title="Status de Suporte nos Navegadores">
+  Style Queries para CSS Custom Properties (`@container style(--variavel: valor)`) são suportadas no Chromium (Chrome e Edge) e Safari. O suporte para propriedades CSS normais (como `style(color: red)`) está em discussão na W3C.
+</Callout>
+
+## 2. Eliminação de Classes Booleanas no DOM
+
+Imagine um componente complexo de lista onde alguns itens recebem uma propriedade de status:
+
+```html
+<!-- No HTML, basta definir a custom property inline -->
+<li style="--status: active;">
+  <span class="indicator"></span>
+  <span class="label">Servidor 01</span>
+</li>
+
+<li style="--status: error;">
+  <span class="indicator"></span>
+  <span class="label">Servidor 02</span>
+</li>
+```
+
+E no CSS:
+```css
+/* Não precisa de container-type para Style Queries! */
+@container style(--status: active) {
+  .indicator {
+    background-color: var(--color-success);
+    box-shadow: 0 0 8px var(--color-success);
+  }
+}
+
+@container style(--status: error) {
+  .indicator {
+    background-color: var(--color-danger);
+    box-shadow: 0 0 8px var(--color-danger);
+  }
+}
+```
+
+Observe que para **Style Queries**, o elemento pai **não precisa** declarar `container-type: inline-size`! Qualquer elemento pai é implicitamente um contêiner de estilo para variáveis CSS.
+
+## 3. Combinação de Tamanho e Estilo
+
+Você pode encadear consultas de tamanho e estilo simultaneamente usando o operador lógico `and`:
+
+```css
+.card-wrapper {
+  container-type: inline-size;
+  container-name: card;
+}
+
+/* Aplica apenas se for grande E estiver em modo destacado */
+@container card (inline-size > 600px) and style(--featured: true) {
+  .card-content {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    background: linear-gradient(to right, var(--color-bg-subtle), transparent);
+  }
+}
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Criar Dezenas de Modificadores BEM no HTML"
+  badCode={`<!-- Verboso e requer renderização condicional de classes -->
+<div class="user-card user-card--vip user-card--dark-mode">
+  <div class="user-card__badge user-card__badge--vip">VIP</div>
+</div>`}
+  goodTitle="Usar Style Queries no Contêiner Pai"
+  goodCode={`<div class="user-card" style="--role: vip; --theme: dark;">
+  <div class="user-card__badge">VIP</div>
+</div>
+
+<style>
+  @container style(--role: vip) {
+    .user-card__badge { background: gold; }
+  }
+</style>`}
+  explanation="Style Queries eliminam a cascata de classes filhas modificadoras. Basta alterar um único token no nó pai para que todos os descendentes ajustem suas variantes."
+/>
+
+## 5. Boas Práticas
+
+1. **Use para Temas Contextuais**: Excelente para alternar componentes entre variações (ex: `--surface: elevated` vs `--surface: sunken`).
+2. **Utilize nomes de tokens descritivos**: `--variant: compact`, `--status: success`.
+3. **Mantenha fallbacks limpos**: Certifique-se de que o componente funcione com elegância caso o contêiner não defina nenhuma variável de estilo.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A sintaxe @container style(--var: valor) foi utilizada?", checked: true },
+    { text: "O componente possui uma apresentação visual padrão caso a variável não exista?", checked: true },
+    { text: "A necessidade de dezenas de classes BEM modificadoras foi reduzida?", checked: true },
+    { text: "A compatibilidade de navegadores foi considerada para o projeto?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Size Queries](/container-query-lab/size-queries) — Consultas por dimensões físicas.
+- [Custom Properties](/css-moderno/custom-properties) — Variáveis e tokens reativos.
+- [Contêineres Nomeados](/container-query-lab/naming-conventions) — Identificando contextos específicos.

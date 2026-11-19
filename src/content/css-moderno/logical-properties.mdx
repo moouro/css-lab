@@ -1,0 +1,141 @@
+---
+title: "Propriedades Lógicas no CSS"
+description: "Abstração da direção física (top/right/bottom/left) em eixos lógicos de fluxo de texto (block e inline) para internacionalização universal."
+draft: false
+publishDate: 2026-01-01
+tags: ["logical-properties", "i18n", "inline-size", "block-size", "writing-mode"]
+difficulty: "beginner"
+order: 5
+feature: "logical-properties"
+browserSupport: "stable"
+canIUseId: "css-logical-props"
+relatedContent:
+  - "fluid-typography"
+  - "container-queries"
+  - "design-tokens"
+layoutPrimitives:
+  - "box"
+  - "stack"
+  - "center"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Durante décadas, o CSS foi construído com referências à física do monitor: `left`, `right`, `top`, `bottom`, `width` e `height`. Esse modelo assume que todo texto é lido da esquerda para a direita (LTR) e de cima para baixo.
+
+Porém, o mundo real contém idiomas lidos da direita para a esquerda (RTL, como árabe e hebraico) e na vertical (como japonês e chinês tradicional).
+
+As **Propriedades Lógicas** (*CSS Logical Properties*) substituem as coordenadas físicas por coordenadas de **fluxo semântico**:
+
+- **Inline**: A direção na qual as palavras fluem em uma linha (horizontal no ocidente).
+- **Block**: A direção na qual os parágrafos e caixas se empilham (vertical no ocidente).
+
+<Callout type="info" title="Baseline Universal">
+  Propriedades lógicas possuem suporte de 100% em todos os navegadores modernos há anos e devem ser o padrão absoluto em qualquer código CSS escrito hoje.
+</Callout>
+
+## 2. Tabela de Mapeamento: Físico vs Lógico
+
+| Propriedade Física Antiga | Propriedade Lógica Moderna | Significado (Modo LTR) |
+| :--- | :--- | :--- |
+| `width` | `inline-size` | Largura da caixa |
+| `height` | `block-size` | Altura da caixa |
+| `min-width` / `max-width` | `min-inline-size` / `max-inline-size` | Limites horizontais |
+| `margin-left` / `margin-right` | `margin-inline-start` / `margin-inline-end` | Margens laterais |
+| `margin-left` + `margin-right` | `margin-inline` | Margens horizontais combinadas |
+| `margin-top` + `margin-bottom` | `margin-block` | Margens verticais combinadas |
+| `padding-left` + `padding-right` | `padding-inline` | Espaçamento horizontal |
+| `padding-top` + `padding-bottom` | `padding-block` | Espaçamento vertical |
+| `border-left` | `border-inline-start` | Borda lateral inicial |
+| `top: 0; left: 0;` | `inset-block-start: 0; inset-inline-start: 0;` | Posicionamento absoluto |
+| `top: 0; right: 0; bottom: 0; left: 0;` | `inset: 0;` | Preenchimento total |
+
+## 3. Centralização e Espaçamento Elegante
+
+A centralização horizontal clássica que antes era:
+```css
+/* Antigo */
+.center {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 60ch;
+}
+```
+
+Agora se resume a:
+```css
+/* Moderno e resiliente a qualquer idioma */
+.center {
+  margin-inline: auto;
+  max-inline-size: 60ch;
+}
+```
+
+E para espaçamento de botões ou cards:
+```css
+.button {
+  padding-block: var(--space-xs);
+  padding-inline: var(--space-m);
+}
+```
+
+## 4. O Impacto Instantâneo no RTL
+
+Se um usuário alternar a interface para um idioma como Árabe (`dir="rtl"`), um layout com propriedades físicas exige a reescrita de dezenas de seletores (`margin-left: 0; margin-right: 1rem;`).
+
+Com **Propriedades Lógicas**, o espelhamento é **100% automático**:
+
+```html
+<!-- O layout inverte sem uma única linha de CSS extra -->
+<div dir="rtl">
+  <div class="user-profile">
+    <img class="avatar" style="margin-inline-end: 1rem;" />
+    <span>Nome do Usuário</span>
+  </div>
+</div>
+```
+
+O avatar automaticamente ficará à direita do texto no modo RTL!
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Margin Left/Right Físico em Ícones e Botões"
+  badCode={`.btn-icon {
+  margin-right: 8px; /* Quebra em layouts RTL */
+}`}
+  goodTitle="Usar margin-inline-end ou gap no Flexbox"
+  goodCode={`.btn-icon {
+  margin-inline-end: var(--space-2xs);
+}`}
+  explanation="No modo RTL, margin-right empurra o espaço na direção errada, colando o ícone no texto. margin-inline-end respeita o fim natural da direção de leitura."
+/>
+
+## 6. Boas Práticas
+
+1. **Abandone `width` e `height` fixos**: Prefira `inline-size` e `block-size` para caixas de layout.
+2. **Use o shorthand `inset: 0`**: Substitui o quarteto `top: 0; right: 0; bottom: 0; left: 0;` em elementos posicionados.
+3. **Use `padding-inline` e `padding-block`**: Elimine declarações redundantes de 4 lados quando apenas 2 eixos importam.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "Nenhum width/height foi usado onde inline-size/block-size é mais apropriado?", checked: true },
+    { text: "O layout foi verificado com o atributo dir='rtl' no elemento raiz?", checked: true },
+    { text: "O seletor inset foi usado no lugar de top/right/bottom/left múltiplos?", checked: true },
+    { text: "As margens e paddings utilizam margin-inline e padding-block?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Every Layout: Box](/every-layout/box) — Uso de padding-inline e padding-block no elemento fundamental.
+- [Every Layout: Center](/every-layout/center) — Centralização via margin-inline: auto e max-inline-size.
+- [Tipografia Fluida](/css-moderno/fluid-typography) — Escalas em inline-size.

@@ -1,0 +1,149 @@
+---
+title: "CSS Subgrid: Alinhamento Entre Ancestrais"
+description: "Permitir que elementos filhos herdem e se alinhem diretamente às faixas e linhas de seu contêiner pai."
+draft: false
+publishDate: 2026-01-01
+tags: ["subgrid", "grid", "nested-grids", "alignment", "cards"]
+difficulty: "advanced"
+order: 5
+relatedContent:
+  - "fundamentals"
+  - "alignment"
+  - "minmax-auto-fill"
+layoutPrimitives:
+  - "grid"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+No CSS Grid tradicional (Level 1), uma limitação histórica frustrava designers e desenvolvedores: **as faixas do grid só se aplicavam aos filhos diretos**. Se um filho direto tivesse seus próprios elementos filhos (netos do grid principal), esses netos viviam em seu próprio contexto isolado, sem conseguir alinhar suas alturas ou larguras com os outros cartões vizinhos da mesma linha.
+
+O caso clássico: uma grade de cartões onde cada cartão tem:
+1. Imagem de capa
+2. Título (às vezes com 1 linha, às vezes com 3 linhas)
+3. Descrição textual variável
+4. Botão de ação no rodapé
+
+Sem subgrid, os títulos têm alturas diferentes e os botões de ação ficam desalinhados em alturas visuais desiguais.
+
+Com o **CSS Subgrid** (Grid Level 2, agora Baseline universal em todos os navegadores), o elemento filho pode herdar as faixas do pai:
+
+```css
+.card {
+  /* O card se estende por 4 linhas do grid pai */
+  grid-row: span 4;
+  display: grid;
+  /* Herda as definições de linhas do pai! */
+  grid-template-rows: subgrid;
+}
+```
+
+<Callout type="info" title="Baseline 2023">
+  Subgrid possui suporte nativo em todos os navegadores modernos (Safari, Firefox, Chrome e Edge) sem polyfills.
+</Callout>
+
+## 2. A Arquitetura do Alinhamento Perfeito
+
+Vejamos como estruturar o layout completo de cards com subgrid:
+
+```css
+/* 1. O Grid Pai define as colunas e o ritmo de linhas */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  /* Cada card tem 4 faixas: imagem, título, corpo e rodapé */
+  grid-auto-rows: auto auto 1fr auto;
+  gap: var(--space-m);
+}
+
+/* 2. O Card filho direto ocupa 4 faixas de linha e adota subgrid */
+.card {
+  display: grid;
+  grid-row: span 4;
+  grid-template-rows: subgrid;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* 3. Os netos se acomodam automaticamente nas faixas coordenadas */
+.card-image  { /* Fica na linha 1 do subgrid */ }
+.card-header { /* Fica na linha 2 do subgrid */ }
+.card-body   { /* Fica na linha 3 do subgrid (1fr) */ }
+.card-footer { /* Fica na linha 4 do subgrid */ }
+```
+
+**Resultado visual espetacular**:
+Mesmo que um título tenha 3 linhas de texto e o título vizinho tenha apenas 1 linha, a faixa do título em **todos** os cartões daquela linha se expandirá para a altura do maior título, mantendo todos os botões de rodapé rigorosamente alinhados na mesma linha horizontal!
+
+## 3. Subgrid em Colunas (`grid-template-columns: subgrid`)
+
+O Subgrid não funciona apenas para linhas horizontais. Ele também pode ser aplicado no eixo das colunas:
+
+```css
+.form-container {
+  display: grid;
+  /* Coluna 1: labels (tamanho max-content); Coluna 2: inputs (1fr) */
+  grid-template-columns: max-content 1fr;
+  gap: var(--space-s);
+}
+
+.form-row {
+  display: grid;
+  grid-column: span 2;
+  grid-template-columns: subgrid;
+  align-items: center;
+}
+```
+
+Dessa forma, todos os campos de formulário ficam perfeitamente alinhados independentemente do tamanho do texto das labels, sem precisar definir larguras fixas em pixels!
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar JavaScript para Forçar Alturas Iguais (Equal Heights)"
+  badCode={`// 30 linhas de script redimensionando elementos no resize
+window.addEventListener('resize', () => {
+  const titles = document.querySelectorAll('.card-title');
+  let maxHeight = Math.max(...Array.from(titles).map(t => t.offsetHeight));
+  titles.forEach(t => t.style.height = maxHeight + 'px');
+});`}
+  goodTitle="Usar grid-template-rows: subgrid Nativo"
+  goodCode={`.card {
+  grid-row: span 4;
+  display: grid;
+  grid-template-rows: subgrid;
+}`}
+  explanation="Subgrid opera diretamente no motor de renderização antes do primeiro paint, com zero recálculo de layout (layout shift) e zero JavaScript."
+/>
+
+## 5. Boas Práticas
+
+1. **Defina explicitamente o `span` no filho**: Antes de declarar `grid-template-rows: subgrid`, você deve dizer quantas faixas o elemento cobrirá (ex: `grid-row: span 3`).
+2. **Cuidado com paddings internos**: Ao aplicar subgrid, paddings no elemento filho podem deslocar o alinhamento com as faixas vizinhas se não forem compensados.
+3. **Use para formulários e tabelas complexas**: Subgrid resolve problemas de alinhamento tabular sem perder a semântica semântica do HTML moderno.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "O contêiner pai possui as faixas de linhas ou colunas definidas?", checked: true },
+    { text: "O elemento intermediário possui grid-row (ou column): span N explícito?", checked: true },
+    { text: "grid-template-rows (ou columns): subgrid foi aplicado?", checked: true },
+    { text: "O alinhamento horizontal dos rodapés de cards foi verificado com textos assimétricos?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Fundamentos do Grid](/grid-lab/fundamentals) — Conceito de faixas e linhas.
+- [Alinhamento no Grid](/grid-lab/alignment) — Controle de eixos e posições.
+- [Componente Card](/components/cards) — Implementação prática de cards com subgrid.

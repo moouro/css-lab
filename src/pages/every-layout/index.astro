@@ -1,0 +1,229 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Center from '@/components/layout/Center.astro';
+import { getPublishedCollection } from '@/utils/collections';
+
+const entries = await getPublishedCollection('every-layout');
+---
+
+<BaseLayout
+  title="Every Layout Lab — As 13 Primitivas Universais"
+  description="Catálogo e documentação completa das 13 primitivas algorítmicas de layout do Every Layout."
+>
+  <div class="hub-container">
+    <Center max="1100px">
+      <div class="stack" style="--stack-space: var(--space-xl);">
+        <header class="hub-header stack" style="--stack-space: var(--space-xs);">
+          <div class="cluster" style="--cluster-space: var(--space-xs); align-items: center;">
+            <span class="hub-badge font-mono text-xs">Pilar Central</span>
+            <span class="text-xs text-muted">Heydon Pickering & Andy Bell</span>
+          </div>
+          <h1 class="hub-title">Every Layout Lab</h1>
+          <p class="hub-desc text-lg text-muted">
+            13 primitivas de layout composable. O segredo de interfaces resilientes não é criar dezenas de breakpoints manuais, mas confiar nos algoritmos nativos do navegador.
+          </p>
+        </header>
+
+        <div class="axiom-banner">
+          <span class="text-xs font-semibold tracking-caps text-accent">Axioma Fundamental</span>
+          <blockquote class="axiom-quote">
+            "Composição sobre herança. Primitivas simples sem significado léxico próprio combinadas para criar qualquer layout complexo."
+          </blockquote>
+        </div>
+
+        <!-- Grid de Cards Perfeitamente Proporcionais -->
+        <div class="hub-cards-grid">
+          {entries.map((entry) => (
+            <a href={`/every-layout/${entry.id}`} class="hub-card-link">
+              <article class="hub-card">
+                <header class="hub-card-header">
+                  <span class="hub-card-order font-mono text-xs text-muted">#{String(entry.data.order).padStart(2, '0')}</span>
+                  <h2 class="hub-card-title">{entry.data.title}</h2>
+                </header>
+                <div class="hub-card-body">
+                  <p class="hub-card-desc text-sm text-muted">{entry.data.problem}</p>
+                </div>
+                <footer class="hub-card-footer">
+                  <span class="badge-difficulty font-mono text-xs">{entry.data.difficulty}</span>
+                  <span class="hub-card-arrow" aria-hidden="true">Acessar →</span>
+                </footer>
+              </article>
+            </a>
+          ))}
+        </div>
+      </div>
+    </Center>
+  </div>
+</BaseLayout>
+
+<style>
+  .hub-container {
+    padding-block: var(--space-xl);
+    padding-inline: var(--space-m);
+  }
+
+  .hub-badge {
+    color: var(--color-accent);
+    background-color: var(--color-accent-muted);
+    padding-inline: 0.6em;
+    padding-block: 0.15em;
+    border-radius: var(--radius-full);
+    font-weight: 500;
+  }
+
+  .hub-title {
+    font-size: var(--step-3);
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    line-height: 1.2;
+  }
+
+  .hub-desc {
+    max-inline-size: 75ch;
+    line-height: 1.6;
+  }
+
+  .axiom-banner {
+    padding: var(--space-m);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    border-inline-start: 4px solid var(--color-accent);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-3xs);
+  }
+
+  .axiom-quote {
+    margin: 0;
+    font-size: var(--step--1);
+    font-style: italic;
+    color: var(--color-fg);
+    line-height: 1.5;
+  }
+
+  /* Grid em 2 colunas fluidas e proporcionais */
+  .hub-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+    gap: var(--space-m);
+  }
+
+  .hub-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    height: 100%;
+  }
+
+  .hub-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    inline-size: 100%;
+    padding: var(--space-m);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                border-color 0.25s ease,
+                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+                background-color 0.25s ease;
+  }
+
+  .hub-card::before {
+    content: "";
+    position: absolute;
+    inset-block-start: 0;
+    inset-inline: 0;
+    block-size: 2px;
+    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
+    opacity: 0;
+    transform: scaleX(0.4);
+    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hub-card-link:hover .hub-card {
+    transform: translateY(-4px);
+    border-color: var(--color-accent-muted);
+    background-color: var(--color-bg-hover);
+    box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.2), 0 0 0 1px var(--color-accent-muted);
+  }
+
+  .hub-card-link:hover .hub-card::before {
+    opacity: 1;
+    transform: scaleX(1);
+  }
+
+  .hub-card-header {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2xs);
+    margin-block-end: var(--space-2xs);
+  }
+
+  .hub-card-title {
+    font-size: var(--step-0);
+    font-weight: 700;
+    color: var(--color-fg);
+    letter-spacing: -0.01em;
+    transition: color 0.2s ease;
+  }
+
+  .hub-card-link:hover .hub-card-title {
+    color: var(--color-accent);
+  }
+
+  .hub-card-body {
+    flex-grow: 1;
+    margin-block-end: var(--space-s);
+  }
+
+  .hub-card-desc {
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .hub-card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-block-start: 1px solid var(--color-border);
+    padding-block-start: var(--space-xs);
+  }
+
+  .badge-difficulty {
+    padding-inline: 0.5em;
+    padding-block: 0.15em;
+    border-radius: var(--radius-sm);
+    background-color: var(--color-bg-subtle);
+    color: var(--color-fg-muted);
+    border: 1px solid var(--color-border);
+    text-transform: capitalize;
+    transition: border-color 0.2s ease, color 0.2s ease;
+  }
+
+  .hub-card-link:hover .badge-difficulty {
+    border-color: var(--color-accent-muted);
+    color: var(--color-fg);
+  }
+
+  .hub-card-arrow {
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--color-accent);
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .hub-card-link:hover .hub-card-arrow {
+    transform: translateX(6px);
+  }
+</style>

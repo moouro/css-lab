@@ -1,0 +1,153 @@
+---
+title: "Quebra de Linha no Flexbox (flex-wrap)"
+description: "Distribuição fluida com flex-wrap: wrap, a física de múltiplas linhas independentes e a solução para o último item esticado."
+draft: false
+publishDate: 2026-01-01
+tags: ["flexbox", "flex-wrap", "wrap", "cluster", "responsive"]
+difficulty: "intermediate"
+order: 4
+relatedContent:
+  - "fundamentals"
+  - "flex-shorthand"
+  - "alignment"
+layoutPrimitives:
+  - "cluster"
+  - "switcher"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Por padrão, o Flexbox tenta forçar todos os itens a caber em uma única linha rígida (`flex-wrap: nowrap`). Se houver muitos itens ou a tela encolher, eles encolherão até o limite de seu conteúdo e depois causarão overflow horizontal.
+
+Ao declarar **`flex-wrap: wrap`**, permitimos que os elementos quebrem naturalmente para uma nova linha quando o espaço da linha atual se esgotar.
+
+```css
+.tag-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+```
+
+<Callout type="info" title="Linhas Completamente Independentes">
+  No Flexbox com `wrap`, **cada linha opera como um contêiner flexível totalmente isolado e independente das linhas anteriores**. O Flexbox não alinha itens entre linhas diferentes (isso é responsabilidade exclusiva do CSS Grid).
+</Callout>
+
+## 2. O Problema do "Último Item Esticado"
+
+Muitos desenvolvedores tentam usar Flexbox para criar grades de produtos aplicando `flex: 1 1 250px`:
+
+```css
+.bad-catalog {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.bad-card {
+  /* Cresce para preencher a linha se houver espaço */
+  flex: 1 1 250px;
+}
+```
+
+**O que acontece na prática?**
+Se você tiver 7 produtos em uma tela que comporta 3 produtos por linha:
+- Linha 1: 3 produtos (cada um com ~33% da tela)
+- Linha 2: 3 produtos (cada um com ~33% da tela)
+- Linha 3: **1 produto solitário que estica até 100% da tela inteira!**
+
+Esse cartão gigante e desproporcional na última linha é a consequência direta de `flex-grow: 1` em um flex contêiner com quebra de linha.
+
+## 3. Como Resolver Corretamente
+
+Existem duas soluções limpas e modernas:
+
+### Solução A: Mudar para CSS Grid (Recomendado para Catálogos)
+Se os itens devem formar colunas alinhadas sem esticar o último elemento, **o layout não é Flexbox, é Grid**:
+
+```css
+.proper-catalog {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: 1rem;
+}
+```
+
+### Solução B: Manter Flexbox com `flex-grow: 0` (Para Tags e Badges)
+Se você deseja que cada item mantenha seu tamanho intrínseco natural:
+
+```css
+.badge-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-xs);
+}
+
+.badge {
+  /* Não cresce, apenas assume a largura necessária para o texto */
+  flex: 0 0 auto;
+}
+```
+
+## 4. O Espaçamento entre Linhas Quebradas
+
+Ao usar `flex-wrap: wrap`, o `gap` cuida de ambos os espaçamentos:
+- O primeiro valor define o espaço entre linhas verticais (`row-gap`)
+- O segundo valor define o espaço entre colunas horizontais (`column-gap`)
+
+```css
+.toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-s) var(--space-m); /* row-gap | column-gap */
+}
+```
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar flex-grow: 1 em Cards que Quebram Linha"
+  badCode={`.card-list {
+  display: flex;
+  flex-wrap: wrap;
+}
+.card {
+  flex: 1 1 300px; /* Estica de forma bizarra na última linha */
+}`}
+  goodTitle="Usar CSS Grid para Manter Colunas Rigorosas"
+  goodCode={`.card-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
+}`}
+  explanation="Flexbox trata cada linha como um mundo isolado. Para garantir que o último item mantenha a largura das colunas de cima, use CSS Grid."
+/>
+
+## 6. Boas Práticas
+
+1. **Use `flex-wrap: wrap` para Tags, Badges e Botões**: Casos onde elementos têm larguras heterogêneas e quebra orgânica é bem-vinda.
+2. **Combine com `align-content`**: Controla como as múltiplas linhas se distribuem caso o contêiner tenha altura fixa.
+3. **Evite `flex-grow: 1` em itens de grade no Flexbox**: Previna o efeito de cartão solitário esticado.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "flex-wrap: wrap foi utilizado para grupos de elementos de largura dinâmica?", checked: true },
+    { text: "O efeito de último item esticado foi verificado e corrigido (Grid vs flex: 0)?", checked: true },
+    { text: "Os espaçamentos vertical e horizontal foram definidos via gap?", checked: true },
+    { text: "O comportamento foi testado em telas mobile estreitas?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Every Layout: Cluster](/every-layout/cluster) — A primitiva universal de agrupamento.
+- [Every Layout: Switcher](/every-layout/switcher) — Alternância entre linha e coluna.
+- [Grid: Minmax e Auto-fill](/grid-lab/minmax-auto-fill) — Quando Grid é melhor que Flexbox.

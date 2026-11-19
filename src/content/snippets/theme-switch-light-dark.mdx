@@ -1,0 +1,40 @@
+---
+title: "Dark Mode com color-scheme & light-dark()"
+description: "A arquitetura de temas mais concisa da web: alternância total com zero classes duplicadas."
+category: "patterns"
+tags: ["patterns", "dark-mode", "light-dark", "color-scheme", "tokens"]
+draft: false
+order: 24
+language: "css"
+---
+
+### Problema
+Evitar duplicar dezenas de variáveis dentro de classes `.dark` ou `@media (prefers-color-scheme: dark)`.
+
+### Código
+
+```css
+:root {
+  /* Habilita ambos os esquemas */
+  color-scheme: light dark;
+
+  /* Cores definidas em uma única linha contínua */
+  --bg-page: light-dark(#ffffff, #0d1117);
+  --text-main: light-dark(#1f2328, #f0f6fc);
+  --border-subtle: light-dark(#d0d7de, #30363d);
+  --brand: light-dark(#0969da, #2f81f7);
+}
+
+/* Override manual do usuário */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+body {
+  background-color: var(--bg-page);
+  color: var(--text-main);
+}
+```

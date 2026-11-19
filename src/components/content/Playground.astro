@@ -1,0 +1,95 @@
+---
+export interface Props {
+  title?: string;
+  defaultSpace?: string;
+  controls?: boolean;
+}
+
+const {
+  title = 'Laboratório Interativo',
+  defaultSpace = '1.5rem',
+  controls = true,
+} = Astro.props;
+
+const parsedPx = defaultSpace.endsWith('rem')
+  ? Math.round(parseFloat(defaultSpace) * 16)
+  : Number.parseInt(defaultSpace, 10);
+const initialPx = Number.isFinite(parsedPx) ? Math.min(48, Math.max(4, parsedPx)) : 24;
+---
+
+<div class="playground-wrapper stack" style="--stack-space: var(--space-xs);">
+  <div class="playground-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between;">
+    <span class="text-xs font-semibold tracking-caps text-muted">🧪 {title}</span>
+    {controls && (
+      <div class="cluster" style="--cluster-space: var(--space-2xs);">
+        <label class="text-xs text-muted cluster" style="--cluster-space: var(--space-3xs);">
+          Espaço:
+          <input
+            type="range"
+            min="4"
+            max="48"
+            value={String(initialPx)}
+            class="range-control"
+          />
+          <span class="range-val font-mono text-xs">{initialPx}px</span>
+        </label>
+      </div>
+    )}
+  </div>
+
+  <div class="playground-canvas">
+    <div class="canvas-target">
+      <slot />
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('input', (e) => {
+    const input = e.target as HTMLInputElement | null;
+    if (!input || !input.classList.contains('range-control')) return;
+
+    const wrapper = input.closest('.playground-wrapper');
+    if (!wrapper) return;
+
+    const valDisplay = wrapper.querySelector('.range-val');
+    const target = wrapper.querySelector<HTMLElement>('.canvas-target > *');
+
+    const val = `${input.value}px`;
+    if (valDisplay) valDisplay.textContent = val;
+    if (target) {
+      target.style.setProperty('--stack-space', val);
+      target.style.setProperty('--cluster-space', val);
+      target.style.setProperty('--grid-space', val);
+      target.style.setProperty('--box-padding', val);
+      target.style.setProperty('--sidebar-gap', val);
+    }
+  });
+</script>
+
+<style>
+  .playground-wrapper {
+    border: var(--border-thin) solid var(--color-border);
+    border-radius: var(--radius-m);
+    padding: var(--space-s);
+    background-color: var(--color-bg-raised);
+    margin-block: var(--space-m);
+  }
+
+  .playground-canvas {
+    padding: var(--space-m);
+    background-color: var(--color-bg-inset);
+    border: var(--border-thin) solid var(--color-border);
+    border-radius: var(--radius-s);
+    overflow: hidden;
+    resize: horizontal;
+    min-inline-size: 260px;
+    max-inline-size: 100%;
+  }
+
+  .range-control {
+    accent-color: var(--color-accent);
+    cursor: pointer;
+    inline-size: 100px;
+  }
+</style>

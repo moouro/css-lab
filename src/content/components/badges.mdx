@@ -1,0 +1,138 @@
+---
+title: "Badges & Tags (Etiquetas)"
+description: "Etiquetas compactas para contagens, status e categorias com layout Cluster e contraste WCAG garantido."
+draft: false
+publishDate: 2026-01-01
+tags: ["components", "badges", "tags", "pills", "status-indicators"]
+difficulty: "beginner"
+order: 9
+anatomy:
+  - "Contêiner em pílula (border-radius: full)"
+  - "Ponto indicador de status (dot)"
+  - "Rótulo de texto curto"
+hasPlayground: true
+a11yNotes: "Se a badge indicar uma contagem numérica dinâmica (como mensagens não lidas), utilize aria-label explicativo (ex: '3 mensagens novas')."
+relatedContent:
+  - "alerts"
+  - "buttons"
+layoutPrimitives:
+  - "cluster"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+**Badges** (também chamadas de *Tags* ou *Pills*) são elementos visuais compactos utilizados para categorizar itens, exibir metadados, sinalizar estados de fluxo de trabalho (ex: "Em Progresso", "Concluído", "Arquivado") ou indicar quantidades numéricas (ex: "12 novos alertas").
+
+A construção refinada de badges prioriza:
+- Proporção tipográfica com a linha do texto pai (usando unidades relativas `em`).
+- Bordas arredondadas suaves (`border-radius: var(--radius-full)`).
+- Cores semânticas suaves com contraste nítido.
+- Suporte a pontos pulsantes (*dots*) para status ao vivo.
+
+## 2. A Estrutura CSS Semântica
+
+```css
+.badge {
+  --badge-bg: var(--color-bg-subtle);
+  --badge-fg: var(--color-fg-muted);
+  --badge-border: var(--color-border);
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35em;
+  padding-block: 0.15em;
+  padding-inline: 0.6em;
+  border-radius: var(--radius-full);
+  background-color: var(--badge-bg);
+  color: var(--badge-fg);
+  border: 1px solid var(--badge-border);
+
+  font-family: var(--font-mono, monospace);
+  font-size: var(--step--2);
+  font-weight: 500;
+  line-height: 1.2;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+/* Ponto Indicador de Status (Status Dot) */
+.badge-dot {
+  inline-size: 0.5em;
+  block-size: 0.5em;
+  border-radius: var(--radius-full);
+  background-color: currentColor;
+}
+
+/* Variantes Semânticas */
+.badge-success {
+  --badge-bg: var(--color-success-subtle);
+  --badge-fg: var(--color-success);
+  --badge-border: transparent;
+}
+
+.badge-warning {
+  --badge-bg: var(--color-warning-subtle);
+  --badge-fg: var(--color-warning);
+  --badge-border: transparent;
+}
+
+.badge-danger {
+  --badge-bg: var(--color-danger-subtle);
+  --badge-fg: var(--color-danger);
+  --badge-border: transparent;
+}
+
+.badge-accent {
+  --badge-bg: var(--color-accent-muted);
+  --badge-fg: var(--color-accent);
+  --badge-border: transparent;
+}
+```
+
+<Callout type="info" title="Por que font-size em --step--2 e padding em em?">
+  Ao definir `padding` em unidades `em`, a badge escala automaticamente de forma simétrica e proporcional caso você a insira dentro de um título `h1` ou de um parágrafo `small`!
+</Callout>
+
+## 3. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Apenas uma Cor Forte sem Texto de Status"
+  badCode={`<!-- O leitor de tela não sabe o que o ponto verde significa -->
+<span class="status-circle" style="background: green;"></span>`}
+  goodTitle="Incluir Texto Visível ou Rótulo de Acessibilidade"
+  goodCode={`<span class="badge badge-success">
+  <span class="badge-dot" aria-hidden="true"></span>
+  Ativo
+</span>`}
+  explanation="Sinalizadores puramente visuais deixam usuários com deficiência visual sem contexto. Sempre combine o ponto de cor com uma palavra descritiva ou atributo aria-label."
+/>
+
+## 4. Boas Práticas
+
+1. **Use fontes monospace para números**: A fonte com largura fixa evita que a badge fique mudando de largura quando contadores atualizam.
+2. **Evite textos longos em badges**: Badges devem ter entre 1 e 3 palavras no máximo.
+3. **Mantenha `white-space: nowrap`**: Garante que o texto da badge nunca quebre em duas linhas.
+
+## 5. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A badge utiliza unidades relativas em para dimensionamento proporcional?", checked: true },
+    { text: "white-space: nowrap está configurado?", checked: true },
+    { text: "O contraste de texto contra o fundo atende à especificação WCAG?", checked: true },
+    { text: "Contagens dinâmicas utilizam rótulos ARIA adequados?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Componentes: Alertas](/components/alerts) — Avisos de sistema expandidos.
+- [Every Layout: Cluster](/every-layout/cluster) — Agrupamento de múltiplas badges.
+- [Design Tokens: Cores](/design-tokens/colors) — Paleta semântica do sistema.

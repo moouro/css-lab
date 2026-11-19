@@ -1,0 +1,162 @@
+---
+title: "Padrões Avançados de Grid"
+description: "Camadas sobrepostas sem position absolute, o Santo Graal com Grid e o futuro do Masonry nativo."
+draft: false
+publishDate: 2026-01-01
+tags: ["grid", "advanced", "stacking", "layers", "holy-grail", "masonry"]
+difficulty: "advanced"
+order: 7
+relatedContent:
+  - "fundamentals"
+  - "auto-placement"
+  - "subgrid"
+layoutPrimitives:
+  - "grid"
+  - "box"
+  - "imposter"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Além de dividir a tela em colunas regulares, o CSS Grid possui capacidades arquiteturais que substituem técnicas legadas complexas.
+
+Neste módulo avançado, exploramos três padrões de alta maturidade:
+1. **Camadas Sobrepostas (Stacking sem `position: absolute`)**
+2. **O Layout "Santo Graal" (Holy Grail Layout) com Grid**
+3. **CSS Grid Masonry Nativo**
+
+## 2. Padrão 1: Camadas Sobrepostas (Zero Absolute Positioning)
+
+Um dos maiores problemas de usar `position: absolute` para sobrepor texto sobre uma imagem (ex: cards de herói ou banners de produto) é que o elemento absoluto é removido do fluxo. Isso significa que o contêiner pai colapsa em altura zero se não tiver uma altura fixa arbitrária em pixels!
+
+Com o CSS Grid, múltiplos elementos podem ocupar **a mesmíssima célula do grid**:
+
+```css
+.hero-banner {
+  display: grid;
+  /* Cria uma única célula 1x1 */
+  grid-template-areas: "layer";
+}
+
+.hero-image,
+.hero-scrim,
+.hero-content {
+  /* Todos ocupam exatamente a mesma área 'layer'! */
+  grid-area: layer;
+}
+
+.hero-image {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  z-index: 1;
+}
+
+.hero-scrim {
+  background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+  z-index: 2;
+}
+
+.hero-content {
+  z-index: 3;
+  align-self: end; /* Fica no rodapé da imagem */
+  padding: var(--space-l);
+  color: #ffffff;
+}
+```
+
+<Callout type="info" title="Vantagem Arquitetural">
+  A altura do `.hero-banner` é automaticamente determinada pelo maior elemento dentro dele (a imagem ou o texto longo), sem nenhuma altura fixa manual!
+</Callout>
+
+## 3. Padrão 2: O Santo Graal Fluido
+
+O Santo Graal clássico da web consiste em:
+- Header no topo
+- Rodapé colado na base
+- Área central dividida em: Barra Lateral Esquerda, Conteúdo Central e Barra Lateral Direita
+- O conteúdo central deve aparecer **primeiro no HTML** para acessibilidade e SEO, mas renderizado no centro visual.
+
+Com CSS Grid:
+
+```css
+.holy-grail {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(180px, 240px) 1fr minmax(180px, 240px);
+  min-block-size: 100vh;
+}
+
+header { grid-column: 1 / -1; }
+nav    { grid-column: 1; grid-row: 2; }
+main   { grid-column: 2; grid-row: 2; }
+aside  { grid-column: 3; grid-row: 2; }
+footer { grid-column: 1 / -1; }
+```
+
+## 4. Padrão 3: Masonry Nativo no CSS Grid
+
+Atualmente em fase de implementação nos navegadores através da especificação CSS Grid Level 3:
+
+```css
+.masonry-feed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  /* Transforma as linhas em um fluxo contínuo de alvenaria (masonry) */
+  grid-template-rows: masonry;
+  gap: var(--space-m);
+}
+```
+
+Isso elimina definitivamente qualquer biblioteca JavaScript como Isotope ou Masonry.js.
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar position: absolute para Scrim e Textos sobre Imagem"
+  badCode={`.card {
+  position: relative;
+  height: 350px; /* Altura arbitrária que corta textos longos */
+}
+.card-content {
+  position: absolute;
+  bottom: 0;
+}`}
+  goodTitle="Usar Grid com a Mesma Célula Compartilhada"
+  goodCode={`.card {
+  display: grid;
+}
+.card > * {
+  grid-area: 1 / 1;
+}`}
+  explanation="No CSS Grid, elementos compartilham a célula 1/1. O contêiner pai nunca colapsa e cresce naturalmente com o texto sem transbordamento."
+/>
+
+## 6. Boas Práticas
+
+1. **Use `grid-area: 1 / 1` para sobreposições de mídia**: Muito mais resiliente e sem necessidade de `position: relative` e `absolute`.
+2. **Defina a ordem do DOM priorizando semântica**: Coloque o `<main>` antes dos `<aside>` no HTML, e organize visualmente via CSS Grid.
+3. **Use `min-block-size: 100vh` ou `100dvh`**: Para garantir que rodapés fiquem colados na base da tela mesmo com pouco conteúdo.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "Banners com imagem e texto sobrepostos usam grid-area: 1 / 1 em vez de position: absolute?", checked: true },
+    { text: "O contêiner principal da aplicação possui min-block-size: 100dvh?", checked: true },
+    { text: "A ordem de leitura e foco (DOM) faz sentido sem o CSS ativado?", checked: true },
+    { text: "Os índices z-index foram mantidos baixos (1, 2, 3) na pilha de grid?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Fundamentos do Grid](/grid-lab/fundamentals) — Coordenadas de linhas.
+- [Template Areas](/grid-lab/template-areas) — Mapeamento bidimensional.
+- [Every Layout: Imposter](/every-layout/imposter) — Sobreposições isoladas.

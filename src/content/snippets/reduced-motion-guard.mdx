@@ -1,0 +1,28 @@
+---
+title: "Guarda Universal de Movimento Reduzido"
+description: "Desativar com segurança transições e animações sem quebrar ouvintes transitionend de JavaScript."
+category: "animation"
+tags: ["animation", "a11y", "reduced-motion", "accessibility"]
+draft: false
+order: 14
+language: "css"
+---
+
+### Problema
+Definir `animation: none !important; transition: none !important;` pode travar bibliotecas que esperam o evento `transitionend` para desmontar componentes do DOM.
+
+### Código
+
+```css
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+```
+*Dica:* O valor `0.01ms` conclui a transição de forma imperceptível aos olhos humanos, mas garante o disparo regular dos eventos JS.

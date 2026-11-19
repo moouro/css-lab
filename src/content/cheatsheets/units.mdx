@@ -1,0 +1,51 @@
+---
+title: "Unidades CSS Modernas Cheatsheet"
+description: "Guia completo de unidades relativas, unidades dinâmicas de viewport (dvh/svh/lvh), contêiner (cqi/cqw) e tipografia (ch/rem)."
+tags: ["units", "cheatsheet", "dvh", "cqi", "ch", "rem", "viewport"]
+draft: false
+order: 4
+printable: true
+---
+
+## 1. Unidades de Viewport Modernas (Baseline 2023)
+
+Resolvem o clássico bug mobile da barra de endereço do navegador que cobre o rodapé.
+
+| Unidade | Nome | Comportamento no Mobile |
+| :--- | :--- | :--- |
+| `100dvh` | **Dynamic Viewport Height** | Adapta-se ativamente quando a barra de URL encolhe ou expande ao rolar |
+| `100svh` | **Small Viewport Height** | Altura mínima com a barra de endereço totalmente visível |
+| `100lvh` | **Large Viewport Height** | Altura máxima simulando a barra de endereço recolhida |
+| `100dvw` | **Dynamic Viewport Width** | Largura dinâmica da janela descontando barras laterais |
+
+*Recomendação:* Use `min-block-size: 100dvh` no `<body>` para sites de tela cheia sem barras cortadas.
+
+## 2. Unidades de Contêiner (Container Query Units)
+
+Calculadas a partir do contêiner pai mais próximo com `container-type`:
+
+| Unidade | Definição |
+| :--- | :--- |
+| `1cqi` | 1% da dimensão **inline** do contêiner (largura em texto horizontal) |
+| `1cqb` | 1% da dimensão **block** do contêiner (altura em texto horizontal) |
+| `1cqw` | 1% da largura física do contêiner |
+| `1cqh` | 1% da altura física do contêiner |
+| `1cqmin` | O menor valor entre `cqi` e `cqb` |
+| `1cqmax` | O maior valor entre `cqi` e `cqb` |
+
+## 3. Unidades Tipográficas Relativas
+
+| Unidade | Base de Referência | Melhor Uso |
+| :--- | :--- | :--- |
+| `rem` | Tamanho da fonte do elemento raiz (`html`) | Espaçamentos, paddings e fontes com suporte a zoom |
+| `em` | Tamanho da fonte do próprio elemento | Badges e ícones que devem escalar com o texto |
+| `ch` | Largura do caractere `0` na fonte atual | **Medida ideal de leitura**: `max-inline-size: 65ch` |
+| `ex` | Altura da letra `x` da fonte | Micro-alinhamentos de linha |
+| `cap` | Altura de letras maiúsculas (Cap Height) | Alinhamento geométrico de títulos |
+
+## 4. Unidades de Grid & Flexibilidade
+
+| Unidade | O que representa? |
+| :--- | :--- |
+| `1fr` | Uma fração do espaço livre restante após descontar conteúdos fixos e gaps |
+| `%` | Porcentagem da largura do elemento pai (cuidado com gaps!) |

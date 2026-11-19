@@ -1,0 +1,152 @@
+---
+title: "Cascade Layers (@layer)"
+description: "Controle determinístico e absoluto sobre a ordem de precedência da cascata CSS, eliminando guerras de especificidade."
+draft: false
+publishDate: 2026-01-01
+tags: ["layers", "cascade", "specificity", "architecture"]
+difficulty: "intermediate"
+order: 2
+feature: "cascade-layers"
+browserSupport: "stable"
+canIUseId: "css-cascade-layers"
+relatedContent:
+  - "nesting"
+  - "is-where-selectors"
+  - "design-tokens"
+layoutPrimitives:
+  - "stack"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+A regra `@layer` (Cascade Layers) redefine a forma como o algoritmo da cascata CSS resolve conflitos de estilo. Historicamente, quando duas declarações competem pela mesma propriedade em um elemento, o CSS desempata por:
+
+1. Origem e Importância (`!important`, User Agent, Autor)
+2. **Especificidade** do Seletor (`#id`, `.class`, `tag`)
+3. **Ordem de Aparição** no arquivo
+
+Com o **Cascade Layers**, uma nova camada hierárquica é inserida **antes** da especificidade:
+
+> **Camada (Layer) > Especificidade > Ordem de Aparição**
+
+Isso significa que um seletor simples de classe dentro de uma camada superior **vence** um seletor super-específico com ID e 3 classes dentro de uma camada inferior!
+
+<Callout type="info" title="Controle Arquitetural">
+  Cascade Layers permite que times inteiros parem de brigar com `!important` ou seletores inflados como `html body #app .card` para sobrescrever um reset de CSS ou uma biblioteca externa.
+</Callout>
+
+## 2. A Declaração Ordenada de Camadas
+
+A ordem das camadas deve ser estabelecida logo no topo do arquivo CSS principal através de uma linha declarativa:
+
+```css
+/* Estabelecendo a hierarquia da aplicação (da menor para a maior prioridade) */
+@layer reset, base, tokens, components, utilities, overrides;
+```
+
+A regra de ouro da cascata para camadas sem `!important`:
+> **A última camada declarada sempre vence as camadas anteriores.**
+
+```css
+@layer reset {
+  /* Camada mais baixa */
+  button {
+    all: unset;
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  /* Camada superior ao reset */
+  .btn-primary {
+    background-color: var(--color-accent);
+    color: var(--color-bg);
+    padding: var(--space-xs) var(--space-s);
+  }
+}
+
+@layer utilities {
+  /* Camada de mais alta prioridade */
+  .hidden {
+    display: none;
+  }
+}
+```
+
+Nesse exemplo, `.hidden` (na layer `utilities`) sobrescreve qualquer declaração em `.btn-primary` (na layer `components`), sem precisar de `!important`.
+
+## 3. O Comportamento Crucial de `!important` em Layers
+
+Aqui reside um dos conceitos mais contraintuitivos e geniais da especificação W3C: **o comportamento de `!important` inverte a ordem das camadas**.
+
+```
+[Normal]    reset < base < components < utilities < unlayered
+[!important] unlayered < utilities < components < base < reset
+```
+
+<Callout type="important" title="Inversão Proposital">
+  Por que a ordem inverte? Porque se o desenvolvedor colocou um `!important` em uma regra de `reset` (por exemplo, acessibilidade ou contenção de layout fundamental), essa declaração do sistema base precisa ter o poder de vencer overrides acidentais de componentes.
+</Callout>
+
+## 4. Estilos Fora de Camadas (Unlayered Styles)
+
+Qualquer CSS escrito fora de um bloco `@layer` pertence ao escopo **unlayered**.
+
+Por especificação:
+- Declarações normais **unlayered** têm prioridade superior a **todas** as declarações normais de qualquer `@layer`.
+- Declarações com `!important` dentro de uma `@layer` têm prioridade sobre declarações com `!important` unlayered.
+
+Portanto, em um projeto moderno, o ideal é encapsular 100% dos estilos em camadas nomeadas.
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Sobrescrever Terceiros com Especificidade Artificial"
+  badCode={`/* Sem Cascade Layers */
+body div#root .app-container .external-lib-modal.override {
+  padding: 2rem !important;
+}`}
+  goodTitle="Isolar a Biblioteca em uma Layer de Menor Prioridade"
+  goodCode={`/* Com Cascade Layers */
+@layer vendor, app;
+
+@import "external-library.css" layer(vendor);
+
+@layer app {
+  /* Vence vendor com seletores limpos e naturais */
+  .external-lib-modal {
+    padding: var(--space-l);
+  }
+}`}
+  explanation="Ao importar estilos externos para uma camada inferior declarada ('vendor'), você pode sobrescrevê-los com seletores de classe simples, sem usar !important ou inflar o DOM com IDs desnecessários."
+/>
+
+## 6. Boas Práticas
+
+1. **Defina a ordem em um único local**: No topo do `app.css` ou `tokens.css`, declare `@layer reset, base, layout, components, utilities;`.
+2. **Não crie dezenas de camadas granulares**: Mantenha entre 4 e 6 camadas arquiteturais bem pensadas.
+3. **Use para import de bibliotecas**: Qualquer dependência de terceiros deve ser encapsulada em `@import "lib.css" layer(vendor);`.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A ordem das camadas está declarada explicitamente no topo do CSS raiz?", checked: true },
+    { text: "O reset ou normalizador está isolado na primeira camada (reset)?", checked: true },
+    { text: "Estilos de utilitários e overrides estão nas camadas mais altas?", checked: true },
+    { text: "O time evita o uso de !important para desempate de componentes?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [CSS Nesting](/css-moderno/nesting) — Sintaxe nativa de hierarquia.
+- [Seletores :is() e :where()](/css-moderno/is-where-selectors) — Ajustes finos de especificidade de seletor.
+- [Design Tokens](/css-moderno/design-tokens) — Estrutura de tokens em camadas.

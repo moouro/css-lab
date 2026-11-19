@@ -1,0 +1,41 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { mergeVars } from '../../utils/style';
+
+type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{
+  as: Tag;
+  itemWidth?: string;
+  space?: string;
+  height?: string;
+  noBar?: boolean;
+}>;
+
+const {
+  as: Tag = 'div',
+  itemWidth = 'auto',
+  space = 'var(--space-s)',
+  height = 'auto',
+  noBar = false,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Element = Tag as 'div';
+const computedStyle = mergeVars(
+  {
+    '--reel-item-width': itemWidth,
+    '--reel-space': space,
+    'block-size': height !== 'auto' ? height : undefined,
+  },
+  style,
+);
+---
+
+<Element
+  class:list={['reel', { 'scrollbar-none': noBar }, className]}
+  style={computedStyle}
+  {...rest}
+>
+  <slot />
+</Element>

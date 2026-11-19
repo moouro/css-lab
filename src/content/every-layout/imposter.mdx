@@ -1,0 +1,106 @@
+---
+title: "The Imposter"
+description: "Sobreposição e centralização absoluta ou fixa sobre um container de posicionamento ou viewport."
+draft: false
+publishDate: 2026-01-01
+tags: ["positioning", "overlays", "modals", "translate", "imposter"]
+difficulty: "advanced"
+order: 11
+primitive: "imposter"
+problem: "Retirar elementos do fluxo do documento com position: absolute/fixed causa sobreposição descontrolada e quebra de conteúdo quando o elemento cresce além do container pai."
+solution: "Combinar inset-block-start: 50% e inset-inline-start: 50% com translate: -50% -50% e contenção via max-inline-size/max-block-size e overflow: auto."
+cssProperties:
+  - "position: absolute | fixed"
+  - "inset-block-start: 50%"
+  - "inset-inline-start: 50%"
+  - "translate: -50% -50%"
+  - "max-inline-size"
+  - "max-block-size"
+  - "overflow: auto"
+propsApi:
+  - name: "position"
+    type: "'absolute' | 'fixed'"
+    default: "'absolute'"
+    description: "Tipo de posicionamento: 'absolute' (relativo ao container pai) ou 'fixed' (relativo à viewport inteira)."
+  - name: "contain"
+    type: "boolean"
+    default: "false"
+    description: "Se verdadeiro, restringe a caixa para não ultrapassar as dimensões do container pai e adiciona barras de rolagem internas caso o conteúdo cresça demais."
+  - name: "margin"
+    type: "string"
+    default: "var(--space-s)"
+    description: "Margem de folga mínima de segurança entre o Imposter e as bordas do container pai."
+relatedContent:
+  - "center"
+  - "cover"
+layoutPrimitives:
+  - "imposter"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Imposter from '@/components/layout/Imposter.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Posicionar elementos fora do fluxo com `position: absolute` é perigoso porque desconecta o elemento do algoritmo padrão de medição do navegador. O **Imposter** é o padrão controlado para sobreposição deliberada: diálogos modais, banners de confirmação, popups e mensagens de carregamento.
+
+## 2. A Fórmula com Propriedades Lógicas e translate
+
+A abordagem moderna não usa `top`, `left` nem `transform: translate()` legado:
+
+```css
+.imposter {
+  position: var(--imposter-position, absolute);
+  inset-block-start: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+}
+
+.imposter[data-contain] {
+  --imposter-margin: var(--space-s);
+  overflow: auto;
+  max-inline-size: calc(100% - (var(--imposter-margin) * 2));
+  max-block-size:  calc(100% - (var(--imposter-margin) * 2));
+}
+```
+
+<Callout type="tip" title="Por que a propriedade individual 'translate'?">
+  A propriedade CSS individual `translate: -50% -50%` é amplamente suportada (Baseline) e evita sobrescrever ou competir com declarações de `scale` ou `rotate` na mesma regra, permitindo animações suaves e independentes!
+</Callout>
+
+<AntiPattern
+  badCode={`/* Frágil: margens negativas com dimensões fixas obrigatórias */\n.dialog {\n  position: absolute;\n  left: 50%; top: 50%;\n  width: 400px; height: 300px;\n  margin-left: -200px; margin-top: -150px; /* Quebra se o texto crescer! */\n}`}
+  goodCode={`/* Resiliente: algoritmo auto-adaptável */\n.imposter {\n  position: absolute;\n  inset-block-start: 50%;\n  inset-inline-start: 50%;\n  translate: -50% -50%;\n}`}
+  explanation="O translate percentual calcula 50% das próprias dimensões do elemento em tempo de execução, adaptando-se a qualquer volume dinâmico de texto."
+/>
+
+## 3. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 4. Playground Interativo
+
+<Playground title="Demonstração do Imposter Centralizado">
+  <div style="position: relative; height: 180px; background-color: var(--color-bg-inset); border: var(--border-thin) dashed var(--color-border); border-radius: var(--radius-m);">
+    <Imposter contain={true}>
+      <Box padding="1rem">
+        <h4 class="text-sm font-semibold">Diálogo Sobreposto</h4>
+        <p class="text-xs text-muted">Centralizado no container pai.</p>
+      </Box>
+    </Imposter>
+  </div>
+</Playground>
+
+## 5. Checklist de Qualidade
+
+<Checklist items={[
+  "O container pai possui position: relative (ou position: relative implícito) para ancorar o contexto de coordenadas.",
+  "Usa translate individual em vez do shorthand transform quando possível.",
+  "Possui max-inline-size e max-block-size com overflow: auto quando ativado o modo de contenção.",
+  "Para diálogos interativos do mundo real, prefira a tag semântica nativa <dialog> que provê top-layer nativo."
+]} />

@@ -1,0 +1,37 @@
+---
+title: "Tokens de Sombras & Elevação"
+description: "Sombras direcionais multicamadas para superfícies elevadas, popovers e modais sem efeitos borrados artificiais."
+category: "shadows"
+order: 5
+draft: false
+---
+
+## 1. Níveis de Elevação Sem Neumorfismo
+
+Evitamos sombras gigantes e difusas no estilo de templates genéricos. Utilizamos sombras direcionais multicamadas sutis que simulam a luz superior ambiente:
+
+```css
+:root {
+  /* Nível 1: Cards e caixas em repouso */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+
+  /* Nível 2: Cards no estado hover ou inputs focados */
+  --shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.1),
+    0 2px 4px -2px rgba(0, 0, 0, 0.06);
+
+  /* Nível 3: Dropdowns, popovers e menus suspensos */
+  --shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -4px rgba(0, 0, 0, 0.08);
+
+  /* Nível 4: Janelas modais na Top Layer */
+  --shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.15),
+    0 8px 10px -6px rgba(0, 0, 0, 0.1);
+}
+```
+
+## 2. Sombras no Dark Mode
+
+No modo escuro, sombras pretas puras são quase invisíveis contra fundos pretos. Para resolver isso, adicionamos uma borda sutil de 1px (`--color-border`) em conjunto com a sombra para delimitar perfeitamente as superfícies elevadas.

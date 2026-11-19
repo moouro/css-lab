@@ -1,0 +1,21 @@
+---
+title: "Pontuação Suspensa Editorial (hanging-punctuation)"
+description: "Alinhamento visual da margem de texto colocando aspas e parênteses fora do bloco tipográfico."
+category: "typography"
+tags: ["typography", "editorial", "hanging-punctuation", "quotes"]
+draft: false
+order: 7
+language: "css"
+---
+
+### Problema
+Quando uma citação ou parágrafo começa com aspas (`"“"`), o glifo da aspa empurra a primeira letra para a direita, quebrando a linha visual reta da margem esquerda do texto.
+
+### Código
+
+```css
+blockquote, p {
+  /* Pendura aspas e travessões para fora da caixa de alinhamento */
+  hanging-punctuation: first last;
+}
+```

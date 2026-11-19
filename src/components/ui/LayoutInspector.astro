@@ -1,0 +1,136 @@
+---
+// LayoutInspector.astro
+// Inspeciona e visualiza as 13 primitivas do Every Layout ativas na página
+---
+
+<div class="layout-inspector-widget no-print" id="layout-inspector-widget">
+  <button
+    type="button"
+    id="toggle-layout-inspector"
+    class="inspector-btn cluster"
+    aria-pressed="false"
+    aria-label="Inspecionar primitivas do Every Layout"
+  >
+    <span class="inspector-icon" aria-hidden="true">📐</span>
+    <span class="inspector-label font-mono text-xs">Every Layout</span>
+    <kbd class="inspector-kbd" aria-hidden="true">⇧L</kbd>
+  </button>
+</div>
+
+<script>
+  const INSPECTOR_STORAGE_KEY = 'css-lab-inspector';
+
+  function applyInspectorState(enabled: boolean): void {
+    if (enabled) {
+      document.documentElement.setAttribute('data-layout-inspector', 'true');
+    } else {
+      document.documentElement.removeAttribute('data-layout-inspector');
+    }
+
+    const btn = document.getElementById('toggle-layout-inspector');
+    if (btn) {
+      btn.setAttribute('aria-pressed', enabled ? 'true' : 'false');
+      btn.classList.toggle('active', enabled);
+    }
+  }
+
+  function syncInspectorFromStorage(): void {
+    try {
+      const isEnabled = localStorage.getItem(INSPECTOR_STORAGE_KEY) === 'true';
+      applyInspectorState(isEnabled);
+    } catch {
+      applyInspectorState(false);
+    }
+  }
+
+  function toggleInspector(): void {
+    const next = document.documentElement.getAttribute('data-layout-inspector') !== 'true';
+    applyInspectorState(next);
+    try {
+      localStorage.setItem(INSPECTOR_STORAGE_KEY, next ? 'true' : 'false');
+    } catch {
+      // Storage indisponível
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    if (target?.closest('#toggle-layout-inspector')) {
+      toggleInspector();
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    const target = e.target as HTMLElement | null;
+    if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) {
+      return;
+    }
+
+    if (e.shiftKey && e.key.toUpperCase() === 'L') {
+      e.preventDefault();
+      toggleInspector();
+    }
+  });
+
+  document.addEventListener('astro:after-swap', syncInspectorFromStorage);
+  document.addEventListener('astro:page-load', syncInspectorFromStorage);
+</script>
+
+<style>
+  .layout-inspector-widget {
+    position: fixed;
+    inset-block-end: var(--space-m);
+    inset-inline-start: var(--space-m);
+    z-index: 900;
+  }
+
+  .inspector-btn {
+    align-items: center;
+    gap: var(--space-2xs);
+    background-color: var(--color-bg-surface);
+    color: var(--color-fg-muted);
+    border: 1px solid var(--color-border);
+    padding: var(--space-3xs) var(--space-xs);
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-md);
+    cursor: pointer;
+    user-select: none;
+    font-size: var(--step--2);
+    transition: all var(--duration-fast) var(--ease-out);
+  }
+
+  .inspector-btn:hover {
+    color: var(--color-fg);
+    border-color: var(--color-border-hover);
+    transform: translateY(-1px);
+  }
+
+  .inspector-btn.active {
+    background-color: var(--color-accent);
+    color: #ffffff;
+    border-color: transparent;
+  }
+
+  .inspector-kbd {
+    font-size: 0.7em;
+    padding: 0.1em 0.4em;
+    background: rgb(0 0 0 / 0.15);
+    border-radius: var(--radius-sm);
+    color: inherit;
+  }
+
+  @media (max-width: 640px) {
+    .layout-inspector-widget {
+      inset-block-end: var(--space-s);
+      inset-inline-start: var(--space-s);
+    }
+    .inspector-label,
+    .inspector-kbd {
+      display: none;
+    }
+    .inspector-btn {
+      padding: 0.45rem;
+      border-radius: var(--radius-full);
+    }
+  }
+</style>

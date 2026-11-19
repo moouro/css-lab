@@ -1,0 +1,107 @@
+---
+title: "The Center"
+description: "Centralização horizontal com contenção de medida tipográfica (measure) e gutters mínimos."
+draft: false
+publishDate: 2026-01-01
+tags: ["centering", "measure", "typography", "max-inline-size"]
+difficulty: "beginner"
+order: 3
+primitive: "center"
+problem: "text-align: center prejudica a legibilidade de textos longos. margin: 0 auto em border-box estreita o conteúdo ao adicionar padding em telas pequenas."
+solution: "Usar content-box, max-inline-size em unidades de caractere (ch) e margens automáticas com padding-inline como gutter de segurança."
+cssProperties:
+  - "max-inline-size"
+  - "margin-inline: auto"
+  - "box-sizing: content-box"
+  - "padding-inline"
+propsApi:
+  - name: "max"
+    type: "string"
+    default: "var(--measure)"
+    description: "Largura máxima da coluna central (padrão tipográfico 65ch)."
+  - name: "gutter"
+    type: "string"
+    default: "var(--space-m)"
+    description: "Espaçamento mínimo de segurança lateral em telas estreitas."
+  - name: "intrinsic"
+    type: "boolean"
+    default: "false"
+    description: "Centraliza os filhos intrinsecamente de acordo com suas próprias larguras de conteúdo (via flex-column align-items: center)."
+relatedContent:
+  - "stack"
+  - "cover"
+layoutPrimitives:
+  - "center"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Center from '@/components/layout/Center.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Alinhar texto ao centro com `text-align: center` quebra a borda esquerda do bloco de leitura (*ragged edge*), forçando o olho a procurar o início de cada nova linha. O **Center** cria uma coluna centralizada horizontalmente no container, mantendo o alinhamento de texto natural e limitando a largura à **medida de leitura ideal** (cerca de 45 a 75 caracteres).
+
+## 2. A Sutileza do Box-Sizing
+
+Ao contrário de quase todos os elementos onde `box-sizing: border-box` é preferido, o **Center** do *Every Layout* adota `box-sizing: content-box`.
+
+Por quê?
+Se o container estivesse em `border-box` com `max-inline-size: 60ch`, qualquer padding interno adicionado reduziria a largura útil do texto, tornando a linha mais curta que a medida desejada. Com `content-box`, o padding atua como **gutter exterior** em viewports estreitas sem encolher o bloco de texto quando há espaço suficiente!
+
+```css
+.center {
+  box-sizing: content-box;
+  max-inline-size: var(--center-max, 65ch);
+  margin-inline: auto;
+  padding-inline: var(--center-gutter, var(--space-m));
+}
+```
+
+<AntiPattern
+  badCode={`/* Frágil: margens abreviadas resetam margens verticais */\n.center {\n  margin: 0 auto; /* destrói qualquer margin-top vinda de um Stack pai! */\n}`}
+  goodCode={`/* Resiliente: propriedade lógica preserva margens verticais */\n.center {\n  margin-inline: auto;\n}`}
+  explanation="Usar 'margin: 0 auto' sobrescreve margens verticais contextuais aplicadas por ancestrais (como o Stack). 'margin-inline: auto' toca estritamente no eixo horizontal."
+/>
+
+## 3. Centralização Intrínseca
+
+Quando você ativa o modo `intrinsic`, o Center transforma-se em um contexto flexível em coluna para centralizar filhos menores (como botões de ação ou badges):
+
+```css
+.center[data-intrinsic] {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+```
+
+## 4. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 5. Playground Interativo
+
+<Playground title="Demonstração do Center">
+  <Center max="45ch">
+    <Box padding="1rem">
+      <h3>Coluna Centralizada Tipográfica</h3>
+      <p class="text-sm text-muted">
+        O texto mantém-se alinhado à esquerda para máxima legibilidade, mas o container nunca excede a medida áurea de caracteres por linha, mesmo em monitores ultrawide.
+      </p>
+    </Box>
+  </Center>
+</Playground>
+
+## 6. Checklist de Qualidade
+
+<Checklist items={[
+  "Usa margin-inline: auto em vez do shorthand margin: 0 auto.",
+  "Medida máxima calibrada em ch (font metrics) para consistência tipográfica.",
+  "Usa content-box para garantir que o padding funcione como gutter sem estrangular o texto.",
+  "Evita text-align: center para parágrafos e textos longos de leitura."
+]} />

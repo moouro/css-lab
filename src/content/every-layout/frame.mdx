@@ -1,0 +1,93 @@
+---
+title: "The Frame"
+description: "Preservação estrita de proporção de tela (aspect ratio) para mídia substituída e corte com object-fit."
+draft: false
+publishDate: 2026-01-01
+tags: ["aspect-ratio", "object-fit", "media", "images", "videos"]
+difficulty: "beginner"
+order: 9
+primitive: "frame"
+problem: "Imagens responsivas (max-width: 100%) variam em proporção dependendo da fonte original, quebrando a harmonia visual de cartões e gerando saltos de layout (CLS)."
+solution: "Usar a propriedade moderna aspect-ratio com overflow: hidden e object-fit: cover em um elemento filho único."
+cssProperties:
+  - "aspect-ratio"
+  - "overflow: hidden"
+  - "object-fit: cover"
+propsApi:
+  - name: "ratio"
+    type: "string"
+    default: "16 / 9"
+    description: "Proporção de largura por altura (ex: 16/9, 4/3, 1/1)."
+relatedContent:
+  - "box"
+  - "grid"
+layoutPrimitives:
+  - "frame"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Frame from '@/components/layout/Frame.astro';
+
+## 1. Conceito
+
+Imagens e vídeos são elementos substituídos (*replaced elements*). Suas dimensões naturais vêm do arquivo codificado, fora do controle imediato do CSS. O **Frame** age como uma janela com proporção geométrica estrita através da qual a mídia é exibida sem distorção.
+
+## 2. A Evolução: Do Hack de Padding ao aspect-ratio Nativo
+
+Antes do suporte a `aspect-ratio` (agora amplamente suportado em todos os browsers), a web dependia do hack do padding percentual vertical (`padding-bottom: 56.25%` para 16:9).
+
+Hoje, a especificação nativa simplifica radicalmente:
+
+```css
+.frame {
+  aspect-ratio: var(--frame-ratio, 16 / 9);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.frame > img,
+.frame > video {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+}
+```
+
+<Callout type="tip" title="Eliminação de CLS (Cumulative Layout Shift)">
+  Ao declarar o `aspect-ratio` no container, o navegador reserva o espaço exato na tela antes mesmo que os bytes da imagem terminem de baixar pela rede, garantindo CLS zero!
+</Callout>
+
+<AntiPattern
+  badCode={`/* Antigo / Complexo: hack de padding e posicionamento absoluto */\n.frame-wrapper {\n  position: relative;\n  padding-bottom: 56.25%;\n}\n.frame-wrapper > img {\n  position: absolute;\n  inset: 0;\n}`}
+  goodCode={`/* Moderno e Declarativo */\n.frame {\n  aspect-ratio: 16 / 9;\n}\n.frame > img {\n  inline-size: 100%;\n  block-size: 100%;\n  object-fit: cover;\n}`}
+  explanation="A propriedade aspect-ratio é nativa, elimina posicionamento absoluto desnecessário e funciona com qualquer proporção dinâmica via CSS Custom Properties."
+/>
+
+## 3. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 4. Playground Interativo
+
+<Playground title="Demonstração do Frame 16:9">
+  <Frame ratio="16 / 9">
+    <div style="background: linear-gradient(135deg, var(--gray-3), var(--gray-4)); width: 100%; height: 100%; display: grid; place-items: center; color: var(--color-text-muted);">
+      <span class="font-mono text-sm">Quadro 16:9 Travado</span>
+    </div>
+  </Frame>
+</Playground>
+
+## 5. Checklist de Qualidade
+
+<Checklist items={[
+  "Usa aspect-ratio nativo em vez de hacks legados de padding.",
+  "Mídia filha configurada com object-fit: cover para manter proporção sem distorcer pixels.",
+  "Usa overflow: hidden no container para aparar bordas excedentes.",
+  "Compatível com imagens, vídeos, iframes e elementos de canvas."
+]} />

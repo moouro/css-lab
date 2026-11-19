@@ -1,0 +1,107 @@
+---
+title: "Alinhamento no CSS Grid"
+description: "O sistema completo de Box Alignment: justify-items, align-items, justify-content, align-content e propriedades self."
+draft: false
+publishDate: 2026-01-01
+tags: ["grid", "alignment", "justify-items", "align-items", "place-content", "place-items"]
+difficulty: "intermediate"
+order: 6
+relatedContent:
+  - "fundamentals"
+  - "subgrid"
+  - "advanced-patterns"
+layoutPrimitives:
+  - "grid"
+  - "box"
+  - "center"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+O alinhamento no CSS moderno foi unificado pela especificação **CSS Box Alignment Module**. No CSS Grid, existem dois eixos fundamentais e dois níveis de controle:
+
+### Os Dois Eixos:
+- **Eixo Inline (Horizontal)**: Controlado pelas propriedades com prefixo `justify-*`.
+- **Eixo Block (Vertical)**: Controlado pelas propriedades com prefixo `align-*`.
+
+### Os Dois Níveis:
+- **Itens dentro das suas células**: `justify-items` / `align-items` (e overrides individuais com `justify-self` / `align-self`).
+- **O Grid inteiro dentro do contêiner**: `justify-content` / `align-content`.
+
+## 2. A Tabela Mestra de Alinhamento
+
+| Propriedade | Eixo | O que movimenta? | Valores Comuns |
+| :--- | :--- | :--- | :--- |
+| `justify-items` | Inline (Horizontal) | Todos os itens dentro de cada célula individual | `stretch` (default), `start`, `center`, `end` |
+| `align-items` | Block (Vertical) | Todos os itens dentro de cada célula individual | `stretch` (default), `start`, `center`, `end` |
+| `justify-content` | Inline (Horizontal) | As faixas do grid como um bloco dentro do contêiner | `start`, `center`, `end`, `space-between`, `space-evenly` |
+| `align-content` | Block (Vertical) | As faixas do grid como um bloco dentro do contêiner | `start`, `center`, `end`, `space-between`, `space-around` |
+| `justify-self` | Inline (Horizontal) | O item específico na sua célula | `stretch`, `start`, `center`, `end` |
+| `align-self` | Block (Vertical) | O item específico na sua célula | `stretch`, `start`, `center`, `end` |
+
+## 3. O Shorthand Mágico: `place-items: center`
+
+A forma mais rápida, elegante e definitiva de centralizar qualquer elemento nos dois eixos em toda a história da web:
+
+```css
+.center-everything {
+  display: grid;
+  place-items: center; /* Equivalente a: align-items: center + justify-items: center */
+}
+```
+
+Duas linhas de código. Sem truques de `position: absolute`, sem `transform: translate(-50%, -50%)`, sem cálculos manuais.
+
+## 4. `*-items` vs `*-content`: A Diferença Fundamental
+
+Um dos pontos que mais confundem desenvolvedores:
+- Use `justify-items` quando você quiser controlar a largura e o alinhamento **do conteúdo de cada célula** (por exemplo, impedir que botões estiquem para 100% da largura da célula usando `justify-items: start`).
+- Use `justify-content` quando a soma das suas colunas for menor do que o contêiner (por exemplo, 3 colunas de 100px dentro de um contêiner de 800px) e você quiser centralizar o **bloco do grid inteiro** na tela: `justify-content: center`.
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Margens Negativas e Transforms para Centralizar"
+  badCode={`.modal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%); /* Pode causar blur em telas não-retina */
+}`}
+  goodTitle="Usar display: grid e place-items: center no Contêiner"
+  goodCode={`.modal-overlay {
+  display: grid;
+  place-items: center;
+  inset: 0;
+}`}
+  explanation="O alinhamento nativo do CSS Grid arredonda submícrons de pixel perfeitamente sem blur subpixel e sem desconectar o elemento do fluxo de rolagem."
+/>
+
+## 6. Boas Práticas
+
+1. **Use `place-items` e `place-content`**: Shorthands tornam a folha de estilos mais concisa e expressiva.
+2. **Defina `justify-items: start` em grids de cards com botões**: Impede que botões de ação ou links estiquem artificialmente até a borda do card, a não ser que isso seja desejado.
+3. **Utilize `*-self` para quebrar a regra pontualmente**: Um único item pode ter `align-self: end` sem afetar toda a grade.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "place-items: center foi utilizado para centralizações bidimensionais?", checked: true },
+    { text: "A distinção entre *-items (células) e *-content (grid global) foi respeitada?", checked: true },
+    { text: "O valor padrão stretch foi mantido apenas quando o preenchimento total é desejado?", checked: true },
+    { text: "Ajustes individuais foram feitos com justify-self ou align-self?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Fundamentos do Grid](/grid-lab/fundamentals) — Conceito de faixas e células.
+- [Every Layout: Center](/every-layout/center) — Centralização intrínseca com max-inline-size.
+- [Flexbox: Alinhamento](/flexbox-lab/alignment) — Comparação de alinhamento no Flexbox.

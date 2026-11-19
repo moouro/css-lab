@@ -1,0 +1,39 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { mergeVars } from '../../utils/style';
+
+type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{
+  as: Tag;
+  space?: string;
+  justify?: 'flex-start' | 'flex-end' | 'center' | 'space-between' | 'space-around';
+  align?: 'flex-start' | 'flex-end' | 'center' | 'baseline' | 'stretch';
+}>;
+
+const {
+  as: Tag = 'div',
+  space = 'var(--space-s)',
+  justify = 'flex-start',
+  align = 'center',
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Element = Tag as 'div';
+const computedStyle = mergeVars(
+  {
+    '--cluster-space': space,
+    '--cluster-justify': justify,
+    '--cluster-align': align,
+  },
+  style,
+);
+---
+
+<Element
+  class:list={['cluster', className]}
+  style={computedStyle}
+  {...rest}
+>
+  <slot />
+</Element>

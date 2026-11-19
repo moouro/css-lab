@@ -1,0 +1,28 @@
+---
+title: "Seção Full-Bleed em Coluna Centralizada"
+description: "Fazer uma imagem ou faixa de destaque esticar de borda a borda da tela mesmo estando dentro de um container centralizado."
+category: "utilities"
+tags: ["utilities", "full-bleed", "breakout", "layout"]
+draft: false
+order: 20
+language: "css"
+---
+
+### Problema
+Quando um artigo está restrito a uma coluna centralizada de leitura (`max-inline-size: 65ch; margin-inline: auto`), como fazer um banner ou foto esticar até 100% da largura da janela sem fechar e reabrir divs no HTML?
+
+### Código
+
+```css
+.full-bleed {
+  inline-size: 100vw;
+  margin-inline-start: calc(50% - 50vw);
+  margin-inline-end: calc(50% - 50vw);
+  max-inline-size: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+}
+```

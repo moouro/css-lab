@@ -1,0 +1,29 @@
+---
+title: "Texto Visivelmente Oculto (sr-only)"
+description: "O padrão definitivo para esconder textos da visão humana mantendo-os 100% legíveis para leitores de tela."
+category: "utilities"
+tags: ["utilities", "a11y", "sr-only", "screen-readers"]
+draft: false
+order: 16
+language: "css"
+---
+
+### Problema
+Usar `display: none` ou `visibility: hidden` remove o elemento completamente da árvore de acessibilidade, tornando-o invisível também para leitores de tela.
+
+### Código
+
+```css
+.sr-only,
+.visually-hidden {
+  position: absolute !important;
+  inline-size: 1px !important;
+  block-size: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+```

@@ -1,0 +1,148 @@
+---
+title: "Cards (Cartões)"
+description: "Cartões modulares construídos com CSS Subgrid, Container Queries, rodapé colado e proporções visuais intrínsecas."
+draft: false
+publishDate: 2026-01-01
+tags: ["components", "cards", "subgrid", "container-queries", "layout"]
+difficulty: "intermediate"
+order: 2
+anatomy:
+  - "Imagem de Capa com aspect-ratio"
+  - "Cabeçalho com título e badge"
+  - "Corpo do texto flexível"
+  - "Rodapé de ações com margin-block-start: auto"
+hasPlayground: true
+a11yNotes: "Se o card inteiro for clicável, use a técnica de pseudo-elemento ::after no link principal para evitar aninhar botões dentro de links."
+relatedContent:
+  - "buttons"
+  - "badges"
+layoutPrimitives:
+  - "box"
+  - "stack"
+  - "frame"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+O **Card** é o contêiner de superfície mais ubíquo da web moderna. Ele agrupa informações relacionadas sobre uma única entidade: um produto, uma postagem de blog, um perfil de usuário ou uma métrica de dashboard.
+
+A engenharia moderna de cards resolve três grandes desafios:
+1. **Alturas Desiguais**: Evitar que títulos de 1 linha e títulos de 3 linhas desalinhem os botões de rodapé (resolvido com `subgrid` ou `margin-block-start: auto`).
+2. **Aspect Ratio**: Garantir que as imagens de capa mantenham uma proporção elegante (`16/9` ou `4/3`) sem Cumulative Layout Shift (CLS).
+3. **Card Clicável sem Inválido HTML**: Evitar envolver o card inteiro em uma tag `<a>`, o que torna impossível incluir links secundários ou botões dentro dele.
+
+## 2. A Técnica do Link Expansível (Clickable Card)
+
+Para tornar um card clicável sem violar a semântica do HTML:
+
+```html
+<article class="card">
+  <div class="card-media">
+    <img src="/thumb.jpg" alt="" />
+  </div>
+  <div class="card-body">
+    <h3 class="card-title">
+      <!-- O link real está apenas no título! -->
+      <a href="/post/1" class="card-link">Arquitetura de CSS Resiliente</a>
+    </h3>
+    <p class="card-excerpt">Aprenda a criar layouts que se adaptam organicamente ao conteúdo.</p>
+  </div>
+  <footer class="card-footer">
+    <span class="card-author">Heydon Pickering</span>
+    <!-- Botão independente de favoritar -->
+    <button type="button" class="btn-favorite" aria-label="Favoritar">★</button>
+  </footer>
+</article>
+```
+
+E no CSS:
+```css
+.card {
+  position: relative; /* Contexto de posicionamento para o pseudo-elemento */
+  display: flex;
+  flex-direction: column;
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  transition: border-color var(--duration-fast) ease, box-shadow var(--duration-fast) ease;
+}
+
+.card:hover {
+  border-color: var(--color-border-hover);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+/* O pseudo-elemento expande a área clicável do título sobre todo o card! */
+.card-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+/* Qualquer botão secundário precisa ficar ACIMA da camada de clique */
+.btn-favorite {
+  position: relative;
+  z-index: 2;
+}
+
+.card-footer {
+  margin-block-start: auto; /* Trava o rodapé na base */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block-start: var(--space-s);
+}
+```
+
+<Callout type="info" title="Vantagem Suprema de UX">
+  O usuário pode clicar em qualquer lugar do card para navegar, mas leitores de tela leem apenas o título conciso do link, e botões secundários continuam perfeitamente clicáveis sem conflitos de navegação.
+</Callout>
+
+## 3. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Envolver o Card Inteiro Dentro de Uma Tag <a>"
+  badCode={`<!-- Inválido se houver outros botões dentro -->
+<a href="/post/1" class="card">
+  <img src="img.jpg" />
+  <h3>Título</h3>
+  <button onclick="share()">Compartilhar</button> <!-- Erro: botão dentro de link -->
+</a>`}
+  goodTitle="Usar Link no Título com Pseudo-elemento ::after Inset: 0"
+  goodCode={`<article class="card">
+  <h3><a href="/post/1" class="card-link">Título</a></h3>
+  <button type="button" class="btn-share">Compartilhar</button>
+</article>`}
+  explanation="Colocar botões ou links dentro de uma tag <a> externa é HTML inválido e confunde gravemente sintetizadores de voz e leitores de tela."
+/>
+
+## 4. Boas Práticas
+
+1. **Defina `aspect-ratio` nas imagens**: Garante espaço reservado antes da imagem carregar, eliminando salto visual (CLS 0).
+2. **Utilize `subgrid` quando os cards estiverem em grid**: Alinha os títulos horizontalmente entre cards vizinhos.
+3. **Use `margin-block-start: auto` no footer**: Garante que cartões com textos de comprimentos diferentes mantenham o rodapé alinhado na base.
+
+## 5. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "O link principal utiliza a técnica do pseudo-elemento ::after inset: 0?", checked: true },
+    { text: "A imagem de capa possui aspect-ratio e object-fit: cover?", checked: true },
+    { text: "O rodapé de ações possui margin-block-start: auto para permanecer na base?", checked: true },
+    { text: "Botões secundários dentro do card possuem z-index acima da camada do link?", checked: true }
+  ]}
+/>
+
+## 6. Links Relacionados
+
+- [Grid: Subgrid](/grid-lab/subgrid) — Alinhando elementos em cartões vizinhos.
+- [Container Queries](/container-query-lab/real-world-patterns) — O card universal auto-adaptável.
+- [Every Layout: Frame](/every-layout/frame) — Proporções de imagem com aspect-ratio.

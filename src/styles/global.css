@@ -1,0 +1,157 @@
+/* ═══════════════════════════════════════════════════════
+   CSS Lab — Global Styles
+   Every Layout axioms applied cleanly inside @layer base.
+   No destructive global resets on *.
+   ═══════════════════════════════════════════════════════ */
+
+@layer base {
+  /* ═══ Every Layout: Measure Axiom ═══════════════════
+     "The measure should never exceed 65ch."
+     Applied with zero specificity via :where().
+     ═══════════════════════════════════════════════════ */
+  :where(p, blockquote, figcaption, dd, li:not(nav li)) {
+    max-inline-size: var(--measure);
+  }
+
+  /* ─── Document ───────────────────────────────────── */
+  html {
+    color: var(--color-text);
+    background-color: var(--color-bg);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    hanging-punctuation: first last;
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+  body {
+    min-block-size: 100dvh;
+  }
+
+  /* ─── Images and media ───────────────────────────── */
+  img, picture, video, canvas, svg {
+    display: block;
+    max-inline-size: 100%;
+  }
+
+  img, video {
+    block-size: auto;
+  }
+
+  /* ─── Form elements ──────────────────────────────── */
+  input, button, textarea, select {
+    font: inherit;
+    color: inherit;
+  }
+
+  button {
+    cursor: pointer;
+  }
+
+  /* ─── Tables ─────────────────────────────────────── */
+  table {
+    border-collapse: collapse;
+  }
+
+  /* ─── Lists ──────────────────────────────────────── */
+  ul, ol {
+    list-style: none;
+  }
+
+  /* ─── Selection ──────────────────────────────────── */
+  ::selection {
+    background-color: var(--color-accent-muted);
+    color: var(--color-text-strong);
+  }
+
+  /* ─── Focus visible ──────────────────────────────── */
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* ─── Native Modal Dialog Scroll Containment ─────── */
+  dialog:modal {
+    overscroll-behavior: contain;
+  }
+
+  dialog::backdrop {
+    overflow: hidden;
+    overscroll-behavior: contain;
+  }
+
+  /* ─── Reduced motion ─────────────────────────────── */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* ─── Code blocks & Shiki Dual-Theme Support ─────── */
+  pre {
+    padding: var(--space-s);
+    background-color: var(--color-bg-inset);
+    border: var(--border-thin) solid var(--color-border);
+    border-radius: var(--radius-m);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .astro-code {
+    background-color: light-dark(var(--shiki-light-bg, #f8f9fa), var(--shiki-dark-bg, #0d1117));
+    color: light-dark(var(--shiki-light, #1f2328), var(--shiki-dark, #e6edf3));
+  }
+
+  .astro-code span {
+    color: light-dark(var(--shiki-light), var(--shiki-dark));
+    font-style: light-dark(var(--shiki-light-font-style, normal), var(--shiki-dark-font-style, normal));
+    font-weight: light-dark(var(--shiki-light-font-weight, normal), var(--shiki-dark-font-weight, normal));
+    text-decoration: light-dark(var(--shiki-light-text-decoration, none), var(--shiki-dark-text-decoration, none));
+  }
+
+  pre code {
+    background: none;
+    border: none;
+    padding: 0;
+    font-size: inherit;
+  }
+
+  :not(pre) > code {
+    padding-inline: 0.35em;
+    padding-block: 0.15em;
+    background-color: var(--color-bg-raised);
+    border: var(--border-thin) solid var(--color-border);
+    border-radius: var(--radius-s);
+    font-size: 0.875em;
+    color: var(--color-text-code);
+  }
+
+  /* ─── Horizontal rule ────────────────────────────── */
+  hr {
+    border: none;
+    border-block-start: var(--border-thin) solid var(--color-border);
+    margin-block: var(--space-l);
+  }
+
+  /* ─── Blockquote ─────────────────────────────────── */
+  blockquote {
+    border-inline-start: 3px solid var(--color-border);
+    padding-inline-start: var(--space-s);
+    color: var(--color-text-muted);
+    font-style: italic;
+  }
+}

@@ -1,0 +1,175 @@
+---
+title: "Tabs (Abas de Navegação)"
+description: "Sistemas de abas acessíveis seguindo o padrão WAI-ARIA com suporte a navegação por teclado e display: contents."
+draft: false
+publishDate: 2026-01-01
+tags: ["components", "tabs", "wai-aria", "accessibility", "keyboard-navigation"]
+difficulty: "intermediate"
+order: 4
+anatomy:
+  - "<div role='tablist'>"
+  - "<button role='tab' aria-selected='...'>"
+  - "<div role='tabpanel' tabindex='0'>"
+hasPlayground: true
+a11yNotes: "Abas exigem gerenciamento de teclas direcionais (Setas Esquerda e Direita). Apenas a aba ativa deve ter tabindex='0'; as inativas devem ter tabindex='-1'."
+relatedContent:
+  - "buttons"
+  - "accordions"
+layoutPrimitives:
+  - "cluster"
+  - "box"
+  - "stack"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+O padrão de **Abas (Tabs)** organiza conteúdos densos em painéis sobrepostos alternáveis, economizando espaço vertical e permitindo ao usuário navegar rapidamente entre diferentes facetas de um mesmo tópico sem recarregar a página.
+
+Embora pareça simples visualmente, o componente de abas é um dos mais rigorosos da especificação de acessibilidade W3C WAI-ARIA:
+- A lista de abas possui `role="tablist"`.
+- Cada aba é um botão com `role="tab"`, `aria-selected="true|false"` e `aria-controls="id-do-painel"`.
+- Cada painel de conteúdo possui `role="tabpanel"`, `aria-labelledby="id-da-aba"` e `tabindex="0"`.
+
+## 2. Implementação CSS Semântica
+
+```css
+/* Lista de Abas */
+.tab-list {
+  display: flex;
+  gap: var(--space-2xs);
+  border-block-end: 1px solid var(--color-border);
+  padding-block-end: 0;
+  margin: 0;
+  list-style: none;
+}
+
+/* Botão da Aba */
+.tab-btn {
+  background: none;
+  border: none;
+  border-block-end: 2px solid transparent;
+  color: var(--color-fg-muted);
+  padding: var(--space-xs) var(--space-s);
+  font-family: inherit;
+  font-size: var(--step--1);
+  font-weight: 500;
+  cursor: pointer;
+  margin-block-end: -1px; /* Encaixa sobre a borda da lista */
+  transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease;
+}
+
+.tab-btn:hover {
+  color: var(--color-fg);
+}
+
+.tab-btn:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Aba Ativa */
+.tab-btn[aria-selected="true"] {
+  color: var(--color-accent);
+  border-block-end-color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* Painel de Conteúdo */
+.tab-panel {
+  padding-block: var(--space-m);
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
+.tab-panel:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 4px;
+}
+```
+
+<Callout type="info" title="Navegação por Teclado WAI-ARIA">
+  No padrão WAI-ARIA, o usuário usa `Tab` para entrar na lista de abas (focando a aba ativa) e usa as **Setas Esquerda e Direita** para alternar entre as abas. Pressionar `Tab` novamente entra diretamente dentro do painel selecionado.
+</Callout>
+
+## 3. Variante Pura em CSS (Zero JS com Radio Inputs)
+
+Para casos onde o JavaScript não puder rodar (páginas ultraleves ou AMP), é possível implementar abas 100% funcionais em CSS utilizando `<input type="radio">` escondidos e o combinador `:checked ~ .tab-panel`:
+
+```html
+<div class="css-tabs">
+  <input type="radio" name="tab-group" id="tab-1" checked />
+  <label for="tab-1">Visão Geral</label>
+
+  <input type="radio" name="tab-group" id="tab-2" />
+  <label for="tab-2">Configurações</label>
+
+  <div class="panel panel-1">Conteúdo da Visão Geral</div>
+  <div class="panel panel-2">Conteúdo das Configurações</div>
+</div>
+```
+
+```css
+.css-tabs input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.css-tabs .panel {
+  display: none;
+}
+
+#tab-1:checked ~ .panel-1,
+#tab-2:checked ~ .panel-2 {
+  display: block;
+}
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Apenas Links <a> sem Atributos de Role ou Estado"
+  badCode={`<!-- Leitores de tela não sabem que são abas alternáveis -->
+<div class="tabs">
+  <a href="#tab1" class="active">Aba 1</a>
+  <a href="#tab2">Aba 2</a>
+</div>`}
+  goodTitle="Usar role='tablist' e role='tab' com aria-selected"
+  goodCode={`<div role="tablist">
+  <button role="tab" aria-selected="true" aria-controls="panel-1" id="tab-1">Aba 1</button>
+  <button role="tab" aria-selected="false" aria-controls="panel-2" id="tab-2">Aba 2</button>
+</div>`}
+  explanation="Sem os atributos ARIA, pessoas cegas ou com baixa visão não recebem o anúncio de 'aba 1 de 2, selecionada' e não conseguem entender a relação entre o botão e o painel correspondente."
+/>
+
+## 5. Boas Práticas
+
+1. **Adicione `tabindex="0"` no painel**: Garante que o painel de conteúdo possa receber foco se contiver apenas texto sem elementos interativos internos.
+2. **Use o atributo nativo `hidden`**: Para esconder os painéis inativos (`.tab-panel[hidden] { display: none; }`).
+3. **Mantenha a linha indicadora alinhada**: Use `margin-block-end: -1px` para que a linha ativa cubra a linha de borda inferior do tablist.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A estrutura ARIA (tablist, tab, tabpanel) foi implementada?", checked: true },
+    { text: "Apenas a aba ativa possui aria-selected='true'?", checked: true },
+    { text: "Os painéis inativos possuem o atributo hidden?", checked: true },
+    { text: "A navegação por teclado (Setas e Tab) funciona perfeitamente?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Componentes: Accordions](/components/accordions) — Alternativa vertical para exibição de conteúdo.
+- [Componentes: Botões](/components/buttons) — Estilização das abas.
+- [Every Layout: Cluster](/every-layout/cluster) — Organização linear das abas.

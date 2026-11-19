@@ -1,0 +1,175 @@
+---
+title: "CSS Nesting Nativo"
+description: "Hierarquia e aninhamento de regras CSS nativas no navegador, eliminando a dependência histórica de Sass/SCSS."
+draft: false
+publishDate: 2026-01-01
+tags: ["nesting", "spec", "selectors", "syntax"]
+difficulty: "beginner"
+order: 1
+feature: "css-nesting"
+browserSupport: "stable"
+canIUseId: "css-nesting"
+relatedContent:
+  - "cascade-layers"
+  - "is-where-selectors"
+  - "has-selector"
+layoutPrimitives:
+  - "stack"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+O **CSS Nesting** nativo permite aninhar uma regra de estilo dentro de outra, representando a hierarquia visual ou estrutural do DOM diretamente na folha de estilos. Durante mais de 15 anos, desenvolvedores recorreram a pré-processadores como Sass, Less ou PostCSS unicamente para obter essa funcionalidade sintática.
+
+Desde 2023, o CSS Nesting é parte oficial do Baseline da plataforma web, suportado nativamente por todos os navegadores modernos (Chromium, Gecko e WebKit) sem qualquer etapa de compilação ou build tool.
+
+<Callout type="info" title="Baseline 2023">
+  O CSS Nesting nativo funciona diretamente em arquivos `.css` lidos pelo navegador. O pré-processador não é mais necessário para aninhamento de regras.
+</Callout>
+
+## 2. O Problema Histórico
+
+Em CSS tradicional ("flat CSS"), cada variação, estado de pseudo-classe ou descendente exigia a repetição completa do seletor raiz. Isso causava dois problemas críticos:
+
+1. **Proliferação de Código**: Seletores longos e repetitivos aumentavam o peso do arquivo CSS.
+2. **Desconexão Mental**: Modificadores e pseudoclasses ficavam espalhados pela folha de estilos, dificultando entender todo o escopo de um componente.
+3. **Dependência de Build**: Equipes adotavam Sass unicamente pelo nesting, adicionando centenas de megabytes em `node_modules`.
+
+## 3. A Solução Nativa e a Sintaxe Relaxada
+
+A especificação W3C inicialmente exigia o uso obrigatório do caractere `&` para iniciar qualquer regra aninhada. Posteriormente, a especificação foi atualizada com a **Syntax Relaxada** (*relaxed nesting*), permitindo aninhar elementos HTML diretos sem o `&`:
+
+```css
+/* Sintaxe Moderna Nativa */
+.card {
+  background-color: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  padding: var(--space-m);
+
+  /* Elemento direto (Sintaxe relaxada) */
+  h2 {
+    font-size: var(--step-1);
+    color: var(--color-fg);
+  }
+
+  /* Pseudoclasse com & explícito */
+  &:hover {
+    border-color: var(--color-border-hover);
+  }
+
+  /* Seletor relacional */
+  &:has(img) {
+    grid-template-columns: 120px 1fr;
+  }
+}
+```
+
+## 4. O Comportamento do `&` e Desmistificação do `:is()`
+
+Internamente no motor dos navegadores, o aninhamento CSS é avaliado convertendo o seletor externo em uma lista agrupada via `:is()`.
+
+Ou seja:
+```css
+.parent {
+  & .child {
+    color: red;
+  }
+}
+
+/* É avaliado pelo navegador como: */
+:is(.parent) .child {
+  color: red;
+}
+```
+
+<Callout type="important" title="Implicação de Especificidade">
+  Como o motor avalia o nesting utilizando `:is()`, a especificidade do seletor aninhado herda a especificidade mais alta de qualquer seletor da lista do pai.
+</Callout>
+
+## 5. Concatenação de Nomes (BEM): Onde o Nativo Difere do Sass
+
+Uma diferença vital que todo desenvolvedor precisa saber: **o CSS nativo não suporta concatenação de strings para criar novas classes BEM**.
+
+<AntiPattern
+  badTitle="Sass Clássico (Concatenação de Strings)"
+  badCode={`.card {
+  /* No Sass, isso gerava .card__title */
+  &__title {
+    font-size: 1.25rem;
+  }
+  &--featured {
+    border-color: gold;
+  }
+}`}
+  goodTitle="CSS Nativo (Seletores Compostos Válidos)"
+  goodCode={`.card {
+  /* Em CSS nativo, & representa o elemento */
+  .card__title {
+    font-size: 1.25rem;
+  }
+  &.is-featured {
+    border-color: gold;
+  }
+}`}
+  explanation="No CSS nativo, o '&' representa um seletor composto (um objeto AST do navegador), não uma string de texto a ser concatenada. Use classes explícitas ou modificadores compostos como '&.is-active'."
+/>
+
+## 6. Aninhamento de Media Queries e Container Queries
+
+Um dos maiores benefícios do Nesting nativo é o encapsulamento de consultas de mídia e contêiner dentro do próprio bloco do componente:
+
+```css
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-m);
+
+  @media (min-width: 48em) {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  @container (inline-size > 600px) {
+    gap: var(--space-xl);
+  }
+}
+```
+
+O navegador expande isso automaticamente sem quebrar o escopo de especificidade.
+
+## 7. Anti-patterns Comuns
+
+1. **Aninhamento Profundo (O Efeito "Inception")**: Aninhar mais de 3 níveis de profundidade recria a armadilha do Sass antigo, inflando a especificidade e gerando CSS acoplado à estrutura exata do HTML.
+2. **Uso de `&` desnecessário para seletores simples**: Escrever `& p` quando `p` direto na sintaxe relaxada é suportado.
+3. **Esquecer a especificidade do `:is()`**: Lembrar que seletor com `:is(#header, .banner)` eleva a especificidade de todos os filhos ao valor do ID.
+
+## 8. Boas Práticas
+
+- Mantenha no máximo 2 níveis de aninhamento.
+- Use nesting para estados (`&:hover`, `&:focus-visible`, `&:disabled`).
+- Use nesting para media queries ou container queries contextuais.
+- Use nesting para seletores relacionais (`&:has(...)`).
+
+## 9. Checklist de Aplicação
+
+<Checklist
+  items={[
+    { text: "O aninhamento tem no máximo 2 a 3 níveis de profundidade?", checked: true },
+    { text: "Nenhum código tenta concatenar nomes de classe como &__element estilo Sass?", checked: true },
+    { text: "Media queries contextuais estão aninhadas dentro do bloco do componente?", checked: true },
+    { text: "A especificidade calculada via :is() foi considerada para evitar conflitos de cascata?", checked: true }
+  ]}
+/>
+
+## 10. Links Relacionados
+
+- [Cascade Layers](/css-moderno/cascade-layers) — Gerenciamento explícito da cascata.
+- [Container Queries](/css-moderno/container-queries) — Componentes que respondem ao contêiner pai.
+- [Seletor :has()](/css-moderno/has-selector) — O seletor pai da plataforma web.

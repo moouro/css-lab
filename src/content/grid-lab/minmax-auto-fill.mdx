@@ -1,0 +1,125 @@
+---
+title: "Grid Intrínseco: auto-fill & auto-fit"
+description: "A clássica fórmula do CSS Grid para criar grids perfeitamente responsivos sem uma única media query."
+draft: false
+publishDate: 2026-01-01
+tags: ["grid", "auto-fill", "auto-fit", "minmax", "intrinsic-design", "no-media-queries"]
+difficulty: "intermediate"
+order: 4
+relatedContent:
+  - "fundamentals"
+  - "auto-placement"
+  - "subgrid"
+layoutPrimitives:
+  - "grid"
+  - "box"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Uma das maiores revoluções trazidas pelo CSS Grid foi a capacidade de criar layouts responsivos completos **sem utilizar nenhuma media query**.
+
+Em vez de dizer ao navegador:
+- "Em 600px tenha 2 colunas"
+- "Em 900px tenha 3 colunas"
+- "Em 1200px tenha 4 colunas"
+
+Dizemos ao algoritmo do navegador:
+> *"Crie tantas colunas quantas couberem na tela, desde que cada uma tenha no mínimo 250px e no máximo o espaço fracionário restante (1fr)."*
+
+A fórmula lendária:
+```css
+.intrinsic-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: var(--space-m);
+}
+```
+
+## 2. A Diferença Fundamental: `auto-fill` vs `auto-fit`
+
+Ambos criam tantas colunas quanto couberem no contêiner. A diferença crucial ocorre quando **há poucos itens no grid para preencher a linha inteira** (por exemplo, apenas 2 itens em uma tela widescreen):
+
+| Palavra-chave | Comportamento com Poucos Itens | Efeito Visual |
+| :--- | :--- | :--- |
+| `auto-fill` | Reserva as colunas vazias na memória e mantém os itens no tamanho mínimo especificado. | Os itens **não esticam** desproporcionalmente; mantêm seu tamanho natural à esquerda. |
+| `auto-fit` | Colapsa as faixas vazias a `0px` e expande os itens existentes para preencher toda a largura da linha (graças ao `1fr`). | Os itens **esticam** até cobrir 100% da tela disponível. |
+
+```css
+/* auto-fill: preserva os slots vazios (recomendado para cards de catálogo) */
+.catalog-grid {
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+}
+
+/* auto-fit: estica os itens para ocupar todo o espaço (ótimo para métricas/KPIs) */
+.kpi-grid {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+}
+```
+
+<Callout type="info" title="Regra Prática do Every Layout">
+  Para catálogos de produtos ou listas de usuários onde esticar um card para 800px de largura quando houver apenas 1 resultado for indesejável, use `auto-fill`.
+  Para barras de métricas ou cabeçalhos onde preencher toda a linha for obrigatório, use `auto-fit`.
+</Callout>
+
+## 3. O Bug do Mobile e a Prevenção com `min()`
+
+Se você usar `minmax(280px, 1fr)` em uma tela de smartphone antiga com largura de 320px ou menos (descontando paddings laterais), o valor de `280px` pode ser maior do que a largura disponível do contêiner, causando **overflow horizontal indesejado**.
+
+A solução moderna e blindada formulada pelo Every Layout:
+
+```css
+.bulletproof-grid {
+  display: grid;
+  /* Garante que se o container tiver menos que 250px, a coluna encolha até 100% sem estourar a tela */
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: var(--space-m);
+}
+```
+
+## 4. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Criar Dezenas de Breakpoints para Colunas de Cards"
+  badCode={`/* Frágil, rígido e código duplicado */
+.grid { display: grid; grid-template-columns: 1fr; }
+@media (min-width: 600px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+@media (min-width: 900px) { .grid { grid-template-columns: repeat(3, 1fr); } }
+@media (min-width: 1200px) { .grid { grid-template-columns: repeat(4, 1fr); } }`}
+  goodTitle="Usar repeat com auto-fill e minmax"
+  goodCode={`.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 250px), 1fr));
+  gap: var(--space-m);
+}`}
+  explanation="A fórmula auto-fill adapta-se suavemente a qualquer resolução imaginável, inclusive janelas redimensionadas pelo usuário ou telas ultrawide, com uma única linha de CSS."
+/>
+
+## 5. Boas Práticas
+
+1. **Sempre use `min(100%, largura-minima)`**: Previne qualquer possibilidade de overflow em dispositivos pequenos.
+2. **Combine com custom properties**: `--grid-min: 250px;` para tornar o grid reutilizável como componente.
+3. **Escolha conscientemente entre auto-fill e auto-fit**: Não use auto-fit se um único item isolado não puder esticar até o fim da tela.
+
+## 6. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "A fórmula repeat(auto-fill, minmax(min(100%, X), 1fr)) foi utilizada?", checked: true },
+    { text: "O comportamento com apenas 1 ou 2 itens na tela foi testado (auto-fill vs auto-fit)?", checked: true },
+    { text: "O layout funciona em telas de 320px sem scroll horizontal?", checked: true },
+    { text: "Todas as media queries redundantes de colunas foram eliminadas?", checked: true }
+  ]}
+/>
+
+## 7. Links Relacionados
+
+- [Every Layout: Grid](/every-layout/grid) — A implementação da primitiva algorítmica.
+- [Fundamentos do Grid](/grid-lab/fundamentals) — A unidade fracional fr.
+- [Subgrid](/grid-lab/subgrid) — Alinhamento vertical entre cards do grid.

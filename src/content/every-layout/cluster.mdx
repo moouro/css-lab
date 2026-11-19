@@ -1,0 +1,103 @@
+---
+title: "The Cluster"
+description: "Distribuição horizontal de elementos variáveis com quebra de linha suave (wrap) e espaçamento uniforme."
+draft: false
+publishDate: 2026-01-01
+tags: ["flexbox", "wrapping", "gap", "inline-groups"]
+difficulty: "beginner"
+order: 4
+primitive: "cluster"
+problem: "Listas de tags, badges ou botões agrupados em inline-block acumulam espaços de texto em branco indesejados (font-size: 0) ou geram desalinhamentos ao quebrar linha."
+solution: "Criar um contexto Flexbox com flex-wrap: wrap e propriedade moderna gap para distribuição perfeitamente higiênica e responsiva."
+cssProperties:
+  - "display: flex"
+  - "flex-wrap: wrap"
+  - "gap"
+  - "justify-content"
+  - "align-items"
+propsApi:
+  - name: "space"
+    type: "string"
+    default: "var(--space-s)"
+    description: "Espaço entre itens horizontais e entre linhas que quebram."
+  - name: "justify"
+    type: "string"
+    default: "flex-start"
+    description: "Alinhamento no eixo principal (flex-start, center, space-between, flex-end)."
+  - name: "align"
+    type: "string"
+    default: "center"
+    description: "Alinhamento no eixo cruzado (center, flex-start, baseline, stretch)."
+relatedContent:
+  - "stack"
+  - "sidebar"
+layoutPrimitives:
+  - "cluster"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Cluster from '@/components/layout/Cluster.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Grupos de elementos heterogêneos em comprimento (como tags, links de navegação, migalhas de pão ou botões de rodapé) não cabem na rigidez de uma grade estática. O **Cluster** organiza itens no eixo horizontal de maneira fluida, permitindo que eles quebrem de linha conforme o espaço disponível acaba, sem exigir media queries.
+
+## 2. O Problema Histórico e a Era do Gap
+
+Antes do suporte amplo a `gap` no Flexbox (introduzido nativamente em 2021 em todos os motores), layouts desse tipo precisavam de técnicas complexas de margem negativa nos pais para compensar margens nos filhos, o que com frequência gerava barras de rolagem horizontal acidentais.
+
+Hoje, a solução é limpa e declarativa:
+
+```css
+.cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cluster-space, var(--space-s));
+  justify-content: var(--cluster-justify, flex-start);
+  align-items: var(--cluster-align, center);
+}
+```
+
+<AntiPattern
+  badCode={`/* Antigo / Complexo: hack de margem negativa */\n.cluster > * {\n  margin: -0.5rem;\n}\n.cluster > * > * {\n  margin: 0.5rem;\n}`}
+  goodCode={`/* Moderno e Resiliente */\n.cluster {\n  display: flex;\n  flex-wrap: wrap;\n  gap: var(--space-s);\n}`}
+  explanation="O gap moderno elimina o risco de estouro de container e a necessidade de elementos 'wrappers' adicionais de isolamento de margem."
+/>
+
+## 3. Casos de Uso Comuns
+
+- **Barras de Navegação:** Logo à esquerda e links à direita via `justify-content: space-between`. Quando a tela estreita, os links quebram naturalmente abaixo da marca sem media queries de breakpoint quebrem o cabeçalho.
+- **Nuvem de Tags / Categorias:** Cada tag possui seu comprimento intrínseco.
+- **Ações de Formulário:** Botões "Cancelar" e "Confirmar" mantêm espaçamento consistente.
+
+## 4. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 5. Playground Interativo
+
+<Playground title="Demonstração do Cluster">
+  <Cluster space="0.75rem" justify="space-between">
+    <span class="font-bold">📐 CSS Lab Header</span>
+    <Cluster space="0.5rem">
+      <span class="badge badge-tag">Home</span>
+      <span class="badge badge-tag">Primitivas</span>
+      <span class="badge badge-tag">Cheatsheets</span>
+      <span class="badge badge-tag">Tokens</span>
+    </Cluster>
+  </Cluster>
+</Playground>
+
+## 6. Checklist de Qualidade
+
+<Checklist items={[
+  "Usa flex-wrap: wrap para garantir que o conteúdo nunca gere estouro horizontal.",
+  "Usa a propriedade gap em vez de margens arbitrárias nos filhos.",
+  "Semântica de lista (role='list' e role='listitem') aplicada se o cluster representar navegação ou coleção estruturada de itens.",
+  "Alinhamento no eixo cruzado (align-items: center ou baseline) definido conscientemente para itens de alturas diversas."
+]} />

@@ -1,0 +1,45 @@
+---
+title: "Ponto de Status Pulsante (Live Indicator)"
+description: "Ponto de status estilo servidor ativo com anel de pulso contínuo em CSS puro."
+category: "animation"
+tags: ["animation", "pulse", "status-dot", "indicators"]
+draft: false
+order: 15
+language: "css"
+---
+
+### Problema
+Sinalizar visualmente que um serviço está online ou que uma gravação está em andamento com sutileza.
+
+### Código
+
+```css
+.status-pulse {
+  position: relative;
+  display: inline-block;
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: var(--radius-full);
+  background-color: var(--color-success);
+}
+
+.status-pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background-color: inherit;
+  animation: pulse-ring 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse-ring {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+```

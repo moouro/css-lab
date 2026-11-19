@@ -1,0 +1,70 @@
+---
+title: "Interruptor Toggle Switch sem JavaScript"
+description: "Criar um switch de alternância ativado/desativado usando apenas um checkbox HTML semântico e CSS moderno."
+category: "patterns"
+tags: ["patterns", "switch", "toggle", "no-js", "forms"]
+draft: false
+order: 22
+language: "css"
+---
+
+### Problema
+Evitar bibliotecas pesadas de UI para um simples botão de alternância (toggle switch).
+
+### Código
+
+```css
+.toggle-switch {
+  --switch-width: 44px;
+  --switch-height: 24px;
+  --thumb-size: 18px;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.toggle-input {
+  position: absolute;
+  opacity: 0;
+  inline-size: 0;
+  block-size: 0;
+}
+
+.toggle-track {
+  inline-size: var(--switch-width);
+  block-size: var(--switch-height);
+  background-color: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  transition: background-color var(--duration-fast) ease;
+  position: relative;
+}
+
+.toggle-track::before {
+  content: "";
+  position: absolute;
+  inset-block-start: 2px;
+  inset-inline-start: 2px;
+  inline-size: var(--thumb-size);
+  block-size: var(--thumb-size);
+  border-radius: var(--radius-full);
+  background-color: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform var(--duration-fast) ease;
+}
+
+.toggle-input:checked + .toggle-track {
+  background-color: var(--color-accent);
+}
+
+.toggle-input:checked + .toggle-track::before {
+  transform: translateX(calc(var(--switch-width) - var(--thumb-size) - 6px));
+}
+
+.toggle-input:focus-visible + .toggle-track {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+}
+```

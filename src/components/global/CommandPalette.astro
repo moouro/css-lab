@@ -1,0 +1,329 @@
+---
+// Accessible Command Palette / Search Dialog using Native <dialog>
+// Follows modern-web-guidance: showModal(), closedby="any" with progressive fallback, lazy Pagefind loading
+---
+
+<dialog id="command-dialog" closedby="any" class="command-dialog" aria-labelledby="dialog-title">
+  <div class="dialog-content stack" style="--stack-space: var(--space-xs);">
+    <header class="cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between;">
+      <h2 id="dialog-title" class="text-sm font-semibold text-muted">Busca Rápida & Navegação</h2>
+      <button type="button" class="close-btn" id="dialog-close-btn" aria-label="Fechar busca">✕</button>
+    </header>
+
+    <!-- Pagefind dynamic container -->
+    <div id="pagefind-container"></div>
+
+    <footer class="dialog-footer cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; border-block-start: 1px solid var(--color-border); padding-block-start: var(--space-xs); font-size: var(--step--2); color: var(--color-fg-muted);">
+      <div class="cluster" style="--cluster-space: var(--space-xs);">
+        <span><kbd class="dialog-kbd">ESC</kbd> Fechar</span>
+        <span><kbd class="dialog-kbd">⇧T</kbd> Tema</span>
+        <span><kbd class="dialog-kbd">⇧L</kbd> Inspetor</span>
+      </div>
+      <span>Busca Local</span>
+    </footer>
+  </div>
+</dialog>
+
+<script>
+  function ensurePagefindStyles(): void {
+    if (document.getElementById('pagefind-styles')) return;
+    const link = document.createElement('link');
+    link.id = 'pagefind-styles';
+    link.rel = 'stylesheet';
+    link.href = '/pagefind/pagefind-ui.css';
+    document.head.appendChild(link);
+  }
+
+  function getPagefindConstructor(): any {
+    return (window as any).PagefindUI;
+  }
+
+  async function loadPagefindScript(): Promise<any> {
+    if (getPagefindConstructor()) return getPagefindConstructor();
+
+    ensurePagefindStyles();
+
+    return new Promise((resolve, reject) => {
+      // Dynamic script tag ensures execution and populates window.PagefindUI
+      const script = document.createElement('script');
+      script.src = '/pagefind/pagefind-ui.js';
+      script.async = true;
+      script.onload = () => {
+        const ctor = getPagefindConstructor();
+        if (ctor) {
+          resolve(ctor);
+        } else {
+          reject(new Error('PagefindUI failed to attach to window'));
+        }
+      };
+      script.onerror = () => reject(new Error('Failed to load /pagefind/pagefind-ui.js'));
+      document.head.appendChild(script);
+    });
+  }
+
+  async function initPagefindIfEmpty(): Promise<void> {
+    const container = document.getElementById('pagefind-container');
+    if (!container) return;
+
+    // Se o input já foi criado, não reinstancia
+    if (container.querySelector('.pagefind-ui__search-input')) return;
+
+    try {
+      const PagefindUI = await loadPagefindScript();
+      container.replaceChildren();
+
+      new PagefindUI({
+        element: '#pagefind-container',
+        showImages: false,
+        showSubResults: true,
+        autofocus: true,
+        translations: {
+          placeholder: 'Buscar conceito, primitiva ou snippet...',
+          clear_search: 'Limpar',
+          load_more: 'Ver mais resultados',
+          search_label: 'Buscar no CSS Lab',
+          filters_label: 'Filtros',
+          zero_results: 'Nenhum resultado encontrado para "[SEARCH_TERM]"',
+          many_results: '[COUNT] resultados encontrados para "[SEARCH_TERM]"',
+          one_result: '[COUNT] resultado encontrado para "[SEARCH_TERM]"',
+          alt_search: 'Nenhum resultado para "[SEARCH_TERM]". Mostrando resultados para "[DIFFERENT_TERM]"',
+          search_suggestion: 'Nenhum resultado para "[SEARCH_TERM]". Tente uma das seguintes buscas:',
+          searching: 'Buscando...',
+        },
+      });
+    } catch {
+      // Fallback em desenvolvimento caso o build do pagefind ainda não tenha rodado
+      if (!container.hasChildNodes()) {
+        const notice = document.createElement('p');
+        notice.className = 'text-sm text-muted';
+        notice.textContent = 'Índice de busca local disponível após executar npm run build.';
+        container.replaceChildren(notice);
+      }
+    }
+  }
+
+  function getCommandDialog(): HTMLDialogElement | null {
+    return document.getElementById('command-dialog') as HTMLDialogElement | null;
+  }
+
+  function focusSearchInput(): void {
+    const dialog = getCommandDialog();
+    if (!dialog) return;
+    const input = dialog.querySelector<HTMLInputElement>('.pagefind-ui__search-input');
+    if (input) {
+      input.focus();
+      input.select();
+    }
+  }
+
+  async function openSearch(): Promise<void> {
+    const dialog = getCommandDialog();
+    if (!dialog) return;
+
+    if (!dialog.open) {
+      dialog.showModal();
+    }
+
+    await initPagefindIfEmpty();
+
+    // Foco garantido no input após inicialização
+    focusSearchInput();
+    setTimeout(focusSearchInput, 50);
+    setTimeout(focusSearchInput, 150);
+  }
+
+  function closeSearch(): void {
+    const dialog = getCommandDialog();
+    if (dialog?.open) {
+      dialog.close();
+    }
+  }
+
+  function outsideDialog(e: PointerEvent, dialog: HTMLDialogElement): boolean {
+    const r = dialog.getBoundingClientRect();
+    return e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+  }
+
+  function bindCommandDialogFallback(): void {
+    const dialog = getCommandDialog();
+    if (!dialog || dialog.dataset.bound === 'true') return;
+    dialog.dataset.bound = 'true';
+
+    if (!('closedBy' in HTMLDialogElement.prototype)) {
+      let pressedOutside = false;
+      dialog.addEventListener('pointerdown', (e) => {
+        pressedOutside = outsideDialog(e, dialog);
+      });
+      dialog.addEventListener('pointerup', (e) => {
+        if (pressedOutside && outsideDialog(e, dialog)) {
+          dialog.close();
+        }
+      });
+    }
+  }
+
+  document.addEventListener('click', (e) => {
+    const target = e.target as Element | null;
+    if (!target) return;
+
+    if (target.closest('#search-trigger, [data-open-search]')) {
+      void openSearch();
+      return;
+    }
+
+    if (target.closest('#dialog-close-btn') || target.closest('#pagefind-container a')) {
+      closeSearch();
+    }
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      e.preventDefault();
+      const dialog = getCommandDialog();
+      if (dialog?.open) {
+        closeSearch();
+      } else {
+        void openSearch();
+      }
+    }
+  });
+
+  document.addEventListener('astro:page-load', bindCommandDialogFallback);
+</script>
+
+<style>
+  /* MANDATORY modern-web-guidance: overscroll-behavior to prevent page scrolling behind dialog */
+  dialog:modal {
+    overscroll-behavior: contain;
+  }
+  dialog::backdrop {
+    overflow: hidden;
+    overscroll-behavior: contain;
+    background-color: oklch(0 0 0 / 0.6);
+    backdrop-filter: blur(4px);
+  }
+
+  .command-dialog {
+    border: var(--border-thin) solid var(--color-border);
+    border-radius: var(--radius-l);
+    background-color: var(--color-bg-raised);
+    color: var(--color-text);
+    padding: var(--space-m);
+    inline-size: min(92vw, 620px);
+    max-block-size: min(85dvh, 720px);
+    margin: auto;
+    box-shadow: var(--shadow-lg);
+  }
+
+  #pagefind-container {
+    max-block-size: 60dvh;
+    overflow-y: auto;
+  }
+
+  /* ─── Pagefind UI Overrides: Garantia de contraste, digitação e foco ─── */
+  :global(.pagefind-ui) {
+    width: 100%;
+    color: var(--color-text) !important;
+  }
+
+  :global(.pagefind-ui__search-input) {
+    color: var(--color-text) !important;
+    background-color: var(--color-bg-inset) !important;
+    border: 1px solid var(--color-border) !important;
+    border-radius: var(--radius-md) !important;
+    caret-color: var(--color-accent) !important;
+    cursor: text !important;
+    user-select: text !important;
+    -webkit-user-select: text !important;
+    pointer-events: auto !important;
+    font-size: 1rem !important;
+    line-height: 1.5 !important;
+    padding-inline-start: 2.75rem !important;
+  }
+
+  :global(.pagefind-ui__search-input:focus) {
+    outline: 2px solid var(--color-accent) !important;
+    outline-offset: -1px !important;
+    border-color: var(--color-accent) !important;
+  }
+
+  :global(.pagefind-ui__search-input::placeholder) {
+    color: var(--color-text-muted) !important;
+    opacity: 0.7 !important;
+  }
+
+  :global(.pagefind-ui__search-clear) {
+    color: var(--color-text-muted) !important;
+    background-color: transparent !important;
+  }
+
+  :global(.pagefind-ui__search-clear:hover) {
+    color: var(--color-text) !important;
+  }
+
+  :global(.pagefind-ui__result-link) {
+    color: var(--color-accent) !important;
+    font-weight: 600 !important;
+    text-decoration: none !important;
+  }
+
+  :global(.pagefind-ui__result-link:hover) {
+    text-decoration: underline !important;
+  }
+
+  :global(.pagefind-ui__result-excerpt) {
+    color: var(--color-text-muted) !important;
+    font-size: var(--step--1) !important;
+    line-height: 1.5 !important;
+  }
+
+  :global(.pagefind-ui__result-excerpt mark) {
+    background-color: var(--color-accent-muted) !important;
+    color: var(--color-text-strong) !important;
+    border-radius: var(--radius-sm);
+    padding-inline: 0.25em;
+    font-weight: 600;
+  }
+
+  :global(.pagefind-ui__message) {
+    color: var(--color-text-muted) !important;
+    font-size: var(--step--1) !important;
+    padding-block: var(--space-xs) !important;
+  }
+
+  :global(.pagefind-ui__button) {
+    color: var(--color-accent) !important;
+    border: 1px solid var(--color-border) !important;
+    background-color: var(--color-bg-raised) !important;
+    border-radius: var(--radius-md) !important;
+    padding: 0.5rem 1rem !important;
+  }
+
+  :global(.pagefind-ui__button:hover) {
+    background-color: var(--color-bg-hover) !important;
+    border-color: var(--color-accent) !important;
+  }
+
+  .close-btn {
+    background: transparent;
+    border: none;
+    color: var(--color-text-muted);
+    font-size: 1rem;
+    padding: 0.25rem 0.5rem;
+    border-radius: var(--radius-s);
+  }
+
+  .close-btn:hover {
+    color: var(--color-text-strong);
+    background-color: var(--color-bg-hover);
+  }
+
+  .dialog-kbd {
+    font-family: var(--font-mono);
+    font-size: 0.85em;
+    padding: 0.1em 0.35em;
+    background-color: var(--color-bg-subtle);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+  }
+</style>

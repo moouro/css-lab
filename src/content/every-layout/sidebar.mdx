@@ -1,0 +1,120 @@
+---
+title: "The Sidebar"
+description: "Layout de duas colunas adjacentes (barra lateral + área principal) com quebra intrínseca sem media queries."
+draft: false
+publishDate: 2026-01-01
+tags: ["flexbox", "flex-basis", "flex-grow", "intrinsic-layout"]
+difficulty: "intermediate"
+order: 5
+primitive: "sidebar"
+problem: "Media queries respondem à viewport inteira, não ao espaço disponível no container pai onde o componente reside."
+solution: "Aproveitar o algoritmo de flex-grow desproporcional (1 vs 999) com min-inline-size para forçar quebra de linha puramente baseada no espaço disponível."
+cssProperties:
+  - "display: flex"
+  - "flex-wrap: wrap"
+  - "flex-basis"
+  - "flex-grow"
+  - "min-inline-size"
+propsApi:
+  - name: "side"
+    type: "'left' | 'right'"
+    default: "'left'"
+    description: "Indica qual elemento irmão é a barra lateral."
+  - name: "sideWidth"
+    type: "string"
+    default: "18rem"
+    description: "Largura ideal da barra lateral enquanto estiver na configuração horizontal."
+  - name: "contentMin"
+    type: "string"
+    default: "50%"
+    description: "Largura mínima aceitável para o conteúdo principal antes de quebrar para a linha de baixo."
+  - name: "gap"
+    type: "string"
+    default: "var(--space-m)"
+    description: "Espaçamento entre a barra lateral e a área principal."
+relatedContent:
+  - "switcher"
+  - "cluster"
+layoutPrimitives:
+  - "sidebar"
+---
+
+import PropsTable from '@/components/content/PropsTable.astro';
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Playground from '@/components/content/Playground.astro';
+import Sidebar from '@/components/layout/Sidebar.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+No web design tradicional, costuma-se escrever `@media (min-width: 768px)` para colocar uma barra lateral ao lado do conteúdo. Mas se esse componente for colocado dentro de uma coluna de 400px em um layout complexo, ele quebrará terrivelmente porque a viewport é larga mas o container é estreito!
+
+O **Sidebar** do *Every Layout* é um layout quântico: ele existe em dois estados (lado a lado ou empilhado) determinados estritamente pelo espaço que o container disponibiliza para os dois irmãos.
+
+## 2. A Mecânica do Algoritmo
+
+O segredo está na distribuição do espaço residual com valores contrastantes de `flex-grow`:
+
+```css
+.with-sidebar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-m);
+}
+
+.with-sidebar > :first-child {
+  /* A barra lateral */
+  flex-basis: 18rem;
+  flex-grow: 1;
+}
+
+.with-sidebar > :last-child {
+  /* O conteúdo principal */
+  flex-basis: 0;
+  flex-grow: 999;
+  min-inline-size: 50%;
+}
+```
+
+### Como a matemática do browser funciona:
+1. O conteúdo principal tem `flex-grow: 999`, consumindo praticamente todo o espaço livre após o `flex-basis: 18rem` da sidebar ser reservado.
+2. Quando a tela encolhe e o conteúdo principal tem menos de `50%` do espaço total disponível (`min-inline-size: 50%`), a regra de flex-wrap é disparada.
+3. Ambos quebram para linhas separadas e agora ocupam `100%` da largura cada um. Zero media queries!
+
+<AntiPattern
+  badCode={`/* Frágil: depende de breakpoints de tela rígidos */\n@media (min-width: 900px) {\n  .sidebar { width: 250px; float: left; }\n  .main { width: calc(100% - 250px); float: right; }\n}`}
+  goodCode={`/* Resiliente: adapta-se a qualquer container */\n.sidebar { flex-basis: 18rem; flex-grow: 1; }\n.main { flex-basis: 0; flex-grow: 999; min-inline-size: 50%; }`}
+  explanation="O componente agora é portátil. Você pode aninhá-lo em modais, abas ou colunas sem reconfigurar regras CSS."
+/>
+
+## 3. Props API
+
+<PropsTable props={frontmatter.propsApi} />
+
+## 4. Playground Interativo
+
+Arraste a borda do canvas abaixo para ver a quebra de linha acontecendo naturalmente:
+
+<Playground title="Demonstração do Sidebar Quântico">
+  <Sidebar sideWidth="12rem" contentMin="60%" gap="1rem">
+    <Box padding="1rem">
+      <h4 class="text-sm font-semibold">Barra Lateral</h4>
+      <p class="text-xs text-muted">flex-basis: 12rem</p>
+    </Box>
+    <Box padding="1rem">
+      <h4 class="text-sm font-semibold">Área de Conteúdo</h4>
+      <p class="text-xs text-muted">flex-grow: 999 (absorve todo o resto)</p>
+    </Box>
+  </Sidebar>
+</Playground>
+
+## 5. Checklist de Qualidade
+
+<Checklist items={[
+  "A barra lateral adota flex-grow: 1 e o conteúdo adota flex-grow elevado (ex: 999).",
+  "min-inline-size é aplicado no conteúdo principal para definir o limite exato de quebra.",
+  "Funciona em qualquer container sem nenhuma @media query acoplada.",
+  "Suporta inversão (barra na direita) sem alterar a ordem do HTML semântico."
+]} />

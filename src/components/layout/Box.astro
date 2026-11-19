@@ -1,0 +1,39 @@
+---
+import type { HTMLTag, Polymorphic } from 'astro/types';
+import { mergeVars } from '../../utils/style';
+
+type Props<Tag extends HTMLTag = 'div'> = Polymorphic<{
+  as: Tag;
+  padding?: string;
+  borderWidth?: string;
+  invert?: boolean;
+}>;
+
+const {
+  as: Tag = 'div',
+  padding = 'var(--space-s)',
+  borderWidth,
+  invert = false,
+  class: className,
+  style,
+  ...rest
+} = Astro.props;
+
+const Element = Tag as 'div';
+const computedStyle = mergeVars(
+  {
+    '--box-padding': padding,
+    '--border-thin': borderWidth && borderWidth !== 'var(--border-thin)' ? borderWidth : undefined,
+  },
+  style,
+);
+---
+
+<Element
+  class:list={['box', className]}
+  data-invert={invert ? '' : undefined}
+  style={computedStyle}
+  {...rest}
+>
+  <slot />
+</Element>

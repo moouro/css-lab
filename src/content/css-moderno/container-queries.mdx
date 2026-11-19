@@ -1,0 +1,167 @@
+---
+title: "Container Queries (@container)"
+description: "Componentes verdadeiramente reativos ao espaço de seu pai direto, rompendo a tirania do viewport global."
+draft: false
+publishDate: 2026-01-01
+tags: ["container-queries", "cqw", "cqi", "responsive", "modularity"]
+difficulty: "intermediate"
+order: 3
+feature: "container-queries"
+browserSupport: "stable"
+canIUseId: "css-container-queries"
+relatedContent:
+  - "nesting"
+  - "fluid-typography"
+  - "logical-properties"
+layoutPrimitives:
+  - "container"
+  - "box"
+  - "stack"
+---
+
+import AntiPattern from '@/components/content/AntiPattern.astro';
+import Checklist from '@/components/content/Checklist.astro';
+import Callout from '@/components/content/Callout.astro';
+import Stack from '@/components/layout/Stack.astro';
+import Box from '@/components/layout/Box.astro';
+
+## 1. Conceito
+
+Durante mais de uma década, o design responsivo na web dependeu exclusivamente de **Media Queries** (`@media (min-width: ...)`). O problema fundamental é que o `@media` só enxerga a janela inteira do navegador (o *viewport* global).
+
+Em arquiteturas orientadas a componentes modernos (Astro, React, Design Systems), o mesmo componente precisa funcionar com elegância em diferentes posições:
+- Em uma coluna central ampla (800px)
+- Dentro de uma barra lateral estreita (280px)
+- Em um modal flutuante (450px)
+
+Com **Container Queries** (`@container`), o componente consulta a largura ou estilo do elemento pai em que foi inserido, adaptando seu layout de forma completamente autônoma.
+
+<Callout type="info" title="Baseline 2023">
+  Container Queries de dimensão (`size queries`) são Baseline universal em todos os navegadores modernos.
+</Callout>
+
+## 2. A Anatomia em Duas Etapas
+
+Para usar uma Container Query, são necessários dois passos:
+
+### Passo 1: Definir o Contêiner de Contexto
+O elemento pai precisa declarar `container-type`:
+
+```css
+.card-wrapper {
+  /* Habilita consultas de dimensão inline (largura) */
+  container-type: inline-size;
+  /* Opcional: nomear o contêiner */
+  container-name: card;
+}
+```
+
+Ou usando o shorthand:
+```css
+.card-wrapper {
+  container: card / inline-size;
+}
+```
+
+### Passo 2: O Filho Consulta o Contêiner
+
+```css
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-s);
+}
+
+/* Quando o contêiner tiver mais de 450px de largura inline */
+@container (inline-size > 450px) {
+  .card-content {
+    flex-direction: row;
+    align-items: center;
+  }
+}
+```
+
+## 3. Novas Unidades de Medida do Contêiner
+
+A especificação introduziu novas unidades de comprimento baseadas no contêiner:
+
+| Unidade | Significado | Equivalente Viewport |
+| :--- | :--- | :--- |
+| `cqw` | 1% da largura (width) do contêiner | `vw` |
+| `cqh` | 1% da altura (height) do contêiner | `vh` |
+| `cqi` | 1% da dimensão inline (largura em texto LTR) | `vi` |
+| `cqb` | 1% da dimensão block (altura em texto LTR) | `vb` |
+| `cqmin` | O menor valor entre `cqi` e `cqb` | `vmin` |
+| `cqmax` | O maior valor entre `cqi` e `cqb` | `vmax` |
+
+Exemplo de tipografia fluida orientada ao contêiner:
+```css
+.card-title {
+  /* O título escala perfeitamente com a largura da coluna, não com o monitor */
+  font-size: clamp(1rem, 0.8rem + 1.5cqi, 2rem);
+}
+```
+
+## 4. Range Syntax Moderna
+
+Container queries suportam nativamente a sintaxe de intervalos matemáticos mais legível:
+
+```css
+/* Antigo e verboso */
+@media (min-width: 400px) and (max-width: 800px) {}
+
+/* Moderno, direto e expressivo */
+@container (400px <= inline-size <= 800px) {
+  .widget {
+    padding: var(--space-m);
+  }
+}
+```
+
+## 5. Anti-patterns Comuns
+
+<AntiPattern
+  badTitle="Usar Media Queries Globais para Estilizar Componentes"
+  badCode={`/* Frágil: quebra se o card for colocado em uma sidebar */
+@media (min-width: 768px) {
+  .user-card {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+  }
+}`}
+  goodTitle="Usar Container Queries para Responsividade Intrínseca"
+  goodCode={`.user-card-host {
+  container-type: inline-size;
+}
+
+@container (inline-size > 500px) {
+  .user-card {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+  }
+}`}
+  explanation="Com Media Queries, se a tela tiver 1200px mas o card estiver numa barra lateral de 250px, o layout quebra. Com Container Queries, o card se comporta pelo espaço real que possui."
+/>
+
+## 6. Boas Práticas
+
+1. **Sempre use `inline-size`**: Evite `container-type: size` a menos que tenha uma altura fixa explícita, caso contrário corre o risco de loop infinito de layout (layout trashing).
+2. **Separe o contêiner do componente**: O elemento que possui `container-type` deve ser o wrapper pai ou host, permitindo que os filhos internos façam as consultas com segurança.
+3. **Combine com Every Layout**: Primitivas como Switcher e Sidebar funcionam em harmonia com Container Queries para micro-adaptações de tipografia e detalhes.
+
+## 7. Checklist de Implementação
+
+<Checklist
+  items={[
+    { text: "O contêiner pai tem container-type: inline-size declarado?", checked: true },
+    { text: "A sintaxe moderna de range (ex: inline-size > 500px) foi utilizada?", checked: true },
+    { text: "As unidades relativas usam cqi em vez de vw para tipografia localizada?", checked: true },
+    { text: "O componente foi testado em colunas estreitas (< 300px) e largas (> 800px)?", checked: true }
+  ]}
+/>
+
+## 8. Links Relacionados
+
+- [Container Query Lab](/container-query-lab) — Laboratório dedicado a size e style queries.
+- [Tipografia Fluida](/css-moderno/fluid-typography) — clamp() com unidades cqi e rem.
+- [Propriedades Lógicas](/css-moderno/logical-properties) — inline-size e block-size.

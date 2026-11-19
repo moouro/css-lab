@@ -1,0 +1,60 @@
+---
+title: "Santo Graal com CSS Grid"
+description: "Header no topo, rodapé na base e corpo em 3 colunas fluidas com o conteúdo principal ordenado semânticamente em primeiro no HTML."
+category: "layout"
+tags: ["layout", "grid", "holy-grail", "page-shell"]
+draft: false
+order: 1
+language: "css"
+---
+
+### Problema
+Construir um shell de aplicação completo com header fixado no topo, footer sempre na base da tela mesmo com pouco conteúdo, barra lateral esquerda, área principal e barra lateral direita, sem usar JavaScript para calcular alturas.
+
+### Código
+
+```css
+.holy-grail {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-columns: minmax(200px, 260px) 1fr minmax(200px, 260px);
+  min-block-size: 100dvh;
+}
+
+header {
+  grid-column: 1 / -1;
+}
+
+/* O HTML pode colocar <main> primeiro por SEO/acessibilidade */
+nav {
+  grid-column: 1;
+  grid-row: 2;
+}
+
+main {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+aside {
+  grid-column: 3;
+  grid-row: 2;
+}
+
+footer {
+  grid-column: 1 / -1;
+}
+
+/* Responsivo para mobile */
+@media (max-width: 768px) {
+  .holy-grail {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto auto;
+  }
+
+  nav, main, aside {
+    grid-column: 1;
+    grid-row: auto;
+  }
+}
+```
