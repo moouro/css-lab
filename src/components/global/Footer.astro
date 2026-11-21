@@ -1,10 +1,14 @@
 ---
+import UiIcon from '../ui/UiIcon.astro';
 ---
 
 <footer class="site-footer">
   <div class="footer-inner cluster" style="--cluster-space: var(--space-m); --cluster-justify: space-between; --cluster-align: flex-start;">
     <div class="stack" style="--stack-space: var(--space-3xs);">
-      <span class="footer-brand">📐 CSS Lab</span>
+      <span class="footer-brand font-mono">
+        <UiIcon name="brand" size={16} class="footer-brand-icon" />
+        <span>CSS Lab</span>
+      </span>
       <p class="text-sm text-muted">
         Segunda memória profissional de arquitetura frontend e design de layout intrínseco.
       </p>
@@ -62,8 +66,15 @@
   }
 
   .footer-brand {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2xs);
     font-weight: var(--weight-bold);
     color: var(--color-text-strong);
+  }
+
+  .footer-brand-icon {
+    color: var(--color-accent);
   }
 
   .footer-link {

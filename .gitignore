@@ -4,6 +4,7 @@ dist/
 .astro/
 .wrangler/
 public/pagefind/
+.agents/
 
 # Cloudflare & Wrangler local secrets
 .dev.vars

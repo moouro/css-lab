@@ -6,7 +6,7 @@
    ═══════════════════════════════════════════════════════ */
 
 @theme {
-  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
+  --font-sans: 'IBM Plex Sans', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
 }
 
@@ -14,39 +14,43 @@
   /* ─── Mandatory: Native browser color-scheme ───────── */
   color-scheme: light dark;
 
-  /* ─── Neutral Scale ────────────────────────────────── */
-  --gray-0: #09090b;
-  --gray-1: #111113;
-  --gray-2: #18181b;
-  --gray-3: #222226;
-  --gray-4: #2c2c32;
-  --gray-5: #3a3a44;
-  --gray-6: #52525b;
-  --gray-7: #71717a;
-  --gray-8: #a1a1aa;
-  --gray-9: #b4b4bd;
+  /* ─── Neutral Scale (Swiss Editorial Slate) ────────── */
+  --gray-0: #07090e;
+  --gray-1: #0b0e14;
+  --gray-2: #111622;
+  --gray-3: #1c2436;
+  --gray-4: #243044;
+  --gray-5: #36455e;
+  --gray-6: #64748b;
+  --gray-7: #8496ae;
+  --gray-8: #94a3b8;
+  --gray-9: #cbd5e1;
   --gray-10: #d4d4d8;
-  --gray-11: #e4e4e7;
-  --gray-12: #fafafa;
+  --gray-11: #e2e8f0;
+  --gray-12: #f8fafc;
 
-  /* Light Scale Equivalents */
-  --light-bg: #fafafa;
+  /* Light Scale Equivalents (Architectural Paper) */
+  --light-bg: #f8fafc;
   --light-bg-raised: #ffffff;
-  --light-bg-hover: #f4f4f5;
-  --light-bg-inset: #f0f0f2;
-  --light-border: #e4e4e7;
-  --light-border-hover: #d4d4d8;
-  --light-text: #27272a;
-  --light-text-strong: #09090b;
-  --light-text-muted: #52525b;
-  --light-text-subtle: #71717a;
+  --light-bg-hover: #e2e8f0;
+  --light-bg-inset: #f1f5f9;
+  --light-border: #cbd5e1;
+  --light-border-hover: #94a3b8;
+  --light-text: #1e293b;
+  --light-text-strong: #0f172a;
+  --light-text-muted: #475569;
+  --light-text-subtle: #475569;
 
-  /* ─── Accent Colors ────────────────────────────────── */
-  --color-accent-light: #2563eb;
-  --color-accent-dark: #3b82f6;
+  /* ─── Accent Colors (Swiss Vermilion / Terracotta) ─── */
+  --color-accent-light: #c2410c;
+  --color-accent-dark: #fb923c;
   --color-accent: light-dark(var(--color-accent-light), var(--color-accent-dark));
-  --color-accent-hover: light-dark(#1d4ed8, #60a5fa);
-  --color-accent-muted: light-dark(oklch(0.55 0.18 250 / 0.12), oklch(0.65 0.15 250 / 0.18));
+  --color-accent-hover: light-dark(#9a3412, #fdba74);
+  --color-on-accent: light-dark(#ffffff, #1c0a00);
+  --color-accent-muted: light-dark(
+    color-mix(in oklab, #c2410c 11%, transparent),
+    color-mix(in oklab, #fb923c 14%, transparent)
+  );
   --accent-muted: var(--color-accent-muted);
 
   /* ─── Semantic Tokens using light-dark() ────────────── */
@@ -57,8 +61,9 @@
   --color-bg-subtle: var(--color-bg-inset);
 
   --color-border: light-dark(var(--light-border), var(--gray-4));
+  --color-border-strong: light-dark(#64748b, #64748b);
   --color-border-hover: light-dark(var(--light-border-hover), var(--gray-5));
-  --color-border-subtle: light-dark(#ececef, #26262b);
+  --color-border-subtle: light-dark(#e2e8f0, #1b2434);
 
   --color-text: light-dark(var(--light-text), var(--gray-11));
   --color-text-strong: light-dark(var(--light-text-strong), var(--gray-12));
@@ -66,25 +71,25 @@
   --color-text-subtle: light-dark(var(--light-text-subtle), var(--gray-7));
   --color-text-code: light-dark(var(--light-text-strong), var(--gray-12));
 
-  --color-surface: light-dark(var(--light-bg-raised), var(--gray-2));
+  --color-surface: light-dark(#ffffff, #141a27);
   --color-surface-hover: light-dark(var(--light-bg-hover), var(--gray-3));
 
   /* ─── Universal Semantic Aliases ───────────────────── */
   --color-fg: var(--color-text);
   --color-fg-muted: var(--color-text-muted);
   --color-fg-subtle: var(--color-text-subtle);
-  --color-bg-surface: var(--color-bg-raised);
+  --color-bg-surface: var(--color-surface);
 
-  --color-success: light-dark(#1a7f37, #3fb950);
-  --color-success-subtle: light-dark(rgb(26 127 55 / 0.15), rgb(63 185 80 / 0.15));
+  --color-success: light-dark(#15803d, #4ade80);
+  --color-success-subtle: light-dark(rgb(21 128 61 / 0.12), rgb(74 222 128 / 0.14));
   --color-success-muted: var(--color-success-subtle);
 
-  --color-warning: light-dark(#9a6700, #d29922);
-  --color-warning-subtle: light-dark(rgb(154 103 0 / 0.15), rgb(210 153 34 / 0.15));
+  --color-warning: light-dark(#a16207, #facc15);
+  --color-warning-subtle: light-dark(rgb(161 98 7 / 0.12), rgb(250 204 21 / 0.14));
   --color-warning-muted: var(--color-warning-subtle);
 
-  --color-danger: light-dark(#cf222e, #f85149);
-  --color-danger-subtle: light-dark(rgb(207 34 46 / 0.15), rgb(248 81 73 / 0.15));
+  --color-danger: light-dark(#dc2626, #f87171);
+  --color-danger-subtle: light-dark(rgb(220 38 38 / 0.12), rgb(248 113 113 / 0.14));
   --color-error: var(--color-danger);
   --color-error-muted: var(--color-danger-subtle);
 
@@ -114,12 +119,12 @@
   --space-2xl: clamp(4rem, 3.64rem + 1.82vw, 5rem);
   --space-3xl: clamp(6rem, 5.45rem + 2.73vw, 7.5rem);
 
-  /* ─── Borders & Radii ──────────────────────────────── */
+  /* ─── Borders & Radii (Swiss Architectural) ────────── */
   --border-thin: 1px;
   --border-thick: 2px;
-  --radius-s: 4px;
-  --radius-m: 8px;
-  --radius-l: 12px;
+  --radius-s: 2px;
+  --radius-m: 4px;
+  --radius-l: 6px;
   --radius-sm: var(--radius-s);
   --radius-md: var(--radius-m);
   --radius-lg: var(--radius-l);
@@ -154,6 +159,16 @@
 @media (pointer: coarse) {
   :root {
     --target-size: 44px;
+  }
+}
+
+@media (forced-colors: active) {
+  :root {
+    --color-border: CanvasText;
+    --color-border-strong: CanvasText;
+    --color-border-hover: Highlight;
+    --color-accent: LinkText;
+    --color-on-accent: Canvas;
   }
 }
 

@@ -1,6 +1,7 @@
 ---
 // Theme Toggle component adhering to modern-web-guidance
 // Centralizes light/dark/system cycling, Shift+T shortcut, and View Transitions persistence
+import UiIcon from './UiIcon.astro';
 ---
 
 <button
@@ -9,8 +10,8 @@
   class="theme-toggle"
   aria-label="Alternar tema de cor (Sistema / Claro / Escuro)"
 >
-  <span class="theme-icon-light" aria-hidden="true">☀️</span>
-  <span class="theme-icon-dark" aria-hidden="true">🌙</span>
+  <span class="theme-icon-light" aria-hidden="true"><UiIcon name="sun" size={16} /></span>
+  <span class="theme-icon-dark" aria-hidden="true"><UiIcon name="moon" size={16} /></span>
 </button>
 
 <script>
@@ -84,18 +85,17 @@
 <style>
   .theme-toggle {
     background: transparent;
-    border: var(--border-thin) solid var(--color-border);
-    padding: 0.35rem 0.6rem;
-    border-radius: var(--radius-m);
+    border: var(--border-thin) solid var(--color-border-strong);
+    padding: 0.4rem;
+    border-radius: var(--radius-sm);
     color: var(--color-text);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    font-size: 0.9em;
     min-inline-size: 2.25rem;
     min-block-size: 2.25rem;
-    transition: background-color var(--duration-fast) var(--ease-out);
+    transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
   }
 
   @media (pointer: coarse) {

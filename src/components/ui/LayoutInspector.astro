@@ -1,6 +1,7 @@
 ---
 // LayoutInspector.astro
 // Inspeciona e visualiza as 13 primitivas do Every Layout ativas na página
+import UiIcon from './UiIcon.astro';
 ---
 
 <div class="layout-inspector-widget no-print" id="layout-inspector-widget">
@@ -11,7 +12,7 @@
     aria-pressed="false"
     aria-label="Inspecionar primitivas do Every Layout"
   >
-    <span class="inspector-icon" aria-hidden="true">📐</span>
+    <UiIcon name="inspector" size={15} class="inspector-icon" />
     <span class="inspector-label font-mono text-xs">Every Layout</span>
     <kbd class="inspector-kbd" aria-hidden="true">⇧L</kbd>
   </button>
@@ -88,27 +89,26 @@
     align-items: center;
     gap: var(--space-2xs);
     background-color: var(--color-bg-surface);
-    color: var(--color-fg-muted);
-    border: 1px solid var(--color-border);
+    color: var(--color-fg);
+    border: 1px solid var(--color-border-strong);
     padding: var(--space-3xs) var(--space-xs);
-    border-radius: var(--radius-full);
-    box-shadow: var(--shadow-md);
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-sm);
     cursor: pointer;
     user-select: none;
     font-size: var(--step--2);
-    transition: all var(--duration-fast) var(--ease-out);
+    transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   }
 
   .inspector-btn:hover {
-    color: var(--color-fg);
-    border-color: var(--color-border-hover);
-    transform: translateY(-1px);
+    background-color: var(--color-bg-hover);
+    border-color: var(--color-accent);
   }
 
   .inspector-btn.active {
     background-color: var(--color-accent);
-    color: #ffffff;
-    border-color: transparent;
+    color: var(--color-on-accent);
+    border-color: var(--color-accent);
   }
 
   .inspector-kbd {

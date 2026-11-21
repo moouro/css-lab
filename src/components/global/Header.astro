@@ -1,5 +1,6 @@
 ---
 import ThemeToggle from '../ui/ThemeToggle.astro';
+import UiIcon from '../ui/UiIcon.astro';
 
 const currentPath = Astro.url.pathname;
 const normalizedPath = currentPath.replace(/\/+$/, '') || '/';
@@ -27,8 +28,8 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
   <div class="header-inner">
     <!-- Brand / Logo -->
     <a href="/" class="brand-link" aria-label="CSS Lab Início" aria-current={isExactRoute('/') ? 'page' : undefined}>
-      <span class="brand-symbol" aria-hidden="true">📐</span>
-      <span class="brand-title">CSS Lab</span>
+      <UiIcon name="brand" size={18} class="brand-symbol" />
+      <span class="brand-title font-mono">CSS Lab</span>
     </a>
 
     <!-- Desktop Navigation (oculto em <= 1024px) -->
@@ -181,10 +182,12 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     <div class="mobile-drawer-content">
       <div class="mobile-drawer-header">
         <div class="cluster" style="--cluster-space: var(--space-2xs); align-items: center;">
-          <span class="brand-symbol" aria-hidden="true">📐</span>
-          <span id="mobile-menu-title" class="text-sm font-bold">Navegação CSS Lab</span>
+          <UiIcon name="brand" size={16} class="brand-symbol" />
+          <span id="mobile-menu-title" class="text-sm font-bold font-mono">CSS Lab</span>
         </div>
-        <button type="button" id="mobile-menu-close" class="close-btn" aria-label="Fechar menu" autofocus>✕</button>
+        <button type="button" id="mobile-menu-close" class="close-btn" aria-label="Fechar menu" autofocus>
+          <UiIcon name="close" size={16} />
+        </button>
       </div>
 
       <nav class="mobile-drawer-nav" aria-label="Menu Mobile">
@@ -198,7 +201,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
                 aria-current={isExactRoute('/every-layout') ? 'page' : undefined}
               >
                 <div class="mobile-link-left">
-                  <span class="mobile-link-icon" aria-hidden="true">📐</span>
+                  <UiIcon name="every-layout" size={16} class="mobile-link-icon" />
                   <span class="mobile-link-title">Every Layout</span>
                 </div>
                 <span class="mobile-link-badge">13 Primitivas</span>
@@ -211,7 +214,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
                 aria-current={isExactRoute('/css-moderno') ? 'page' : undefined}
               >
                 <div class="mobile-link-left">
-                  <span class="mobile-link-icon" aria-hidden="true">⚡</span>
+                  <UiIcon name="css-moderno" size={16} class="mobile-link-icon" />
                   <span class="mobile-link-title">CSS Moderno</span>
                 </div>
                 <span class="mobile-link-badge">11 Tópicos</span>
@@ -230,7 +233,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
                 aria-current={isExactRoute('/grid-lab') ? 'page' : undefined}
               >
                 <div class="mobile-link-left">
-                  <span class="mobile-link-icon" aria-hidden="true">⊞</span>
+                  <UiIcon name="grid-lab" size={16} class="mobile-link-icon" />
                   <span class="mobile-link-title">Grid Lab</span>
                 </div>
                 <span class="mobile-link-badge">7 Tópicos</span>
@@ -243,7 +246,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
                 aria-current={isExactRoute('/flexbox-lab') ? 'page' : undefined}
               >
                 <div class="mobile-link-left">
-                  <span class="mobile-link-icon" aria-hidden="true">⇄</span>
+                  <UiIcon name="flexbox-lab" size={16} class="mobile-link-icon" />
                   <span class="mobile-link-title">Flexbox Lab</span>
                 </div>
                 <span class="mobile-link-badge">6 Tópicos</span>
@@ -256,7 +259,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
                 aria-current={isExactRoute('/container-query-lab') ? 'page' : undefined}
               >
                 <div class="mobile-link-left">
-                  <span class="mobile-link-icon" aria-hidden="true">⧉</span>
+                  <UiIcon name="container-query" size={16} class="mobile-link-icon" />
                   <span class="mobile-link-title">Container Queries</span>
                 </div>
                 <span class="mobile-link-badge">5 Tópicos</span>
@@ -275,7 +278,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
                 aria-current={isExactRoute('/components') ? 'page' : undefined}
               >
                 <div class="mobile-link-left">
-                  <span class="mobile-link-icon" aria-hidden="true">❖</span>
+                  <UiIcon name="components" size={16} class="mobile-link-icon" />
                   <span class="mobile-link-title">Componentes</span>
                 </div>
                 <span class="mobile-link-badge">10 Guias</span>
@@ -288,7 +291,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
                 aria-current={isExactRoute('/snippets') ? 'page' : undefined}
               >
                 <div class="mobile-link-left">
-                  <span class="mobile-link-icon" aria-hidden="true">✂</span>
+                  <UiIcon name="snippets" size={16} class="mobile-link-icon" />
                   <span class="mobile-link-title">Snippets</span>
                 </div>
                 <span class="mobile-link-badge">25 Prontos</span>
@@ -301,7 +304,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
                 aria-current={isExactRoute('/cheatsheets') ? 'page' : undefined}
               >
                 <div class="mobile-link-left">
-                  <span class="mobile-link-icon" aria-hidden="true">📄</span>
+                  <UiIcon name="cheatsheets" size={16} class="mobile-link-icon" />
                   <span class="mobile-link-title">Cheatsheets</span>
                 </div>
                 <span class="mobile-link-badge">Print A4</span>
@@ -314,7 +317,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
                 aria-current={isExactRoute('/design-tokens') ? 'page' : undefined}
               >
                 <div class="mobile-link-left">
-                  <span class="mobile-link-icon" aria-hidden="true">🎨</span>
+                  <UiIcon name="design-tokens" size={16} class="mobile-link-icon" />
                   <span class="mobile-link-title">Design Tokens</span>
                 </div>
                 <span class="mobile-link-badge">5 Guias</span>
@@ -430,11 +433,10 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
 <style>
   .site-header {
     border-block-end: 1px solid var(--color-border);
-    background-color: var(--color-bg);
+    background-color: var(--color-bg-raised);
     position: sticky;
     inset-block-start: 0;
     z-index: 100;
-    backdrop-filter: blur(12px);
   }
 
   .header-inner {
@@ -461,7 +463,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
   }
 
   .brand-symbol {
-    font-size: 1.15em;
+    color: var(--color-accent);
   }
 
   .brand-title {
@@ -611,19 +613,20 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     align-items: center;
     gap: var(--space-2xs);
     background-color: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-strong);
     color: var(--color-fg-muted);
     padding-inline: var(--space-xs);
     padding-block: 0.35rem;
     border-radius: var(--radius-sm);
     font-size: var(--step--1);
-    transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+    transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
     cursor: pointer;
   }
 
   .search-button:hover {
-    border-color: var(--color-border-hover);
+    border-color: var(--color-accent);
     color: var(--color-fg);
+    background-color: var(--color-bg-hover);
   }
 
   .search-kbd {
@@ -641,7 +644,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     align-items: center;
     justify-content: center;
     background: transparent;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-strong);
     padding: 0.4rem;
     border-radius: var(--radius-sm);
     color: var(--color-fg-muted);
@@ -655,7 +658,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
   .github-link:hover {
     color: var(--color-fg);
     background-color: var(--color-bg-hover);
-    border-color: var(--color-border-hover);
+    border-color: var(--color-accent);
     text-decoration: none;
   }
 
@@ -663,7 +666,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
   .mobile-menu-btn {
     display: none;
     background: transparent;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-strong);
     border-radius: var(--radius-sm);
     padding: 0.4rem;
     color: var(--color-fg);

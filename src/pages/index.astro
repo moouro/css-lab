@@ -1,13 +1,25 @@
 ---
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Center from '@/components/layout/Center.astro';
+import UiIcon, { type IconName } from '@/components/ui/UiIcon.astro';
 import { getPublishedCollection } from '@/utils/collections';
 
 const everyLayoutEntries = await getPublishedCollection('every-layout');
 
-const pillars = [
+interface PillarItem {
+  index: string;
+  icon: IconName;
+  title: string;
+  desc: string;
+  href: string;
+  badge: string;
+  highlight?: boolean;
+}
+
+const pillars: PillarItem[] = [
   {
-    icon: '📐',
+    index: '01',
+    icon: 'every-layout',
     title: 'Every Layout Lab',
     desc: 'As 13 primitivas universais do livro de Heydon Pickering & Andy Bell. Composição algorítmica e intrínseca.',
     href: '/every-layout',
@@ -15,105 +27,138 @@ const pillars = [
     highlight: true,
   },
   {
-    icon: '⚡',
+    index: '02',
+    icon: 'css-moderno',
     title: 'CSS Moderno',
     desc: 'Nesting nativo, Cascade Layers, :has(), Container Queries, light-dark() e propriedades lógicas sem JS.',
     href: '/css-moderno',
     badge: '11 Tópicos',
   },
   {
-    icon: '⊞',
+    index: '03',
+    icon: 'grid-lab',
     title: 'Grid Lab',
     desc: 'Desde minmax() com auto-fill e auto-fit até subgrid e mapeamento visual de template areas.',
     href: '/grid-lab',
     badge: '7 Tópicos',
   },
   {
-    icon: '⇄',
+    index: '04',
+    icon: 'flexbox-lab',
     title: 'Flexbox Lab',
     desc: 'Domínio de flex-basis, quebra de linha suave, Holy Albatross, eixos e margin: auto.',
     href: '/flexbox-lab',
     badge: '6 Tópicos',
   },
   {
-    icon: '⧉',
+    index: '05',
+    icon: 'container-query',
     title: 'Container Query Lab',
     desc: 'Size queries, style queries, unidades cqi/cqw e componentes universais verdadeiramente autocontidos.',
     href: '/container-query-lab',
     badge: '5 Tópicos',
   },
   {
-    icon: '❖',
+    index: '06',
+    icon: 'components',
     title: 'Component Library',
     desc: 'Buttons, Modals com <dialog>, Tabs nativas, Accordions com ::details-content e Cards com subgrid.',
     href: '/components',
     badge: '10 Componentes',
   },
   {
-    icon: '✂',
+    index: '07',
+    icon: 'snippets',
     title: 'Snippets Library',
     desc: 'Soluções rápidas de CSS moderno para layout, tipografia, animação, utilitários e padrões de produção.',
     href: '/snippets',
     badge: '25 Snippets',
   },
   {
-    icon: '📄',
+    index: '08',
+    icon: 'cheatsheets',
     title: 'Cheatsheets',
     desc: 'Tabelas e guias rápidos para consulta instantânea no dia a dia, otimizados para impressão em folha A4.',
     href: '/cheatsheets',
     badge: '6 Guias A4',
   },
   {
-    icon: '🎨',
+    index: '09',
+    icon: 'design-tokens',
     title: 'Design Tokens',
     desc: 'A arquitetura de tokens e decisões de design codificadas em variáveis nativas e escalas matemáticas.',
     href: '/design-tokens',
     badge: '5 Guias',
   },
 ];
+
+const specs = [
+  { value: '09', label: 'Pilares Técnicos' },
+  { value: '13', label: 'Primitivas Every Layout' },
+  { value: '88', label: 'Guias Indexados' },
+  { value: '00', label: 'Trackers & CDNs' },
+];
 ---
 
 <BaseLayout title="Home — Segunda Memória de CSS & Layout">
   <div class="home-container stack" style="--stack-space: var(--space-2xl);">
-    <!-- Hero Editorial (foco em tipografia, sem clichês de IA) -->
+    <!-- Hero Editorial Suíço (alinhado à esquerda, sem clichês de IA) -->
     <section class="hero-section">
-      <Center max="80ch">
-        <div class="stack" style="--stack-space: var(--space-s); text-align: center; align-items: center;">
-          <h1 class="hero-title">
-            Como o layout responde ao conteúdo, e não à tela.
-          </h1>
+      <Center max="1200px">
+        <div class="hero-grid">
+          <div class="hero-main stack" style="--stack-space: var(--space-s);">
+            <p class="hero-eyebrow font-mono text-xs tracking-caps">
+              Arquitetura CSS · Every Layout · Referência Viva
+            </p>
 
-          <p class="hero-desc text-lg text-muted">
-            Uma plataforma pessoal viva para consulta, estudo e experimentação de CSS moderno e arquitetura de layout baseada em composição algorítmica. O próprio site é construído com as primitivas que ensina.
-          </p>
+            <h1 class="hero-title">
+              Como o layout responde ao conteúdo, e não à tela.
+            </h1>
 
-          <div class="hero-actions cluster" style="--cluster-space: var(--space-s); padding-block-start: var(--space-xs); justify-content: center;">
-            <a href="#pilares" class="btn btn-primary">
-              <span>Explorar os 9 Pilares</span>
-              <span class="action-arrow" aria-hidden="true">↓</span>
-            </a>
-            <button
-              type="button"
-              class="btn btn-secondary"
-              data-open-search
-              aria-label="Abrir busca rápida por conceitos e propriedades (Atalho: Cmd+K ou Ctrl+K)"
-            >
-              <svg class="btn-search-icon" viewBox="0 0 20 20" fill="none" stroke="currentColor" width="16" height="16" aria-hidden="true">
-                <circle cx="8.5" cy="8.5" r="5.75" stroke-width="1.75" />
-                <line x1="13" y1="13" x2="18" y2="18" stroke-width="1.75" stroke-linecap="round" />
-              </svg>
-              <span>Buscar Conceito</span>
-              <kbd class="shortcut-kbd-inline font-mono">⌘K</kbd>
-            </button>
+            <p class="hero-desc text-lg text-muted">
+              Plataforma pessoal de consulta, estudo e experimentação de CSS moderno e composição algorítmica. O próprio site é construído com as primitivas que documenta.
+            </p>
+
+            <div class="hero-actions cluster" style="--cluster-space: var(--space-s); padding-block-start: var(--space-xs);">
+              <a href="#pilares" class="btn btn-primary">
+                <span>Explorar os 9 Pilares</span>
+                <UiIcon name="arrow-down" size={16} class="action-arrow" />
+              </a>
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-open-search
+                aria-label="Abrir busca rápida por conceitos e propriedades (Atalho: Cmd+K ou Ctrl+K)"
+              >
+                <UiIcon name="search" size={16} class="btn-search-icon" />
+                <span>Buscar Conceito</span>
+                <kbd class="shortcut-kbd-inline font-mono">⌘K</kbd>
+              </button>
+            </div>
+
+            <!-- Legenda de Atalhos (oculta em mobile) -->
+            <div class="shortcuts-legend cluster" style="--cluster-space: var(--space-xs); padding-block-start: var(--space-xs);">
+              <span class="text-xs text-muted font-mono">Atalhos:</span>
+              <span class="shortcut-tag text-xs font-mono"><kbd>⌘K</kbd> Busca</span>
+              <span class="shortcut-tag text-xs font-mono"><kbd>⇧T</kbd> Tema</span>
+              <span class="shortcut-tag text-xs font-mono"><kbd>⇧L</kbd> Inspetor</span>
+            </div>
           </div>
 
-          <!-- Dica de Produtividade & Atalhos -->
-          <div class="shortcuts-legend cluster" style="--cluster-space: var(--space-xs); padding-block-start: var(--space-s); justify-content: center;">
-            <span class="text-xs text-muted">Atalhos Globais:</span>
-            <span class="shortcut-tag text-xs font-mono"><kbd>⌘K</kbd> Busca</span>
-            <span class="shortcut-tag text-xs font-mono"><kbd>⇧T</kbd> Tema</span>
-            <span class="shortcut-tag text-xs font-mono"><kbd>⇧L</kbd> Inspetor</span>
-          </div>
+          <!-- Painel de Especificação Técnica -->
+          <aside class="hero-specs" aria-label="Resumo quantitativo da plataforma">
+            <div class="specs-header font-mono text-xs tracking-caps text-muted">
+              Especificação do Acervo
+            </div>
+            <dl class="specs-grid">
+              {specs.map((spec) => (
+                <div class="spec-cell">
+                  <dt class="spec-label text-xs text-muted">{spec.label}</dt>
+                  <dd class="spec-value font-mono">{spec.value}</dd>
+                </div>
+              ))}
+            </dl>
+          </aside>
         </div>
       </Center>
     </section>
@@ -122,12 +167,15 @@ const pillars = [
     <section class="bookmarks-section" id="bookmarks-section" style="display: none;">
       <Center max="1200px">
         <div class="stack" style="--stack-space: var(--space-s);">
-          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: center;">
-            <div>
-              <span class="text-xs font-semibold tracking-caps text-accent">⭐ Minha Segunda Memória</span>
+          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: baseline;">
+            <div class="stack" style="--stack-space: 0.25rem;">
+              <span class="section-eyebrow font-mono text-xs tracking-caps text-accent">
+                <UiIcon name="star" size={13} />
+                <span>Minha Segunda Memória</span>
+              </span>
               <h2 class="text-xl font-bold">Conteúdos Favoritados</h2>
             </div>
-            <span class="text-xs text-muted">Salvo no seu navegador (localStorage)</span>
+            <span class="text-xs text-muted font-mono">localStorage</span>
           </div>
           <div id="bookmarks-container" class="cluster" style="--cluster-space: var(--space-xs);"></div>
         </div>
@@ -173,15 +221,14 @@ const pillars = [
             link.href = item.url;
             link.className = 'bookmark-chip';
 
-            const star = document.createElement('span');
-            star.className = 'star-icon';
-            star.setAttribute('aria-hidden', 'true');
-            star.textContent = '★';
+            const marker = document.createElement('span');
+            marker.className = 'bookmark-dot';
+            marker.setAttribute('aria-hidden', 'true');
 
             const label = document.createElement('span');
             label.textContent = item.title;
 
-            link.append(star, label);
+            link.append(marker, label);
             return link;
           });
 
@@ -194,16 +241,16 @@ const pillars = [
       document.addEventListener('astro:page-load', renderBookmarks);
     </script>
 
-    <!-- Pilares de Conhecimento (Cards Proporcionais) -->
+    <!-- Pilares de Conhecimento (Grade Arquitetônica Suíça) -->
     <section class="pillars-section" id="pilares">
       <Center max="1200px">
         <div class="stack" style="--stack-space: var(--space-m);">
-          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: center;">
-            <div>
-              <span class="text-xs font-semibold tracking-caps text-muted">Arquitetura de Conhecimento</span>
+          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: baseline;">
+            <div class="stack" style="--stack-space: 0.25rem;">
+              <span class="font-mono text-xs tracking-caps text-muted">01 · Arquitetura de Conhecimento</span>
               <h2 class="text-xl font-bold">Pilares Fundamentais</h2>
             </div>
-            <span class="text-xs text-muted">9 Áreas de Domínio Técnico</span>
+            <span class="font-mono text-xs text-muted">9 Áreas de Domínio Técnico</span>
           </div>
 
           <div class="pillars-grid">
@@ -211,7 +258,12 @@ const pillars = [
               <a href={pillar.href} class="pillar-card-link">
                 <article class:list={['pillar-card', { highlight: pillar.highlight }]}>
                   <header class="pillar-header">
-                    <span class="pillar-icon" aria-hidden="true">{pillar.icon}</span>
+                    <div class="pillar-identity">
+                      <span class="pillar-index font-mono text-xs text-muted">{pillar.index}</span>
+                      <span class="pillar-icon-wrap" aria-hidden="true">
+                        <UiIcon name={pillar.icon} size={18} />
+                      </span>
+                    </div>
                     <span class="pillar-badge font-mono text-xs">{pillar.badge}</span>
                   </header>
                   <div class="pillar-body">
@@ -219,7 +271,10 @@ const pillars = [
                     <p class="pillar-desc text-sm text-muted">{pillar.desc}</p>
                   </div>
                   <footer class="pillar-footer">
-                    <span class="pillar-action">Acessar pilar <span class="action-arrow">→</span></span>
+                    <span class="pillar-action">
+                      <span>Acessar pilar</span>
+                      <UiIcon name="arrow-right" size={14} class="action-arrow" />
+                    </span>
                   </footer>
                 </article>
               </a>
@@ -229,16 +284,16 @@ const pillars = [
       </Center>
     </section>
 
-    <!-- Every Layout: O Índice Central de Primitivas -->
+    <!-- Every Layout: Índice de Especificação das 13 Primitivas -->
     <section class="primitives-section">
       <Center max="1200px">
         <div class="stack" style="--stack-space: var(--space-m);">
-          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: center;">
-            <div>
-              <span class="text-xs font-semibold tracking-caps text-muted">Primitivas Fundamentais</span>
-              <h2 class="text-xl font-bold">As 13 Primitivas de Layout</h2>
+          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: baseline;">
+            <div class="stack" style="--stack-space: 0.25rem;">
+              <span class="font-mono text-xs tracking-caps text-muted">02 · Especificação de Layout</span>
+              <h2 class="text-xl font-bold">As 13 Primitivas do Every Layout</h2>
             </div>
-            <span class="text-xs text-muted">Composição Algorítmica sem Breakpoints</span>
+            <span class="font-mono text-xs text-muted">Composição Algorítmica sem Breakpoints</span>
           </div>
 
           <div class="primitives-table" role="list">
@@ -255,7 +310,7 @@ const pillars = [
                 </div>
                 <div class="primitive-meta-group">
                   <span class="badge badge-difficulty">{entry.data.difficulty}</span>
-                  <span class="primitive-arrow" aria-hidden="true">→</span>
+                  <UiIcon name="arrow-right" size={14} class="primitive-arrow" />
                 </div>
               </a>
             ))}
@@ -275,33 +330,89 @@ const pillars = [
     overflow-x: clip;
   }
 
+  /* ─── Hero Editorial Suíço ─────────────────────────── */
   .hero-section {
     padding-block-end: var(--space-2xl);
     border-block-end: 1px solid var(--color-border);
   }
 
-  .hero-badge {
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.65fr) minmax(260px, 1fr);
+    gap: var(--space-xl);
+    align-items: end;
+  }
+
+  .hero-eyebrow {
     color: var(--color-accent);
-    background-color: var(--color-accent-muted);
-    padding-inline: 0.6em;
-    padding-block: 0.2em;
-    border-radius: var(--radius-full);
-    font-weight: 500;
+    font-weight: 600;
+    margin: 0;
   }
 
   .hero-title {
     font-size: var(--step-4);
+    font-weight: 700;
     letter-spacing: -0.03em;
-    line-height: 1.15;
-    margin-block: var(--space-xs);
+    line-height: 1.12;
+    margin: 0;
+    max-inline-size: 20ch;
   }
 
   .hero-desc {
-    max-inline-size: 65ch;
-    margin-inline: auto;
+    max-inline-size: 58ch;
     line-height: 1.6;
+    margin: 0;
   }
 
+  /* Painel de Especificação Técnica */
+  .hero-specs {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+  }
+
+  .specs-header {
+    padding: var(--space-xs) var(--space-s);
+    border-block-end: 1px solid var(--color-border);
+    background-color: var(--color-bg-inset);
+  }
+
+  .specs-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    margin: 0;
+  }
+
+  .spec-cell {
+    display: flex;
+    flex-direction: column-reverse;
+    gap: 0.2rem;
+    padding: var(--space-s);
+    border-block-end: 1px solid var(--color-border);
+    border-inline-end: 1px solid var(--color-border);
+  }
+
+  .spec-cell:nth-child(2n) {
+    border-inline-end: none;
+  }
+
+  .spec-cell:nth-last-child(-n + 2) {
+    border-block-end: none;
+  }
+
+  .spec-value {
+    font-size: var(--step-2);
+    font-weight: 700;
+    color: var(--color-text-strong);
+    line-height: 1.1;
+    margin: 0;
+  }
+
+  .spec-label {
+    line-height: 1.3;
+  }
+
+  /* ─── Botões & Atalhos ─────────────────────────────── */
   .btn {
     display: inline-flex;
     align-items: center;
@@ -314,10 +425,10 @@ const pillars = [
     font-weight: 600;
     font-family: inherit;
     text-decoration: none;
-    border: none;
+    border: 1px solid transparent;
     cursor: pointer;
     min-block-size: var(--target-size, 24px);
-    transition: all var(--duration-fast) ease;
+    transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease, color var(--duration-fast) ease;
   }
 
   @media (pointer: coarse) {
@@ -328,24 +439,27 @@ const pillars = [
 
   .btn-primary {
     background-color: var(--color-accent);
-    color: #ffffff;
+    border-color: var(--color-accent);
+    color: var(--color-on-accent);
   }
+
   .btn-primary:hover {
     background-color: var(--color-accent-hover);
+    border-color: var(--color-accent-hover);
+    color: var(--color-on-accent);
     text-decoration: none;
-    transform: translateY(-1px);
   }
 
   .btn-secondary {
     background-color: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
+    border-color: var(--color-border-strong);
     color: var(--color-fg);
   }
+
   .btn-secondary:hover {
     background-color: var(--color-bg-hover);
-    border-color: var(--color-border-hover);
+    border-color: var(--color-accent);
     text-decoration: none;
-    transform: translateY(-1px);
   }
 
   .btn-search-icon {
@@ -355,7 +469,7 @@ const pillars = [
   .shortcut-kbd-inline {
     font-size: 0.75em;
     padding: 0.1em 0.35em;
-    background-color: var(--color-bg-subtle);
+    background-color: var(--color-bg-inset);
     border-radius: var(--radius-sm);
     border: 1px solid var(--color-border);
     color: var(--color-fg-muted);
@@ -364,8 +478,8 @@ const pillars = [
   .shortcut-tag {
     display: inline-flex;
     align-items: center;
-    gap: 0.3em;
-    padding: 0.2em 0.5em;
+    gap: 0.35em;
+    padding: 0.15em 0.45em;
     background-color: var(--color-bg-surface);
     border: 1px solid var(--color-border);
     border-radius: var(--radius-sm);
@@ -374,15 +488,22 @@ const pillars = [
 
   .shortcut-tag kbd {
     font-size: 0.85em;
-    padding: 0.1em 0.35em;
-    background-color: var(--color-bg-subtle);
+    padding: 0.05em 0.3em;
+    background-color: var(--color-bg-inset);
     border-radius: var(--radius-sm);
     border: 1px solid var(--color-border);
-    color: var(--color-fg);
+    color: var(--color-text-strong);
+  }
+
+  /* ─── Bookmarks ────────────────────────────────────── */
+  .section-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
   }
 
   .bookmarks-section {
-    padding-block: var(--space-l);
+    padding-block-end: var(--space-l);
     border-block-end: 1px solid var(--color-border);
   }
 
@@ -391,51 +512,41 @@ const pillars = [
     align-items: center;
     gap: var(--space-2xs);
     padding: var(--space-3xs) var(--space-xs);
-    border-radius: var(--radius-full);
+    border-radius: var(--radius-sm);
     background-color: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border-strong);
     color: var(--color-fg);
     text-decoration: none;
     font-size: var(--step--1);
-    transition: all var(--duration-fast) ease;
+    transition: border-color var(--duration-fast) ease, color var(--duration-fast) ease, background-color var(--duration-fast) ease;
   }
 
   :global(.bookmark-chip:hover) {
     border-color: var(--color-accent);
+    background-color: var(--color-bg-hover);
     color: var(--color-accent);
-    transform: translateY(-1px);
     text-decoration: none;
   }
 
-  :global(.bookmark-chip .star-icon) {
-    color: #eab308;
+  :global(.bookmark-dot) {
+    inline-size: 6px;
+    block-size: 6px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-accent);
+    flex-shrink: 0;
   }
 
-  /* Pillars Grid: Cards perfeitamente proporcionais */
+  /* ─── Grade dos 9 Pilares (Bordas Reais 1px) ───────── */
   .pillars-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(min(100%, 300px), 1fr));
-    gap: var(--space-m);
-  }
-
-  @media (max-width: 640px) {
-    .shortcuts-legend {
-      display: none;
-    }
-    .shortcut-kbd-inline {
-      display: none;
-    }
-    .pillars-grid {
-      grid-template-columns: 1fr;
-      gap: var(--space-s);
-    }
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
+    gap: var(--space-s);
   }
 
   .pillar-card-link {
     text-decoration: none;
     color: inherit;
     display: flex;
-    height: 100%;
   }
 
   .pillar-card {
@@ -447,89 +558,73 @@ const pillars = [
     border-radius: var(--radius-md);
     background-color: var(--color-bg-surface);
     border: 1px solid var(--color-border);
-    position: relative;
-    overflow: hidden;
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.25s ease,
-                box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
-                background-color 0.25s ease;
-  }
-
-  .pillar-card::before {
-    content: "";
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline: 0;
-    block-size: 2px;
-    background: linear-gradient(90deg, transparent, var(--color-accent), transparent);
-    opacity: 0;
-    transform: scaleX(0.4);
-    transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  }
-
-  .pillar-card-link:hover .pillar-card {
-    transform: translateY(-4px);
-    border-color: var(--color-accent-muted);
-    background-color: var(--color-bg-hover);
-    box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.2), 0 0 0 1px var(--color-accent-muted);
-  }
-
-  .pillar-card-link:hover .pillar-card::before {
-    opacity: 1;
-    transform: scaleX(1);
+    transition: border-color var(--duration-fast) ease, background-color var(--duration-fast) ease;
   }
 
   .pillar-card.highlight {
-    border-color: var(--color-accent);
-    position: relative;
+    border-inline-start: 3px solid var(--color-accent);
   }
 
-  .pillar-card.highlight::after {
-    content: "";
-    position: absolute;
-    inset-block-start: 0;
-    inset-inline-start: 0;
-    inset-inline-end: 0;
-    block-size: 3px;
-    background-color: var(--color-accent);
-    border-start-start-radius: var(--radius-md);
-    border-start-end-radius: var(--radius-md);
+  .pillar-card-link:hover .pillar-card {
+    border-color: var(--color-accent);
+    background-color: var(--color-bg-hover);
   }
 
   .pillar-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-block-end: var(--space-xs);
+    gap: var(--space-xs);
+    margin-block-end: var(--space-s);
   }
 
-  .pillar-icon {
-    font-size: 1.35rem;
+  .pillar-identity {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-xs);
+  }
+
+  .pillar-index {
+    font-weight: 600;
+  }
+
+  .pillar-icon-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    inline-size: 2rem;
+    block-size: 2rem;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-inset);
+    color: var(--color-fg-muted);
+    transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease;
+  }
+
+  .pillar-card-link:hover .pillar-icon-wrap {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
   }
 
   .pillar-badge {
-    color: var(--color-fg-muted);
-    background-color: var(--color-bg-subtle);
-    padding-inline: 0.45em;
-    padding-block: 0.15em;
+    padding: 0.15em 0.5em;
     border-radius: var(--radius-sm);
+    background-color: var(--color-bg-inset);
     border: 1px solid var(--color-border);
+    color: var(--color-fg-muted);
   }
 
   .pillar-body {
     flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-2xs);
     margin-block-end: var(--space-m);
   }
 
   .pillar-title {
-    font-size: var(--step-0);
-    font-weight: 700;
-    color: var(--color-fg);
-    letter-spacing: -0.01em;
-    transition: color 0.2s ease;
+    font-size: var(--step-1);
+    font-weight: 600;
+    color: var(--color-text-strong);
+    margin-block: 0 var(--space-3xs);
+    transition: color var(--duration-fast) ease;
   }
 
   .pillar-card-link:hover .pillar-title {
@@ -537,7 +632,8 @@ const pillars = [
   }
 
   .pillar-desc {
-    line-height: 1.5;
+    margin: 0;
+    line-height: 1.55;
   }
 
   .pillar-footer {
@@ -548,25 +644,33 @@ const pillars = [
   .pillar-action {
     font-size: var(--step--1);
     font-weight: 600;
-    color: var(--color-accent);
+    color: var(--color-text-strong);
     display: inline-flex;
     align-items: center;
-    gap: 0.25rem;
+    gap: 0.35rem;
+    transition: color var(--duration-fast) ease;
+  }
+
+  .pillar-card-link:hover .pillar-action {
+    color: var(--color-accent);
   }
 
   .action-arrow {
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    transition: transform var(--duration-fast) var(--ease-out);
   }
 
   .pillar-card-link:hover .action-arrow {
-    transform: translateX(6px);
+    transform: translateX(4px);
   }
 
-  /* Primitives Table: Grid de 4 Colunas Alinhadas */
+  /* ─── Tabela das 13 Primitivas (Especificação Limpa) ─ */
   .primitives-table {
     display: flex;
     flex-direction: column;
-    gap: var(--space-2xs);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background-color: var(--color-bg-surface);
+    overflow: hidden;
   }
 
   .primitive-row {
@@ -576,22 +680,18 @@ const pillars = [
     gap: var(--space-s);
     padding-inline: var(--space-m);
     padding-block: var(--space-s);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background-color: var(--color-bg-surface);
+    border-block-end: 1px solid var(--color-border);
     text-decoration: none;
     color: inherit;
-    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.2s ease,
-                background-color 0.2s ease,
-                box-shadow 0.22s ease;
+    transition: background-color var(--duration-fast) ease;
+  }
+
+  .primitive-row:last-child {
+    border-block-end: none;
   }
 
   .primitive-row:hover {
     background-color: var(--color-bg-hover);
-    border-color: var(--color-accent-muted);
-    transform: translateX(4px);
-    box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.15), 0 0 0 1px var(--color-accent-muted);
     text-decoration: none;
   }
 
@@ -601,12 +701,12 @@ const pillars = [
 
   .primitive-name {
     font-size: var(--step-0);
-    color: var(--color-fg);
-    transition: color 0.2s ease;
+    color: var(--color-text-strong);
+    transition: color var(--duration-fast) ease;
   }
 
   .primitive-desc {
-    line-height: 1.4;
+    line-height: 1.45;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -625,7 +725,7 @@ const pillars = [
     padding-inline: 0.5em;
     padding-block: 0.15em;
     border-radius: var(--radius-sm);
-    background-color: var(--color-bg-subtle);
+    background-color: var(--color-bg-inset);
     border: 1px solid var(--color-border);
     color: var(--color-fg-muted);
     text-transform: capitalize;
@@ -633,7 +733,7 @@ const pillars = [
 
   .primitive-arrow {
     color: var(--color-fg-muted);
-    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.2s ease;
+    transition: transform var(--duration-fast) var(--ease-out), color var(--duration-fast) ease;
   }
 
   .primitive-row:hover .primitive-name,
@@ -642,19 +742,42 @@ const pillars = [
   }
 
   .primitive-row:hover .primitive-arrow {
-    transform: translateX(5px);
+    transform: translateX(4px);
   }
 
-  /* Responsividade da Tabela de Primitivas para Mobile */
+  /* ─── Responsividade ───────────────────────────────── */
+  @media (max-width: 960px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-l);
+    }
+
+    .hero-title {
+      max-inline-size: none;
+    }
+  }
+
   @media (max-width: 860px) {
     .primitive-row {
-      grid-template-columns: 2.5rem 1fr auto;
+      grid-template-columns: 2.75rem 1fr auto;
       gap: var(--space-xs);
       padding: var(--space-s);
     }
 
     .primitive-problem-group {
-      display: none; /* Em telas menores, foca no nome e dificuldade */
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .shortcuts-legend,
+    .shortcut-kbd-inline {
+      display: none;
+    }
+
+    .pillars-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-s);
     }
   }
 
@@ -663,6 +786,7 @@ const pillars = [
       grid-template-columns: 1fr auto;
       padding: var(--space-xs) var(--space-s);
     }
+
     .primitive-order {
       display: none;
     }
@@ -673,9 +797,9 @@ const pillars = [
       flex-direction: column;
       inline-size: 100%;
     }
+
     .hero-actions .btn {
       inline-size: 100%;
-      justify-content: center;
     }
   }
 </style>

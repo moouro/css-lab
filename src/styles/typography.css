@@ -16,10 +16,6 @@
   --step-4:  clamp(2.0738rem, 1.6835rem + 1.9509vw, 3.0518rem);
   --step-5:  clamp(2.4881rem, 1.9548rem + 2.6668vw, 3.8147rem);
 
-  /* ─── Font families ────────────────────────────── */
-  --font-sans: 'Inter Variable', 'Inter', system-ui, -apple-system, sans-serif;
-  --font-mono: 'JetBrains Mono Variable', 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
-
   /* ─── Line heights ─────────────────────────────── */
   --leading-none:    1;
   --leading-tight:   1.2;
@@ -52,7 +48,6 @@
     line-height: var(--leading-normal);
     font-weight: var(--weight-normal);
     letter-spacing: var(--tracking-normal);
-    font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
     font-variant-numeric: tabular-nums;
   }
 
