@@ -10,9 +10,9 @@ const { items = [] } = Astro.props;
   <h4 class="text-sm font-semibold tracking-caps text-muted">Checklist de Resiliência</h4>
   <ul class="checklist stack" style="--stack-space: var(--space-3xs);">
     {items.map((item) => (
-      <li class="checklist-item cluster" style="--cluster-space: var(--space-xs);">
+      <li class="checklist-item">
         <span class="check-icon" aria-hidden="true">✓</span>
-        <span class="text-sm">{item}</span>
+        <span class="checklist-text text-sm">{item}</span>
       </li>
     ))}
   </ul>
@@ -27,13 +27,26 @@ const { items = [] } = Astro.props;
     margin-block: var(--space-m);
   }
 
+  .checklist {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
   .checklist-item {
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    gap: var(--space-xs);
+    align-items: start;
   }
 
   .check-icon {
     color: var(--color-success);
     font-weight: var(--weight-bold);
-    line-height: 1.4;
+    line-height: 1.5;
+  }
+
+  .checklist-text {
+    line-height: 1.5;
   }
 </style>

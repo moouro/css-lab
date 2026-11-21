@@ -58,6 +58,7 @@ const { props = [] } = Astro.props;
     border-block-end: var(--border-thin) solid var(--color-border);
     color: var(--color-text-muted);
     font-weight: var(--weight-semibold);
+    white-space: nowrap;
   }
 
   .props-table td {
@@ -73,10 +74,14 @@ const { props = [] } = Astro.props;
   .prop-name {
     color: var(--color-accent);
     font-weight: var(--weight-medium);
+    white-space: nowrap;
+    overflow-wrap: normal;
   }
 
   .prop-type {
     color: var(--color-text-muted);
+    white-space: nowrap;
+    overflow-wrap: normal;
   }
 
   /* ═══ Transformação Responsiva em Cards (Modern Web Guidance) ═══

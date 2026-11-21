@@ -38,23 +38,12 @@ import UiIcon from './UiIcon.astro';
 
     const current = meta.content;
     const systemIsDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    const isCurrentlyDark = current === 'dark' || (current === 'light dark' && systemIsDark);
 
-    let nextTheme: 'light' | 'dark' | 'light dark';
-    if (current === 'light dark') {
-      nextTheme = systemIsDark ? 'light' : 'dark';
-    } else if (current === 'dark') {
-      nextTheme = systemIsDark ? 'light dark' : 'light';
-    } else {
-      nextTheme = systemIsDark ? 'dark' : 'light dark';
-    }
-
+    const nextTheme: 'light' | 'dark' = isCurrentlyDark ? 'light' : 'dark';
     meta.content = nextTheme;
     try {
-      if (nextTheme === 'light dark') {
-        localStorage.removeItem(THEME_STORAGE_KEY);
-      } else {
-        localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
-      }
+      localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
     } catch {
       // Storage indisponível
     }

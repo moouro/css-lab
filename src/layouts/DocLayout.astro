@@ -117,7 +117,7 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
             data-pagefind-filter={`seção:${collectionName}`}
           >
             <!-- Breadcrumbs -->
-            <nav aria-label="Localização na plataforma" class="doc-breadcrumbs">
+            <nav aria-label="Localização na plataforma" class="doc-breadcrumbs" data-pagefind-ignore>
               <ol class="breadcrumb-list">
                 <li><a href="/" class="breadcrumb-link">Início</a></li>
                 <li class="breadcrumb-sep" aria-hidden="true">/</li>
@@ -128,8 +128,8 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
             </nav>
 
             <header class="doc-header stack" style="--stack-space: var(--space-2xs);">
-              <div class="cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: center;">
-                <div class="cluster" style="--cluster-space: var(--space-3xs); align-items: center;">
+              <div class="doc-meta-bar cluster" data-pagefind-ignore style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: center;">
+                <div class="cluster" style="--cluster-space: var(--space-3xs); --cluster-justify: flex-start; align-items: center;">
                   {difficulty && (
                     <span class="badge badge-difficulty">{difficulty}</span>
                   )}
@@ -153,7 +153,7 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
             <hr class="doc-divider" />
 
             <!-- Paginação Sequencial: Anterior & Próximo -->
-            <nav class="doc-pagination-nav" aria-label="Navegação sequencial de leitura">
+            <nav class="doc-pagination-nav" aria-label="Navegação sequencial de leitura" data-pagefind-ignore>
               <div class="pagination-grid">
                 {prevItem ? (
                   <a href={`/${slugBase}/${prevItem.slug}`} class="pagination-card pagination-prev">
