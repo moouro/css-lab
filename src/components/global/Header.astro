@@ -433,10 +433,12 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
 <style>
   .site-header {
     border-block-end: 1px solid var(--color-border);
-    background-color: var(--color-bg-raised);
+    background-color: var(--color-header-bg);
     position: sticky;
     inset-block-start: 0;
     z-index: 100;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
   }
 
   .header-inner {
@@ -612,20 +614,20 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     display: inline-flex;
     align-items: center;
     gap: var(--space-2xs);
-    background-color: var(--color-bg-surface);
-    border: 1px solid var(--color-border-strong);
+    background-color: var(--color-bg-inset);
+    border: 1px solid var(--color-border);
     color: var(--color-fg-muted);
-    padding-inline: var(--space-xs);
-    padding-block: 0.35rem;
-    border-radius: var(--radius-sm);
+    padding-inline: 0.75rem;
+    padding-block: 0.38rem;
+    border-radius: var(--radius-md);
     font-size: var(--step--1);
     transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
     cursor: pointer;
   }
 
   .search-button:hover {
-    border-color: var(--color-accent);
-    color: var(--color-fg);
+    border-color: var(--color-border-hover);
+    color: var(--color-text-strong);
     background-color: var(--color-bg-hover);
   }
 
@@ -644,7 +646,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     align-items: center;
     justify-content: center;
     background: transparent;
-    border: 1px solid var(--color-border-strong);
+    border: 1px solid transparent;
     padding: 0.4rem;
     border-radius: var(--radius-sm);
     color: var(--color-fg-muted);
@@ -652,13 +654,12 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     cursor: pointer;
     min-inline-size: 2.25rem;
     min-block-size: 2.25rem;
-    transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+    transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
   }
 
   .github-link:hover {
-    color: var(--color-fg);
+    color: var(--color-text-strong);
     background-color: var(--color-bg-hover);
-    border-color: var(--color-accent);
     text-decoration: none;
   }
 
@@ -666,7 +667,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
   .mobile-menu-btn {
     display: none;
     background: transparent;
-    border: 1px solid var(--color-border-strong);
+    border: 1px solid transparent;
     border-radius: var(--radius-sm);
     padding: 0.4rem;
     color: var(--color-fg);

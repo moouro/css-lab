@@ -7,346 +7,352 @@ import { getPublishedCollection } from '@/utils/collections';
 const everyLayoutEntries = await getPublishedCollection('every-layout');
 
 interface PillarItem {
-  index: string;
   icon: IconName;
   title: string;
   desc: string;
   href: string;
   badge: string;
-  highlight?: boolean;
 }
 
 const pillars: PillarItem[] = [
   {
-    index: '01',
     icon: 'every-layout',
     title: 'Every Layout Lab',
-    desc: 'As 13 primitivas universais do livro de Heydon Pickering & Andy Bell. Composição algorítmica e intrínseca.',
+    desc: 'As 13 primitivas universais de Heydon Pickering & Andy Bell. Composição algorítmica e intrínseca sem breakpoints.',
     href: '/every-layout',
-    badge: '13 Primitivas',
-    highlight: true,
+    badge: '13 primitivas',
   },
   {
-    index: '02',
     icon: 'css-moderno',
     title: 'CSS Moderno',
     desc: 'Nesting nativo, Cascade Layers, :has(), Container Queries, light-dark() e propriedades lógicas sem JS.',
     href: '/css-moderno',
-    badge: '11 Tópicos',
+    badge: '11 tópicos',
   },
   {
-    index: '03',
     icon: 'grid-lab',
     title: 'Grid Lab',
-    desc: 'Desde minmax() com auto-fill e auto-fit até subgrid e mapeamento visual de template areas.',
+    desc: 'De minmax() com auto-fill e auto-fit até subgrid e mapeamento visual de template areas.',
     href: '/grid-lab',
-    badge: '7 Tópicos',
+    badge: '7 tópicos',
   },
   {
-    index: '04',
     icon: 'flexbox-lab',
     title: 'Flexbox Lab',
-    desc: 'Domínio de flex-basis, quebra de linha suave, Holy Albatross, eixos e margin: auto.',
+    desc: 'Domínio de flex-basis, quebra de linha suave, Holy Albatross, eixos e alinhamento com margin: auto.',
     href: '/flexbox-lab',
-    badge: '6 Tópicos',
+    badge: '6 tópicos',
   },
   {
-    index: '05',
     icon: 'container-query',
     title: 'Container Query Lab',
-    desc: 'Size queries, style queries, unidades cqi/cqw e componentes universais verdadeiramente autocontidos.',
+    desc: 'Size queries, style queries, unidades cqi/cqw e componentes verdadeiramente autocontidos.',
     href: '/container-query-lab',
-    badge: '5 Tópicos',
+    badge: '5 tópicos',
   },
   {
-    index: '06',
     icon: 'components',
     title: 'Component Library',
-    desc: 'Buttons, Modals com <dialog>, Tabs nativas, Accordions com ::details-content e Cards com subgrid.',
+    desc: 'Buttons, Modals com <dialog>, Tabs nativas, Accordions modernos e Cards com subgrid.',
     href: '/components',
-    badge: '10 Componentes',
+    badge: '10 guias',
   },
   {
-    index: '07',
     icon: 'snippets',
     title: 'Snippets Library',
-    desc: 'Soluções rápidas de CSS moderno para layout, tipografia, animação, utilitários e padrões de produção.',
+    desc: 'Receitas prontas de CSS moderno para layout, tipografia, micro-interações e padrões de produção.',
     href: '/snippets',
-    badge: '25 Snippets',
+    badge: '25 receitas',
   },
   {
-    index: '08',
     icon: 'cheatsheets',
     title: 'Cheatsheets',
-    desc: 'Tabelas e guias rápidos para consulta instantânea no dia a dia, otimizados para impressão em folha A4.',
+    desc: 'Guias de consulta rápida para o dia a dia, otimizados para leitura ágil e impressão em folha A4.',
     href: '/cheatsheets',
-    badge: '6 Guias A4',
+    badge: '6 guias A4',
   },
   {
-    index: '09',
     icon: 'design-tokens',
     title: 'Design Tokens',
-    desc: 'A arquitetura de tokens e decisões de design codificadas em variáveis nativas e escalas matemáticas.',
+    desc: 'Arquitetura de tokens e decisões de design codificadas em variáveis nativas e escalas fluidas.',
     href: '/design-tokens',
-    badge: '5 Guias',
+    badge: '5 guias',
   },
 ];
 
-const specs = [
-  { value: '09', label: 'Pilares Técnicos' },
-  { value: '13', label: 'Primitivas Every Layout' },
-  { value: '88', label: 'Guias Indexados' },
-  { value: '00', label: 'Trackers & CDNs' },
+const quickLinks = [
+  { label: 'Every Layout', href: '/every-layout' },
+  { label: 'CSS Moderno', href: '/css-moderno' },
+  { label: 'Grid Lab', href: '/grid-lab' },
+  { label: 'Snippets', href: '/snippets' },
 ];
 ---
 
 <BaseLayout title="Home — Segunda Memória de CSS & Layout">
-  <div class="home-container stack" style="--stack-space: var(--space-2xl);">
-    <!-- Hero Editorial Suíço (alinhado à esquerda, sem clichês de IA) -->
+  <div class="home-page">
+    <!-- Hero Mintlify Docs (limpo, respirável, focado em busca) -->
     <section class="hero-section">
-      <Center max="1200px">
-        <div class="hero-grid">
-          <div class="hero-main stack" style="--stack-space: var(--space-s);">
-            <p class="hero-eyebrow font-mono text-xs tracking-caps">
-              Arquitetura CSS · Every Layout · Referência Viva
-            </p>
+      <div class="hero-glow" aria-hidden="true"></div>
+      <Center max="860px">
+        <div class="hero-inner stack" style="--stack-space: var(--space-s);">
+          <a href="#pilares" class="hero-pill">
+            <span class="pill-dot" aria-hidden="true"></span>
+            <span>9 pilares · 13 primitivas · 88 guias</span>
+            <UiIcon name="arrow-down" size={13} />
+          </a>
 
-            <h1 class="hero-title">
-              Como o layout responde ao conteúdo, e não à tela.
-            </h1>
+          <h1 class="hero-title">
+            Como o layout responde ao conteúdo, e não à tela.
+          </h1>
 
-            <p class="hero-desc text-lg text-muted">
-              Plataforma pessoal de consulta, estudo e experimentação de CSS moderno e composição algorítmica. O próprio site é construído com as primitivas que documenta.
-            </p>
+          <p class="hero-desc text-lg text-muted">
+            Sua segunda memória viva de CSS moderno e arquitetura de layout intrínseco. Pesquise qualquer propriedade, primitiva ou receita em milissegundos.
+          </p>
 
-            <div class="hero-actions cluster" style="--cluster-space: var(--space-s); padding-block-start: var(--space-xs);">
-              <a href="#pilares" class="btn btn-primary">
-                <span>Explorar os 9 Pilares</span>
-                <UiIcon name="arrow-down" size={16} class="action-arrow" />
-              </a>
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-open-search
-                aria-label="Abrir busca rápida por conceitos e propriedades (Atalho: Cmd+K ou Ctrl+K)"
-              >
-                <UiIcon name="search" size={16} class="btn-search-icon" />
-                <span>Buscar Conceito</span>
-                <kbd class="shortcut-kbd-inline font-mono">⌘K</kbd>
-              </button>
-            </div>
-
-            <!-- Legenda de Atalhos (oculta em mobile) -->
-            <div class="shortcuts-legend cluster" style="--cluster-space: var(--space-xs); padding-block-start: var(--space-xs);">
-              <span class="text-xs text-muted font-mono">Atalhos:</span>
-              <span class="shortcut-tag text-xs font-mono"><kbd>⌘K</kbd> Busca</span>
-              <span class="shortcut-tag text-xs font-mono"><kbd>⇧T</kbd> Tema</span>
-              <span class="shortcut-tag text-xs font-mono"><kbd>⇧L</kbd> Inspetor</span>
-            </div>
-          </div>
-
-          <!-- Painel de Especificação Técnica -->
-          <aside class="hero-specs" aria-label="Resumo quantitativo da plataforma">
-            <div class="specs-header font-mono text-xs tracking-caps text-muted">
-              Especificação do Acervo
-            </div>
-            <dl class="specs-grid">
-              {specs.map((spec) => (
-                <div class="spec-cell">
-                  <dt class="spec-label text-xs text-muted">{spec.label}</dt>
-                  <dd class="spec-value font-mono">{spec.value}</dd>
-                </div>
-              ))}
-            </dl>
-          </aside>
-        </div>
-      </Center>
-    </section>
-
-    <!-- Minha Segunda Memória (Favoritos do Usuário via LocalStorage) -->
-    <section class="bookmarks-section" id="bookmarks-section" style="display: none;">
-      <Center max="1200px">
-        <div class="stack" style="--stack-space: var(--space-s);">
-          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: baseline;">
-            <div class="stack" style="--stack-space: 0.25rem;">
-              <span class="section-eyebrow font-mono text-xs tracking-caps text-accent">
-                <UiIcon name="star" size={13} />
-                <span>Minha Segunda Memória</span>
+          <!-- Barra de Busca em Destaque (estilo Mintlify / GitBook) -->
+          <div class="hero-search-wrap">
+            <button
+              type="button"
+              class="hero-search-bar"
+              data-open-search
+              aria-label="Abrir busca rápida por conceitos, propriedades e snippets (Atalho: Cmd+K ou Ctrl+K)"
+            >
+              <span class="hero-search-left">
+                <UiIcon name="search" size={18} class="hero-search-icon" />
+                <span class="hero-search-placeholder">Buscar primitivas, subgrid, :has(), snippets...</span>
               </span>
-              <h2 class="text-xl font-bold">Conteúdos Favoritados</h2>
-            </div>
-            <span class="text-xs text-muted font-mono">localStorage</span>
+              <kbd class="hero-search-kbd font-mono">⌘K</kbd>
+            </button>
           </div>
-          <div id="bookmarks-container" class="cluster" style="--cluster-space: var(--space-xs);"></div>
+
+          <!-- Acesso Rápido -->
+          <div class="quick-links cluster" style="--cluster-space: var(--space-2xs); justify-content: center;">
+            <span class="quick-links-label text-xs text-muted">Populares:</span>
+            {quickLinks.map((item) => (
+              <a href={item.href} class="quick-link-pill text-xs">
+                {item.label}
+              </a>
+            ))}
+          </div>
         </div>
       </Center>
     </section>
 
-    <script>
-      interface BookmarkItem {
-        title: string;
-        url: string;
-      }
-
-      function isValidBookmark(item: unknown): item is BookmarkItem {
-        if (!item || typeof item !== 'object') return false;
-        const candidate = item as Record<string, unknown>;
-        return (
-          typeof candidate.url === 'string' &&
-          candidate.url.startsWith('/') &&
-          !candidate.url.startsWith('//') &&
-          typeof candidate.title === 'string'
-        );
-      }
-
-      function renderBookmarks(): void {
-        try {
-          const raw = localStorage.getItem('css-lab-bookmarks');
-          const section = document.getElementById('bookmarks-section');
-          const container = document.getElementById('bookmarks-container');
-          if (!section || !container) return;
-
-          const parsed: unknown = raw ? JSON.parse(raw) : [];
-          const items = Array.isArray(parsed) ? parsed.filter(isValidBookmark) : [];
-
-          if (items.length === 0) {
-            section.style.display = 'none';
-            container.replaceChildren();
-            return;
-          }
-
-          section.style.display = 'block';
-          const chips = items.map((item) => {
-            const link = document.createElement('a');
-            link.href = item.url;
-            link.className = 'bookmark-chip';
-
-            const marker = document.createElement('span');
-            marker.className = 'bookmark-dot';
-            marker.setAttribute('aria-hidden', 'true');
-
-            const label = document.createElement('span');
-            label.textContent = item.title;
-
-            link.append(marker, label);
-            return link;
-          });
-
-          container.replaceChildren(...chips);
-        } catch {
-          // Ignora JSON inválido ou bloqueio de storage
-        }
-      }
-
-      document.addEventListener('astro:page-load', renderBookmarks);
-    </script>
-
-    <!-- Pilares de Conhecimento (Grade Arquitetônica Suíça) -->
-    <section class="pillars-section" id="pilares">
-      <Center max="1200px">
-        <div class="stack" style="--stack-space: var(--space-m);">
-          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: baseline;">
-            <div class="stack" style="--stack-space: 0.25rem;">
-              <span class="font-mono text-xs tracking-caps text-muted">01 · Arquitetura de Conhecimento</span>
-              <h2 class="text-xl font-bold">Pilares Fundamentais</h2>
+    <div class="home-sections stack" style="--stack-space: var(--space-2xl);">
+      <!-- Minha Segunda Memória (Favoritos do Usuário via LocalStorage) -->
+      <section class="bookmarks-section" id="bookmarks-section" style="display: none;">
+        <Center max="1140px">
+          <div class="stack" style="--stack-space: var(--space-s);">
+            <div class="section-header">
+              <div class="stack" style="--stack-space: 0.2rem;">
+                <span class="section-kicker text-xs font-semibold text-accent">
+                  <UiIcon name="star" size={13} />
+                  <span>Salvos localmente</span>
+                </span>
+                <h2 class="section-title">Minha Segunda Memória</h2>
+              </div>
             </div>
-            <span class="font-mono text-xs text-muted">9 Áreas de Domínio Técnico</span>
+            <div id="bookmarks-container" class="cluster" style="--cluster-space: var(--space-2xs);"></div>
           </div>
+        </Center>
+      </section>
 
-          <div class="pillars-grid">
-            {pillars.map((pillar) => (
-              <a href={pillar.href} class="pillar-card-link">
-                <article class:list={['pillar-card', { highlight: pillar.highlight }]}>
-                  <header class="pillar-header">
-                    <div class="pillar-identity">
-                      <span class="pillar-index font-mono text-xs text-muted">{pillar.index}</span>
-                      <span class="pillar-icon-wrap" aria-hidden="true">
-                        <UiIcon name={pillar.icon} size={18} />
-                      </span>
-                    </div>
-                    <span class="pillar-badge font-mono text-xs">{pillar.badge}</span>
-                  </header>
-                  <div class="pillar-body">
-                    <h3 class="pillar-title">{pillar.title}</h3>
+      <script>
+        interface BookmarkItem {
+          title: string;
+          url: string;
+        }
+
+        function isValidBookmark(item: unknown): item is BookmarkItem {
+          if (!item || typeof item !== 'object') return false;
+          const candidate = item as Record<string, unknown>;
+          return (
+            typeof candidate.url === 'string' &&
+            candidate.url.startsWith('/') &&
+            !candidate.url.startsWith('//') &&
+            typeof candidate.title === 'string'
+          );
+        }
+
+        function renderBookmarks(): void {
+          try {
+            const raw = localStorage.getItem('css-lab-bookmarks');
+            const section = document.getElementById('bookmarks-section');
+            const container = document.getElementById('bookmarks-container');
+            if (!section || !container) return;
+
+            const parsed: unknown = raw ? JSON.parse(raw) : [];
+            const items = Array.isArray(parsed) ? parsed.filter(isValidBookmark) : [];
+
+            if (items.length === 0) {
+              section.style.display = 'none';
+              container.replaceChildren();
+              return;
+            }
+
+            section.style.display = 'block';
+            const chips = items.map((item) => {
+              const link = document.createElement('a');
+              link.href = item.url;
+              link.className = 'bookmark-chip';
+
+              const dot = document.createElement('span');
+              dot.className = 'bookmark-dot';
+              dot.setAttribute('aria-hidden', 'true');
+
+              const label = document.createElement('span');
+              label.textContent = item.title;
+
+              link.append(dot, label);
+              return link;
+            });
+
+            container.replaceChildren(...chips);
+          } catch {
+            // Ignora JSON inválido ou bloqueio de storage
+          }
+        }
+
+        document.addEventListener('astro:page-load', renderBookmarks);
+      </script>
+
+      <!-- Pilares de Conhecimento (Cards Suaves estilo Mintlify) -->
+      <section class="pillars-section" id="pilares">
+        <Center max="1140px">
+          <div class="stack" style="--stack-space: var(--space-m);">
+            <div class="section-header">
+              <div class="stack" style="--stack-space: 0.2rem;">
+                <span class="section-kicker text-xs font-semibold text-accent">Explorar documentação</span>
+                <h2 class="section-title">Pilares Fundamentais</h2>
+              </div>
+              <p class="section-subtitle text-sm text-muted">
+                Escolha um tópico para aprofundar ou consultar padrões prontos.
+              </p>
+            </div>
+
+            <div class="pillars-grid">
+              {pillars.map((pillar) => (
+                <a href={pillar.href} class="pillar-card">
+                  <div class="pillar-top">
+                    <span class="pillar-icon-badge" aria-hidden="true">
+                      <UiIcon name={pillar.icon} size={20} />
+                    </span>
+                    <span class="pillar-badge text-xs font-mono">{pillar.badge}</span>
+                  </div>
+
+                  <div class="pillar-content">
+                    <h3 class="pillar-title">
+                      <span>{pillar.title}</span>
+                      <UiIcon name="arrow-right" size={15} class="pillar-arrow" />
+                    </h3>
                     <p class="pillar-desc text-sm text-muted">{pillar.desc}</p>
                   </div>
-                  <footer class="pillar-footer">
-                    <span class="pillar-action">
-                      <span>Acessar pilar</span>
-                      <UiIcon name="arrow-right" size={14} class="action-arrow" />
-                    </span>
-                  </footer>
-                </article>
-              </a>
-            ))}
-          </div>
-        </div>
-      </Center>
-    </section>
-
-    <!-- Every Layout: Índice de Especificação das 13 Primitivas -->
-    <section class="primitives-section">
-      <Center max="1200px">
-        <div class="stack" style="--stack-space: var(--space-m);">
-          <div class="section-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: baseline;">
-            <div class="stack" style="--stack-space: 0.25rem;">
-              <span class="font-mono text-xs tracking-caps text-muted">02 · Especificação de Layout</span>
-              <h2 class="text-xl font-bold">As 13 Primitivas do Every Layout</h2>
+                </a>
+              ))}
             </div>
-            <span class="font-mono text-xs text-muted">Composição Algorítmica sem Breakpoints</span>
           </div>
+        </Center>
+      </section>
 
-          <div class="primitives-table" role="list">
-            {everyLayoutEntries.map((entry) => (
-              <a href={`/every-layout/${entry.id}`} class="primitive-row" role="listitem">
-                <span class="primitive-order font-mono text-xs text-muted">
-                  #{String(entry.data.order).padStart(2, '0')}
-                </span>
-                <div class="primitive-title-group">
-                  <strong class="primitive-name">{entry.data.title}</strong>
-                </div>
-                <div class="primitive-problem-group">
-                  <span class="primitive-desc text-sm text-muted">{entry.data.problem}</span>
-                </div>
-                <div class="primitive-meta-group">
-                  <span class="badge badge-difficulty">{entry.data.difficulty}</span>
-                  <UiIcon name="arrow-right" size={14} class="primitive-arrow" />
-                </div>
+      <!-- Every Layout: As 13 Primitivas -->
+      <section class="primitives-section">
+        <Center max="1140px">
+          <div class="stack" style="--stack-space: var(--space-m);">
+            <div class="section-header">
+              <div class="stack" style="--stack-space: 0.2rem;">
+                <span class="section-kicker text-xs font-semibold text-accent">Every Layout</span>
+                <h2 class="section-title">As 13 Primitivas de Layout</h2>
+              </div>
+              <a href="/every-layout" class="section-all-link text-sm font-medium">
+                <span>Ver visão geral</span>
+                <UiIcon name="arrow-right" size={14} />
               </a>
-            ))}
+            </div>
+
+            <div class="primitives-list" role="list">
+              {everyLayoutEntries.map((entry) => (
+                <a href={`/every-layout/${entry.id}`} class="primitive-row" role="listitem">
+                  <span class="primitive-order font-mono text-xs text-muted">
+                    {String(entry.data.order).padStart(2, '0')}
+                  </span>
+                  <strong class="primitive-name">{entry.data.title}</strong>
+                  <span class="primitive-desc text-sm text-muted">{entry.data.problem}</span>
+                  <div class="primitive-meta">
+                    <span class="badge-difficulty font-mono text-xs">{entry.data.difficulty}</span>
+                    <UiIcon name="arrow-right" size={14} class="primitive-arrow" />
+                  </div>
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
-      </Center>
-    </section>
+        </Center>
+      </section>
+    </div>
   </div>
 </BaseLayout>
 
 <style>
-  .home-container {
-    padding-block-start: var(--space-xl);
-    padding-block-end: var(--space-3xl);
-    padding-inline: var(--space-s);
-    max-inline-size: 100%;
+  .home-page {
+    position: relative;
     overflow-x: clip;
+    padding-block-end: var(--space-3xl);
   }
 
-  /* ─── Hero Editorial Suíço ─────────────────────────── */
+  /* ─── Hero Mintlify Docs ───────────────────────────── */
   .hero-section {
-    padding-block-end: var(--space-2xl);
-    border-block-end: 1px solid var(--color-border);
+    position: relative;
+    padding-block: var(--space-2xl) var(--space-xl);
+    padding-inline: var(--space-s);
   }
 
-  .hero-grid {
-    display: grid;
-    grid-template-columns: minmax(0, 1.65fr) minmax(260px, 1fr);
-    gap: var(--space-xl);
-    align-items: end;
+  .hero-glow {
+    position: absolute;
+    inset-block-start: -8rem;
+    inset-inline: 0;
+    block-size: 28rem;
+    background: radial-gradient(
+      ellipse 60% 55% at 50% 20%,
+      var(--color-accent-muted),
+      transparent 75%
+    );
+    pointer-events: none;
+    z-index: 0;
   }
 
-  .hero-eyebrow {
-    color: var(--color-accent);
-    font-weight: 600;
-    margin: 0;
+  .hero-inner {
+    position: relative;
+    z-index: 1;
+    align-items: center;
+    text-align: center;
+  }
+
+  .hero-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    padding: 0.3rem 0.8rem;
+    border-radius: var(--radius-full);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    color: var(--color-fg-muted);
+    font-size: var(--step--2);
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color var(--duration-fast) ease, color var(--duration-fast) ease;
+  }
+
+  .hero-pill:hover {
+    border-color: var(--color-border-hover);
+    color: var(--color-text-strong);
+    text-decoration: none;
+  }
+
+  .pill-dot {
+    inline-size: 6px;
+    block-size: 6px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-accent);
   }
 
   .hero-title {
@@ -355,175 +361,161 @@ const specs = [
     letter-spacing: -0.03em;
     line-height: 1.12;
     margin: 0;
-    max-inline-size: 20ch;
+    max-inline-size: 22ch;
+    color: var(--color-text-strong);
   }
 
   .hero-desc {
-    max-inline-size: 58ch;
+    max-inline-size: 56ch;
+    margin: 0;
     line-height: 1.6;
-    margin: 0;
   }
 
-  /* Painel de Especificação Técnica */
-  .hero-specs {
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background-color: var(--color-bg-surface);
+  /* Barra de Busca Principal */
+  .hero-search-wrap {
+    inline-size: 100%;
+    max-inline-size: 540px;
+    padding-block-start: var(--space-xs);
   }
 
-  .specs-header {
-    padding: var(--space-xs) var(--space-s);
-    border-block-end: 1px solid var(--color-border);
-    background-color: var(--color-bg-inset);
-  }
-
-  .specs-grid {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    margin: 0;
-  }
-
-  .spec-cell {
+  .hero-search-bar {
     display: flex;
-    flex-direction: column-reverse;
-    gap: 0.2rem;
-    padding: var(--space-s);
-    border-block-end: 1px solid var(--color-border);
-    border-inline-end: 1px solid var(--color-border);
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-s);
+    inline-size: 100%;
+    padding: 0.8rem 1rem 0.8rem 1.1rem;
+    border-radius: var(--radius-m);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border-strong);
+    box-shadow: var(--shadow-md);
+    color: var(--color-fg-muted);
+    font-family: inherit;
+    font-size: var(--step--1);
+    cursor: pointer;
+    min-block-size: 48px;
+    transition: border-color var(--duration-fast) var(--ease-out),
+                box-shadow var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out);
   }
 
-  .spec-cell:nth-child(2n) {
-    border-inline-end: none;
-  }
-
-  .spec-cell:nth-last-child(-n + 2) {
-    border-block-end: none;
-  }
-
-  .spec-value {
-    font-size: var(--step-2);
-    font-weight: 700;
+  .hero-search-bar:hover {
+    border-color: var(--color-accent);
     color: var(--color-text-strong);
-    line-height: 1.1;
-    margin: 0;
   }
 
-  .spec-label {
-    line-height: 1.3;
-  }
-
-  /* ─── Botões & Atalhos ─────────────────────────────── */
-  .btn {
+  .hero-search-left {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    gap: var(--space-2xs);
-    padding-inline: var(--space-m);
-    padding-block: 0.65rem;
-    border-radius: var(--radius-sm);
-    font-size: var(--step--1);
-    font-weight: 600;
-    font-family: inherit;
-    text-decoration: none;
-    border: 1px solid transparent;
-    cursor: pointer;
-    min-block-size: var(--target-size, 24px);
-    transition: background-color var(--duration-fast) ease, border-color var(--duration-fast) ease, color var(--duration-fast) ease;
+    gap: 0.65rem;
+    min-inline-size: 0;
   }
 
-  @media (pointer: coarse) {
-    .btn {
-      min-block-size: 44px;
-    }
-  }
-
-  .btn-primary {
-    background-color: var(--color-accent);
-    border-color: var(--color-accent);
-    color: var(--color-on-accent);
-  }
-
-  .btn-primary:hover {
-    background-color: var(--color-accent-hover);
-    border-color: var(--color-accent-hover);
-    color: var(--color-on-accent);
-    text-decoration: none;
-  }
-
-  .btn-secondary {
-    background-color: var(--color-bg-surface);
-    border-color: var(--color-border-strong);
-    color: var(--color-fg);
-  }
-
-  .btn-secondary:hover {
-    background-color: var(--color-bg-hover);
-    border-color: var(--color-accent);
-    text-decoration: none;
-  }
-
-  .btn-search-icon {
+  .hero-search-icon {
+    color: var(--color-accent);
     flex-shrink: 0;
   }
 
-  .shortcut-kbd-inline {
-    font-size: 0.75em;
-    padding: 0.1em 0.35em;
-    background-color: var(--color-bg-inset);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-border);
-    color: var(--color-fg-muted);
+  .hero-search-placeholder {
+    text-align: start;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
-  .shortcut-tag {
-    display: inline-flex;
+  .hero-search-kbd {
+    font-size: 0.78em;
+    padding: 0.18em 0.5em;
+    border-radius: var(--radius-s);
+    background-color: var(--color-bg-inset);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg-muted);
+    flex-shrink: 0;
+  }
+
+  /* Quick Links */
+  .quick-links {
     align-items: center;
-    gap: 0.35em;
-    padding: 0.15em 0.45em;
-    background-color: var(--color-bg-surface);
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-sm);
-    color: var(--color-fg-muted);
+    padding-block-start: 0.25rem;
   }
 
-  .shortcut-tag kbd {
-    font-size: 0.85em;
-    padding: 0.05em 0.3em;
+  .quick-link-pill {
+    padding: 0.28rem 0.7rem;
+    border-radius: var(--radius-full);
     background-color: var(--color-bg-inset);
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-strong);
+    color: var(--color-fg-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
   }
 
-  /* ─── Bookmarks ────────────────────────────────────── */
-  .section-eyebrow {
+  .quick-link-pill:hover {
+    background-color: var(--color-accent-muted);
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  /* ─── Seções Principais ────────────────────────────── */
+  .home-sections {
+    padding-inline: var(--space-s);
+  }
+
+  .section-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-xs);
+  }
+
+  .section-kicker {
     display: inline-flex;
     align-items: center;
     gap: 0.35rem;
   }
 
-  .bookmarks-section {
-    padding-block-end: var(--space-l);
-    border-block-end: 1px solid var(--color-border);
+  .section-title {
+    font-size: var(--step-2);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
   }
 
+  .section-subtitle {
+    margin: 0;
+  }
+
+  .section-all-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    color: var(--color-accent);
+    text-decoration: none;
+  }
+
+  .section-all-link:hover {
+    color: var(--color-accent-hover);
+    text-decoration: none;
+  }
+
+  /* ─── Bookmarks ────────────────────────────────────── */
   :global(.bookmark-chip) {
     display: inline-flex;
     align-items: center;
-    gap: var(--space-2xs);
-    padding: var(--space-3xs) var(--space-xs);
-    border-radius: var(--radius-sm);
+    gap: 0.45rem;
+    padding: 0.38rem 0.8rem;
+    border-radius: var(--radius-full);
     background-color: var(--color-bg-surface);
-    border: 1px solid var(--color-border-strong);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
     color: var(--color-fg);
     text-decoration: none;
     font-size: var(--step--1);
-    transition: border-color var(--duration-fast) ease, color var(--duration-fast) ease, background-color var(--duration-fast) ease;
+    transition: border-color var(--duration-fast) ease, color var(--duration-fast) ease;
   }
 
   :global(.bookmark-chip:hover) {
     border-color: var(--color-accent);
-    background-color: var(--color-bg-hover);
     color: var(--color-accent);
     text-decoration: none;
   }
@@ -536,99 +528,97 @@ const specs = [
     flex-shrink: 0;
   }
 
-  /* ─── Grade dos 9 Pilares (Bordas Reais 1px) ───────── */
+  /* ─── Cards dos 9 Pilares (Mintlify Soft Cards) ────── */
   .pillars-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, 310px), 1fr));
-    gap: var(--space-s);
-  }
-
-  .pillar-card-link {
-    text-decoration: none;
-    color: inherit;
-    display: flex;
+    gap: var(--space-m);
   }
 
   .pillar-card {
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    inline-size: 100%;
+    gap: var(--space-s);
     padding: var(--space-m);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-l);
     background-color: var(--color-bg-surface);
     border: 1px solid var(--color-border);
-    transition: border-color var(--duration-fast) ease, background-color var(--duration-fast) ease;
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out),
+                background-color var(--duration-normal) var(--ease-out);
   }
 
-  .pillar-card.highlight {
-    border-inline-start: 3px solid var(--color-accent);
+  .pillar-card:hover {
+    border-color: var(--color-border-hover);
+    background-color: var(--color-surface-hover);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
   }
 
-  .pillar-card-link:hover .pillar-card {
-    border-color: var(--color-accent);
-    background-color: var(--color-bg-hover);
-  }
-
-  .pillar-header {
+  .pillar-top {
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-xs);
-    margin-block-end: var(--space-s);
   }
 
-  .pillar-identity {
-    display: inline-flex;
-    align-items: center;
-    gap: var(--space-xs);
-  }
-
-  .pillar-index {
-    font-weight: 600;
-  }
-
-  .pillar-icon-wrap {
+  .pillar-icon-badge {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    inline-size: 2rem;
-    block-size: 2rem;
-    border-radius: var(--radius-sm);
-    border: 1px solid var(--color-border);
-    background-color: var(--color-bg-inset);
-    color: var(--color-fg-muted);
-    transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease;
+    inline-size: 2.5rem;
+    block-size: 2.5rem;
+    border-radius: 10px;
+    background-color: var(--color-accent-muted);
+    color: var(--color-accent);
+    transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
   }
 
-  .pillar-card-link:hover .pillar-icon-wrap {
-    color: var(--color-accent);
-    border-color: var(--color-accent);
+  .pillar-card:hover .pillar-icon-badge {
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
   }
 
   .pillar-badge {
-    padding: 0.15em 0.5em;
-    border-radius: var(--radius-sm);
+    padding: 0.2em 0.6em;
+    border-radius: var(--radius-full);
     background-color: var(--color-bg-inset);
-    border: 1px solid var(--color-border);
     color: var(--color-fg-muted);
   }
 
-  .pillar-body {
-    flex-grow: 1;
-    margin-block-end: var(--space-m);
+  .pillar-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
   }
 
   .pillar-title {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
     font-size: var(--step-1);
     font-weight: 600;
     color: var(--color-text-strong);
-    margin-block: 0 var(--space-3xs);
+    margin: 0;
     transition: color var(--duration-fast) ease;
   }
 
-  .pillar-card-link:hover .pillar-title {
+  .pillar-card:hover .pillar-title {
     color: var(--color-accent);
+  }
+
+  .pillar-arrow {
+    opacity: 0;
+    transform: translateX(-4px);
+    transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
+  }
+
+  .pillar-card:hover .pillar-arrow {
+    opacity: 1;
+    transform: translateX(2px);
   }
 
   .pillar-desc {
@@ -636,51 +626,24 @@ const specs = [
     line-height: 1.55;
   }
 
-  .pillar-footer {
-    border-block-start: 1px solid var(--color-border);
-    padding-block-start: var(--space-xs);
-  }
-
-  .pillar-action {
-    font-size: var(--step--1);
-    font-weight: 600;
-    color: var(--color-text-strong);
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    transition: color var(--duration-fast) ease;
-  }
-
-  .pillar-card-link:hover .pillar-action {
-    color: var(--color-accent);
-  }
-
-  .action-arrow {
-    transition: transform var(--duration-fast) var(--ease-out);
-  }
-
-  .pillar-card-link:hover .action-arrow {
-    transform: translateX(4px);
-  }
-
-  /* ─── Tabela das 13 Primitivas (Especificação Limpa) ─ */
-  .primitives-table {
+  /* ─── Lista das 13 Primitivas ──────────────────────── */
+  .primitives-list {
     display: flex;
     flex-direction: column;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-l);
     background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
     overflow: hidden;
   }
 
   .primitive-row {
     display: grid;
-    grid-template-columns: 3.5rem 12rem 1fr auto;
+    grid-template-columns: 2.75rem 11.5rem 1fr auto;
     align-items: center;
     gap: var(--space-s);
-    padding-inline: var(--space-m);
-    padding-block: var(--space-s);
-    border-block-end: 1px solid var(--color-border);
+    padding: 0.95rem var(--space-m);
+    border-block-end: 1px solid var(--color-border-subtle);
     text-decoration: none;
     color: inherit;
     transition: background-color var(--duration-fast) ease;
@@ -691,16 +654,13 @@ const specs = [
   }
 
   .primitive-row:hover {
-    background-color: var(--color-bg-hover);
+    background-color: var(--color-surface-hover);
     text-decoration: none;
-  }
-
-  .primitive-order {
-    font-size: var(--step--1);
   }
 
   .primitive-name {
     font-size: var(--step-0);
+    font-weight: 600;
     color: var(--color-text-strong);
     transition: color var(--duration-fast) ease;
   }
@@ -713,20 +673,16 @@ const specs = [
     overflow: hidden;
   }
 
-  .primitive-meta-group {
-    display: flex;
+  .primitive-meta {
+    display: inline-flex;
     align-items: center;
     gap: var(--space-s);
   }
 
   .badge-difficulty {
-    font-family: var(--font-mono);
-    font-size: var(--step--2);
-    padding-inline: 0.5em;
-    padding-block: 0.15em;
-    border-radius: var(--radius-sm);
+    padding: 0.18em 0.6em;
+    border-radius: var(--radius-full);
     background-color: var(--color-bg-inset);
-    border: 1px solid var(--color-border);
     color: var(--color-fg-muted);
     text-transform: capitalize;
   }
@@ -742,36 +698,24 @@ const specs = [
   }
 
   .primitive-row:hover .primitive-arrow {
-    transform: translateX(4px);
+    transform: translateX(3px);
   }
 
   /* ─── Responsividade ───────────────────────────────── */
-  @media (max-width: 960px) {
-    .hero-grid {
-      grid-template-columns: 1fr;
-      gap: var(--space-l);
-    }
-
-    .hero-title {
-      max-inline-size: none;
-    }
-  }
-
   @media (max-width: 860px) {
     .primitive-row {
-      grid-template-columns: 2.75rem 1fr auto;
+      grid-template-columns: 2.5rem 1fr auto;
       gap: var(--space-xs);
-      padding: var(--space-s);
+      padding: 0.85rem var(--space-s);
     }
 
-    .primitive-problem-group {
+    .primitive-desc {
       display: none;
     }
   }
 
   @media (max-width: 640px) {
-    .shortcuts-legend,
-    .shortcut-kbd-inline {
+    .hero-search-kbd {
       display: none;
     }
 
@@ -779,27 +723,20 @@ const specs = [
       grid-template-columns: 1fr;
       gap: var(--space-s);
     }
+
+    .pillar-arrow {
+      opacity: 0.6;
+      transform: none;
+    }
   }
 
   @media (max-width: 520px) {
     .primitive-row {
       grid-template-columns: 1fr auto;
-      padding: var(--space-xs) var(--space-s);
     }
 
     .primitive-order {
       display: none;
-    }
-  }
-
-  @media (max-width: 480px) {
-    .hero-actions {
-      flex-direction: column;
-      inline-size: 100%;
-    }
-
-    .hero-actions .btn {
-      inline-size: 100%;
     }
   }
 </style>

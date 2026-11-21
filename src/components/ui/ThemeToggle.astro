@@ -85,17 +85,17 @@ import UiIcon from './UiIcon.astro';
 <style>
   .theme-toggle {
     background: transparent;
-    border: var(--border-thin) solid var(--color-border-strong);
+    border: 1px solid transparent;
     padding: 0.4rem;
     border-radius: var(--radius-sm);
-    color: var(--color-text);
+    color: var(--color-fg-muted);
     display: inline-flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     min-inline-size: 2.25rem;
     min-block-size: 2.25rem;
-    transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out);
+    transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
   }
 
   @media (pointer: coarse) {
@@ -107,6 +107,7 @@ import UiIcon from './UiIcon.astro';
 
   .theme-toggle:hover {
     background-color: var(--color-bg-hover);
+    color: var(--color-text-strong);
   }
 
   /* Show appropriate icon based on active color-scheme */
