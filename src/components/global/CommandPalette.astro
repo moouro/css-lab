@@ -1,13 +1,16 @@
 ---
 // Accessible Command Palette / Search Dialog using Native <dialog>
 // Follows modern-web-guidance: showModal(), closedby="any" with progressive fallback, lazy Pagefind loading
+import UiIcon from '../ui/UiIcon.astro';
 ---
 
 <dialog id="command-dialog" closedby="any" class="command-dialog" aria-labelledby="dialog-title">
   <div class="dialog-content stack" style="--stack-space: var(--space-xs);">
     <header class="cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between;">
       <h2 id="dialog-title" class="text-sm font-semibold text-muted">Busca Rápida & Navegação</h2>
-      <button type="button" class="close-btn" id="dialog-close-btn" aria-label="Fechar busca">✕</button>
+      <button type="button" class="close-btn" id="dialog-close-btn" aria-label="Fechar busca">
+        <UiIcon name="close" size={16} />
+      </button>
     </header>
 
     <!-- Pagefind dynamic container -->
@@ -15,6 +18,7 @@
 
     <footer class="dialog-footer cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; border-block-start: 1px solid var(--color-border); padding-block-start: var(--space-xs); font-size: var(--step--2); color: var(--color-fg-muted);">
       <div class="cluster" style="--cluster-space: var(--space-xs);">
+        <span><kbd class="dialog-kbd">/</kbd> Buscar</span>
         <span><kbd class="dialog-kbd">ESC</kbd> Fechar</span>
         <span><kbd class="dialog-kbd">⇧T</kbd> Tema</span>
         <span><kbd class="dialog-kbd">⇧L</kbd> Inspetor</span>
@@ -185,6 +189,26 @@
       } else {
         void openSearch();
       }
+      return;
+    }
+
+    if (e.key === '/' && !e.metaKey && !e.ctrlKey && !e.altKey) {
+      const target = e.target as HTMLElement | null;
+      if (
+        target &&
+        (target.tagName === 'INPUT' ||
+          target.tagName === 'TEXTAREA' ||
+          target.tagName === 'SELECT' ||
+          target.isContentEditable)
+      ) {
+        return;
+      }
+
+      const dialog = getCommandDialog();
+      if (!dialog?.open) {
+        e.preventDefault();
+        void openSearch();
+      }
     }
   });
 
@@ -304,12 +328,31 @@
     border-color: var(--color-accent) !important;
   }
 
+  :global(.pagefind-ui__drawer) {
+    flex-direction: column !important;
+    gap: var(--space-xs) !important;
+  }
+
+  :global(.pagefind-ui__filter-panel) {
+    min-width: 0 !important;
+    width: 100% !important;
+    margin-top: 0 !important;
+    padding-bottom: var(--space-2xs) !important;
+    border-bottom: 1px solid var(--color-border-subtle) !important;
+  }
+
+  :global(.pagefind-ui__results-area) {
+    margin-top: 0 !important;
+  }
+
   .close-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     background: transparent;
     border: none;
     color: var(--color-text-muted);
-    font-size: 1rem;
-    padding: 0.25rem 0.5rem;
+    padding: 0.35rem;
     border-radius: var(--radius-s);
   }
 

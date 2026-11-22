@@ -3,6 +3,7 @@ import Header from '@/components/global/Header.astro';
 import Footer from '@/components/global/Footer.astro';
 import CommandPalette from '@/components/global/CommandPalette.astro';
 import LayoutInspector from '@/components/ui/LayoutInspector.astro';
+import CodeCopyEnhancer from '@/components/ui/CodeCopyEnhancer.astro';
 import { ClientRouter } from 'astro:transitions';
 import '@fontsource/ibm-plex-sans/400.css';
 import '@fontsource/ibm-plex-sans/500.css';
@@ -69,6 +70,7 @@ const {
 
     <CommandPalette />
     <LayoutInspector />
+    <CodeCopyEnhancer />
 
     <style>
       .site-wrapper {
