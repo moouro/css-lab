@@ -229,10 +229,10 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
             <aside class="doc-toc">
               <div class="toc-sticky stack" style="--stack-space: var(--space-xs);">
                 <span class="text-xs font-semibold tracking-caps text-muted">Nesta página</span>
-                <nav aria-label="Sumário da página">
-                  <ul class="toc-list stack" style="--stack-space: var(--space-3xs);">
+                <nav class="toc-nav" aria-label="Sumário da página">
+                  <ul class="toc-list">
                     {headings.filter(h => h.depth <= 3).map((h) => (
-                      <li style={{ paddingInlineStart: `${(h.depth - 2) * 0.75}rem` }}>
+                      <li class="toc-item" data-depth={h.depth}>
                         <a href={`#${h.slug}`} class="toc-link">
                           {h.text}
                         </a>
@@ -251,11 +251,18 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
 
 <script>
   const RECENT_STORAGE_KEY = 'css-lab-recent';
+  let cleanupTocSpy: (() => void) | null = null;
+  let docLayoutListenersBound = false;
 
   interface RecentItem {
     title: string;
     url: string;
     section: string;
+  }
+
+  interface TocEntry {
+    link: HTMLAnchorElement;
+    heading: HTMLElement;
   }
 
   function isValidRecent(item: unknown): item is RecentItem {
@@ -293,8 +300,132 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     }
   }
 
-  recordRecentDoc();
-  document.addEventListener('astro:page-load', recordRecentDoc);
+  function initTocScrollSpy(): void {
+    cleanupTocSpy?.();
+    cleanupTocSpy = null;
+
+    const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.doc-toc .toc-link'));
+    if (links.length === 0) return;
+
+    const entries: TocEntry[] = [];
+    for (const link of links) {
+      const href = link.getAttribute('href');
+      if (!href || !href.startsWith('#')) continue;
+      let targetId = href.slice(1);
+      try {
+        targetId = decodeURIComponent(targetId);
+      } catch {
+        // Mantém slug bruto se houver caractere inválido
+      }
+      const heading = document.getElementById(targetId);
+      if (heading) {
+        if (!heading.hasAttribute('tabindex')) {
+          heading.setAttribute('tabindex', '-1');
+        }
+        entries.push({ link, heading });
+      }
+    }
+
+    if (entries.length === 0) return;
+
+    const supportsScrollTargetGroup =
+      typeof CSS !== 'undefined' && CSS.supports('scroll-target-group: auto');
+
+    if (supportsScrollTargetGroup) {
+      const syncNativeAria = (): void => {
+        const activeLink = document.querySelector<HTMLAnchorElement>('.doc-toc .toc-link:target-current');
+        for (const { link } of entries) {
+          link.setAttribute('aria-current', link === activeLink ? 'true' : 'false');
+        }
+        activeLink?.scrollIntoView({ block: 'nearest' });
+      };
+
+      syncNativeAria();
+      document.addEventListener('scrollend', syncNativeAria);
+      cleanupTocSpy = () => {
+        document.removeEventListener('scrollend', syncNativeAria);
+      };
+      return;
+    }
+
+    let rafId: number | null = null;
+
+    const updateActiveFallback = (): void => {
+      const scrollBottom = window.innerHeight + window.scrollY;
+      const docHeight = document.documentElement.scrollHeight;
+      let activeIndex = 0;
+
+      if (docHeight > window.innerHeight && scrollBottom >= docHeight - 24) {
+        activeIndex = entries.length - 1;
+      } else {
+        for (let i = 0; i < entries.length; i++) {
+          const rect = entries[i].heading.getBoundingClientRect();
+          if (rect.top <= 128) {
+            activeIndex = i;
+          } else {
+            break;
+          }
+        }
+      }
+
+      entries.forEach(({ link }, idx) => {
+        const isActive = idx === activeIndex;
+        link.classList.toggle('target-current', isActive);
+        link.setAttribute('aria-current', isActive ? 'true' : 'false');
+      });
+
+      entries[activeIndex]?.link.scrollIntoView({ block: 'nearest' });
+    };
+
+    const scheduleFallbackUpdate = (): void => {
+      if (rafId !== null) return;
+      rafId = window.requestAnimationFrame(() => {
+        rafId = null;
+        updateActiveFallback();
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      () => {
+        scheduleFallbackUpdate();
+      },
+      { rootMargin: '-12% 0px -65% 0px', threshold: 0 }
+    );
+
+    for (const { heading } of entries) {
+      observer.observe(heading);
+    }
+
+    updateActiveFallback();
+    window.addEventListener('scroll', scheduleFallbackUpdate, { passive: true });
+    window.addEventListener('resize', scheduleFallbackUpdate, { passive: true });
+
+    cleanupTocSpy = () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', scheduleFallbackUpdate);
+      window.removeEventListener('resize', scheduleFallbackUpdate);
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+        rafId = null;
+      }
+    };
+  }
+
+  function handleDocPageLoad(): void {
+    recordRecentDoc();
+    initTocScrollSpy();
+  }
+
+  if (!docLayoutListenersBound) {
+    docLayoutListenersBound = true;
+    document.addEventListener('astro:page-load', handleDocPageLoad);
+    document.addEventListener('astro:before-swap', () => {
+      cleanupTocSpy?.();
+      cleanupTocSpy = null;
+    });
+  }
+
+  handleDocPageLoad();
 </script>
 
 <style>
@@ -566,22 +697,44 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     overflow-y: auto;
   }
 
+  .toc-nav {
+    scroll-target-group: auto;
+  }
+
   .toc-list {
     list-style: none;
     margin: 0;
     padding: 0;
+    border-inline-start: 1px solid var(--color-border);
   }
 
   .toc-link {
+    display: block;
     font-size: var(--step--2);
     color: var(--color-fg-muted);
     text-decoration: none;
-    line-height: var(--leading-snug);
+    line-height: 1.38;
+    padding-block: 0.32rem;
+    padding-inline-start: 0.85rem;
+    margin-inline-start: -1px;
+    border-inline-start: 2px solid transparent;
+    transition: color var(--duration-fast) ease, border-color var(--duration-fast) ease;
+  }
+
+  .toc-item[data-depth="3"] .toc-link {
+    padding-inline-start: 1.55rem;
   }
 
   .toc-link:hover {
-    color: var(--color-fg);
-    text-decoration: underline;
+    color: var(--color-text-strong);
+    text-decoration: none;
+  }
+
+  /* MANDATORY scrollspy rule: use :is() so unrecognized :target-current never invalidates fallback .target-current */
+  .toc-link:is(:target-current, .target-current) {
+    color: var(--color-accent);
+    border-inline-start-color: var(--color-accent);
+    font-weight: 600;
   }
 
   .prose-content {
@@ -590,6 +743,10 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     max-inline-size: 100%;
     overflow-wrap: break-word;
     word-break: break-word;
+  }
+
+  .prose-content :global(:is(h2, h3)) {
+    scroll-margin-block-start: 5.5rem;
   }
 
   .prose-content :global(pre) {
