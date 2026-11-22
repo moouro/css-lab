@@ -1,4 +1,6 @@
 ---
+import UiIcon, { type IconName } from '../ui/UiIcon.astro';
+
 export interface Props {
   type?: 'tip' | 'warning' | 'info' | 'important';
   title?: string;
@@ -6,17 +8,19 @@ export interface Props {
 
 const { type = 'info', title } = Astro.props;
 
-const icons = {
-  tip: '💡',
-  warning: '⚠️',
-  info: 'ℹ️',
-  important: '⚡'
+const iconMap: Record<NonNullable<Props['type']>, IconName> = {
+  tip: 'tip',
+  warning: 'warning',
+  info: 'info',
+  important: 'zap',
 };
 ---
 
 <aside class:list={['callout', `callout-${type}`]}>
   <div class="callout-header">
-    <span class="callout-icon" aria-hidden="true">{icons[type]}</span>
+    <span class="callout-icon" aria-hidden="true">
+      <UiIcon name={iconMap[type]} size={16} />
+    </span>
     <strong class="callout-title">{title || type.toUpperCase()}</strong>
   </div>
   <div class="callout-body">
@@ -28,7 +32,8 @@ const icons = {
   .callout {
     padding: var(--space-s);
     border-radius: var(--radius-m);
-    border-inline-start: 4px solid var(--callout-border);
+    border: 1px solid var(--color-border);
+    border-inline-start: 3px solid var(--callout-border);
     background-color: var(--callout-bg);
     margin-block: var(--space-m);
   }
@@ -49,8 +54,8 @@ const icons = {
   }
 
   .callout-important {
-    --callout-border: #a855f7;
-    --callout-bg: oklch(0.6 0.2 300 / 0.1);
+    --callout-border: light-dark(#7c3aed, #a78bfa);
+    --callout-bg: light-dark(rgb(124 58 237 / 0.08), rgb(167 139 250 / 0.12));
   }
 
   .callout-header {
@@ -60,8 +65,16 @@ const icons = {
     margin-block-end: var(--space-3xs);
   }
 
+  .callout-icon {
+    display: inline-flex;
+    align-items: center;
+    color: var(--callout-border);
+    flex-shrink: 0;
+  }
+
   .callout-title {
     font-size: var(--step--1);
+    color: var(--color-text-strong);
     letter-spacing: var(--tracking-wide);
   }
 

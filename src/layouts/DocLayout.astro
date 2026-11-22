@@ -2,6 +2,8 @@
 import BaseLayout from './BaseLayout.astro';
 import SidebarLayout from '../components/layout/Sidebar.astro';
 import BookmarkButton from '../components/ui/BookmarkButton.astro';
+import MasteryButton from '../components/ui/MasteryButton.astro';
+import UiIcon from '../components/ui/UiIcon.astro';
 
 export interface Props {
   title: string;
@@ -48,10 +50,10 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
         <details class="mobile-collection-accordion">
           <summary class="mobile-collection-summary">
             <span class="mobile-collection-title">
-              <span class="collection-folder-icon" aria-hidden="true">📁</span>
+              <UiIcon name="folder" size={15} class="collection-folder-icon" />
               <span>{collectionName} <span class="collection-count">({items.length} guias)</span></span>
             </span>
-            <span class="mobile-collection-chevron" aria-hidden="true">▾</span>
+            <UiIcon name="chevron-down" size={14} class="mobile-collection-chevron" />
           </summary>
           <div class="mobile-collection-content">
             <nav aria-label="Navegação da coleção no celular">
@@ -110,11 +112,14 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
       <!-- Center & Right: Main Content & Floating TOC -->
       <div class="doc-main-col">
         <div class="doc-content-wrapper">
-          <article 
-            class="doc-article stack" 
+          <article
+            class="doc-article stack"
             style="--stack-space: var(--space-m);"
             data-pagefind-body
             data-pagefind-filter={`seção:${collectionName}`}
+            data-doc-title={title}
+            data-doc-url={normalizedCurrent}
+            data-doc-section={collectionName}
           >
             <!-- Breadcrumbs -->
             <nav aria-label="Localização na plataforma" class="doc-breadcrumbs" data-pagefind-ignore>
@@ -137,7 +142,10 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
                     <span class="badge badge-tag">#{tag}</span>
                   ))}
                 </div>
-                <BookmarkButton title={title} url={normalizedCurrent} />
+                <div class="doc-actions cluster" style="--cluster-space: var(--space-2xs); align-items: center;">
+                  <MasteryButton url={normalizedCurrent} />
+                  <BookmarkButton title={title} url={normalizedCurrent} />
+                </div>
               </div>
               <h1 class="doc-title">{title}</h1>
               {description && <p class="doc-desc text-lg text-muted">{description}</p>}
@@ -185,10 +193,10 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
                 <details class="mobile-collection-accordion bottom-accordion">
                   <summary class="mobile-collection-summary">
                     <span class="mobile-collection-title">
-                      <span class="collection-folder-icon" aria-hidden="true">📑</span>
+                      <UiIcon name="book-open" size={15} class="collection-folder-icon" />
                       <span>Todos os guias de {collectionName} <span class="collection-count">({currentIndex >= 0 ? `${currentIndex + 1}/${items.length}` : `${items.length} guias`})</span></span>
                     </span>
-                    <span class="mobile-collection-chevron" aria-hidden="true">▾</span>
+                    <UiIcon name="chevron-down" size={14} class="mobile-collection-chevron" />
                   </summary>
                   <div class="mobile-collection-content">
                     <ul class="nav-tree">
@@ -240,6 +248,54 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     </SidebarLayout>
   </div>
 </BaseLayout>
+
+<script>
+  const RECENT_STORAGE_KEY = 'css-lab-recent';
+
+  interface RecentItem {
+    title: string;
+    url: string;
+    section: string;
+  }
+
+  function isValidRecent(item: unknown): item is RecentItem {
+    if (!item || typeof item !== 'object') return false;
+    const candidate = item as Record<string, unknown>;
+    return (
+      typeof candidate.url === 'string' &&
+      candidate.url.startsWith('/') &&
+      !candidate.url.startsWith('//') &&
+      typeof candidate.title === 'string' &&
+      typeof candidate.section === 'string'
+    );
+  }
+
+  function recordRecentDoc(): void {
+    const article = document.querySelector<HTMLElement>('.doc-article[data-doc-url]');
+    if (!article) return;
+
+    const url = article.getAttribute('data-doc-url') || '';
+    const title = article.getAttribute('data-doc-title') || '';
+    const section = article.getAttribute('data-doc-section') || '';
+    if (!url.startsWith('/') || url.startsWith('//') || !title) return;
+
+    try {
+      const raw = localStorage.getItem(RECENT_STORAGE_KEY);
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      const existing = Array.isArray(parsed) ? parsed.filter(isValidRecent) : [];
+      const updated: RecentItem[] = [
+        { title, url, section },
+        ...existing.filter((entry) => entry.url !== url),
+      ].slice(0, 3);
+      localStorage.setItem(RECENT_STORAGE_KEY, JSON.stringify(updated));
+    } catch {
+      // Storage indisponível
+    }
+  }
+
+  recordRecentDoc();
+  document.addEventListener('astro:page-load', recordRecentDoc);
+</script>
 
 <style>
   .doc-container {
@@ -320,8 +376,13 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     display: none;
     background-color: var(--color-bg-surface);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    margin-block-end: var(--space-m);
+    border-radius: var(--radius-l);
+    box-shadow: var(--shadow-sm);
+    margin-block-end: 0;
+  }
+
+  :global(.collection-folder-icon) {
+    color: var(--color-accent);
   }
 
   .mobile-collection-summary {
@@ -436,7 +497,7 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     .doc-container :global(.with-sidebar) {
       display: flex;
       flex-direction: column !important;
-      gap: var(--space-m) !important;
+      gap: var(--space-xs) !important;
     }
 
     .doc-container :global(.with-sidebar > :first-child),
@@ -450,9 +511,9 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     .doc-sidebar {
       border-inline-end: none;
       padding-inline-end: 0;
-      border-block-end: 1px solid var(--color-border);
-      padding-block-end: var(--space-s);
-      margin-block-end: var(--space-s);
+      border-block-end: none;
+      padding-block-end: var(--space-xs);
+      margin-block-end: 0;
       inline-size: 100%;
     }
 
@@ -481,13 +542,13 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
   .badge {
     font-family: var(--font-mono);
     font-size: var(--step--2);
-    padding-inline: 0.45em;
-    padding-block: 0.15em;
-    border-radius: var(--radius-sm);
+    padding-inline: 0.6em;
+    padding-block: 0.18em;
+    border-radius: var(--radius-full);
   }
 
   .badge-difficulty {
-    background-color: var(--color-bg-raised);
+    background-color: var(--color-bg-inset);
     border: 1px solid var(--color-border);
     color: var(--color-fg);
     text-transform: capitalize;
@@ -495,7 +556,7 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
 
   .badge-tag {
     color: var(--color-fg-muted);
-    background-color: var(--color-bg-hover);
+    background-color: var(--color-bg-inset);
   }
 
   .toc-sticky {
@@ -582,22 +643,21 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     gap: var(--space-3xs);
     padding: var(--space-s) var(--space-m);
     border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
+    border-radius: var(--radius-l);
     background-color: var(--color-bg-surface);
+    box-shadow: var(--shadow-sm);
     text-decoration: none;
     color: var(--color-fg);
-    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1),
-                border-color 0.2s ease,
-                background-color 0.2s ease,
-                box-shadow 0.2s ease;
+    transition: border-color var(--duration-normal) var(--ease-out),
+                background-color var(--duration-normal) var(--ease-out),
+                box-shadow var(--duration-normal) var(--ease-out);
     min-block-size: 4.5rem;
     justify-content: center;
   }
 
   .pagination-card:hover {
-    background-color: var(--color-bg-hover);
+    background-color: var(--color-surface-hover);
     border-color: var(--color-accent);
-    transform: translateY(-2px);
     box-shadow: var(--shadow-md);
     text-decoration: none;
   }
@@ -605,7 +665,7 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
   .pagination-next {
     text-align: end;
     border-color: var(--color-accent-muted);
-    background: linear-gradient(135deg, var(--color-bg-surface), var(--color-bg-hover));
+    background-color: var(--color-bg-surface);
   }
 
   .pagination-prev {

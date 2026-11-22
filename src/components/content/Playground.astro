@@ -1,4 +1,6 @@
 ---
+import UiIcon from '../ui/UiIcon.astro';
+
 export interface Props {
   title?: string;
   defaultSpace?: string;
@@ -18,12 +20,23 @@ const initialPx = Number.isFinite(parsedPx) ? Math.min(48, Math.max(4, parsedPx)
 ---
 
 <div class="playground-wrapper stack" style="--stack-space: var(--space-xs);">
-  <div class="playground-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between;">
-    <span class="text-xs font-semibold tracking-caps text-muted">🧪 {title}</span>
-    {controls && (
-      <div class="cluster" style="--cluster-space: var(--space-2xs);">
-        <label class="text-xs text-muted cluster" style="--cluster-space: var(--space-3xs);">
-          Espaço:
+  <div class="playground-header cluster" style="--cluster-space: var(--space-xs); --cluster-justify: space-between; align-items: center;">
+    <span class="playground-title-wrap text-xs font-semibold tracking-caps text-muted">
+      <UiIcon name="flask" size={15} class="playground-icon" />
+      <span>{title}</span>
+    </span>
+
+    <div class="playground-toolbar cluster" style="--cluster-space: var(--space-s); align-items: center;">
+      <div class="playground-width-controls cluster" role="group" aria-label="Largura do contêiner" style="--cluster-space: 0.3rem; align-items: center;">
+        <button type="button" class="preset-btn" data-width-preset="320px" aria-pressed="false">320px</button>
+        <button type="button" class="preset-btn" data-width-preset="640px" aria-pressed="false">640px</button>
+        <button type="button" class="preset-btn" data-width-preset="100%" aria-pressed="true">100%</button>
+        <span class="canvas-width-readout font-mono text-xs" aria-live="off">100%</span>
+      </div>
+
+      {controls && (
+        <label class="space-control-label text-xs text-muted cluster" style="--cluster-space: var(--space-3xs); align-items: center;">
+          <span>Espaço:</span>
           <input
             type="range"
             min="4"
@@ -33,8 +46,8 @@ const initialPx = Number.isFinite(parsedPx) ? Math.min(48, Math.max(4, parsedPx)
           />
           <span class="range-val font-mono text-xs">{initialPx}px</span>
         </label>
-      </div>
-    )}
+      )}
+    </div>
   </div>
 
   <div class="playground-canvas">
@@ -45,51 +58,160 @@ const initialPx = Number.isFinite(parsedPx) ? Math.min(48, Math.max(4, parsedPx)
 </div>
 
 <script>
-  document.addEventListener('input', (e) => {
-    const input = e.target as HTMLInputElement | null;
-    if (!input || !input.classList.contains('range-control')) return;
+  let playgroundListenersBound = false;
+  let canvasObserver: ResizeObserver | null = null;
+  const observedCanvases = new WeakSet<Element>();
 
-    const wrapper = input.closest('.playground-wrapper');
-    if (!wrapper) return;
+  function getCanvasObserver(): ResizeObserver | null {
+    if (typeof ResizeObserver === 'undefined') return null;
+    if (canvasObserver) return canvasObserver;
 
-    const valDisplay = wrapper.querySelector('.range-val');
-    const target = wrapper.querySelector<HTMLElement>('.canvas-target > *');
+    canvasObserver = new ResizeObserver((entries) => {
+      for (const entry of entries) {
+        const wrapper = entry.target.closest('.playground-wrapper');
+        const readout = wrapper?.querySelector('.canvas-width-readout');
+        if (readout) {
+          readout.textContent = `${Math.round(entry.contentRect.width)}px`;
+        }
+      }
+    });
+    return canvasObserver;
+  }
 
-    const val = `${input.value}px`;
-    if (valDisplay) valDisplay.textContent = val;
-    if (target) {
-      target.style.setProperty('--stack-space', val);
-      target.style.setProperty('--cluster-space', val);
-      target.style.setProperty('--grid-space', val);
-      target.style.setProperty('--box-padding', val);
-      target.style.setProperty('--sidebar-gap', val);
-    }
-  });
+  function observePlaygrounds(): void {
+    const observer = getCanvasObserver();
+    if (!observer) return;
+
+    document.querySelectorAll('.playground-canvas').forEach((canvas) => {
+      if (!observedCanvases.has(canvas)) {
+        observedCanvases.add(canvas);
+        observer.observe(canvas);
+      }
+    });
+  }
+
+  if (!playgroundListenersBound) {
+    playgroundListenersBound = true;
+
+    document.addEventListener('input', (e) => {
+      const input = e.target as HTMLInputElement | null;
+      if (!input || !input.classList.contains('range-control')) return;
+
+      const wrapper = input.closest('.playground-wrapper');
+      if (!wrapper) return;
+
+      const valDisplay = wrapper.querySelector('.range-val');
+      const target = wrapper.querySelector<HTMLElement>('.canvas-target > *');
+
+      const val = `${input.value}px`;
+      if (valDisplay) valDisplay.textContent = val;
+      if (target) {
+        target.style.setProperty('--stack-space', val);
+        target.style.setProperty('--cluster-space', val);
+        target.style.setProperty('--grid-space', val);
+        target.style.setProperty('--box-padding', val);
+        target.style.setProperty('--sidebar-gap', val);
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      const target = e.target as Element | null;
+      const btn = target?.closest<HTMLButtonElement>('.preset-btn[data-width-preset]');
+      if (!btn) return;
+
+      const wrapper = btn.closest('.playground-wrapper');
+      const canvas = wrapper?.querySelector<HTMLElement>('.playground-canvas');
+      const preset = btn.getAttribute('data-width-preset');
+      if (!wrapper || !canvas || !preset) return;
+
+      wrapper.querySelectorAll<HTMLButtonElement>('.preset-btn[data-width-preset]').forEach((item) => {
+        item.setAttribute('aria-pressed', item === btn ? 'true' : 'false');
+      });
+
+      canvas.style.inlineSize = preset;
+    });
+  }
+
+  observePlaygrounds();
+  document.addEventListener('astro:page-load', observePlaygrounds);
 </script>
 
 <style>
   .playground-wrapper {
-    border: var(--border-thin) solid var(--color-border);
-    border-radius: var(--radius-m);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-l);
     padding: var(--space-s);
-    background-color: var(--color-bg-raised);
+    background-color: var(--color-bg-surface);
+    box-shadow: var(--shadow-sm);
     margin-block: var(--space-m);
+  }
+
+  .playground-title-wrap {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  :global(.playground-icon) {
+    color: var(--color-accent);
+  }
+
+  .preset-btn {
+    padding: 0.22rem 0.55rem;
+    border-radius: var(--radius-s);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-inset);
+    color: var(--color-fg-muted);
+    font-family: var(--font-mono);
+    font-size: var(--step--2);
+    line-height: 1.3;
+    cursor: pointer;
+    transition: color var(--duration-fast) ease,
+                border-color var(--duration-fast) ease,
+                background-color var(--duration-fast) ease;
+  }
+
+  .preset-btn:hover {
+    color: var(--color-text-strong);
+    border-color: var(--color-border-hover);
+  }
+
+  .preset-btn[aria-pressed="true"] {
+    color: var(--color-accent);
+    border-color: var(--color-accent);
+    background-color: var(--color-accent-muted);
+    font-weight: 600;
+  }
+
+  .canvas-width-readout {
+    color: var(--color-fg-muted);
+    padding-inline-start: 0.25rem;
+    min-inline-size: 3.2rem;
   }
 
   .playground-canvas {
     padding: var(--space-m);
     background-color: var(--color-bg-inset);
-    border: var(--border-thin) solid var(--color-border);
-    border-radius: var(--radius-s);
-    overflow: hidden;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-m);
+    overflow: auto;
     resize: horizontal;
-    min-inline-size: 260px;
+    inline-size: 100%;
+    min-inline-size: min(260px, 100%);
     max-inline-size: 100%;
+    margin-inline: auto;
   }
 
   .range-control {
     accent-color: var(--color-accent);
     cursor: pointer;
-    inline-size: 100px;
+    inline-size: 96px;
+  }
+
+  @media (pointer: coarse) {
+    .preset-btn {
+      min-block-size: 36px;
+      padding-inline: 0.65rem;
+    }
   }
 </style>

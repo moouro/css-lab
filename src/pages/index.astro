@@ -139,6 +139,24 @@ const quickLinks = [
     </section>
 
     <div class="home-sections stack" style="--stack-space: var(--space-2xl);">
+      <!-- Continuar Estudando (Últimos 3 guias em localStorage) -->
+      <section class="recent-section" id="recent-section" style="display: none;">
+        <Center max="1140px">
+          <div class="stack" style="--stack-space: var(--space-s);">
+            <div class="section-header">
+              <div class="stack" style="--stack-space: 0.2rem;">
+                <span class="section-kicker text-xs font-semibold text-accent">
+                  <UiIcon name="clock" size={13} />
+                  <span>Histórico local</span>
+                </span>
+                <h2 class="section-title">Continuar estudando</h2>
+              </div>
+            </div>
+            <div id="recent-container" class="recent-grid"></div>
+          </div>
+        </Center>
+      </section>
+
       <!-- Minha Segunda Memória (Favoritos do Usuário via LocalStorage) -->
       <section class="bookmarks-section" id="bookmarks-section" style="display: none;">
         <Center max="1140px">
@@ -163,15 +181,87 @@ const quickLinks = [
           url: string;
         }
 
+        interface RecentItem {
+          title: string;
+          url: string;
+          section: string;
+        }
+
+        function isSafeLocalUrl(val: unknown): val is string {
+          return typeof val === 'string' && val.startsWith('/') && !val.startsWith('//');
+        }
+
         function isValidBookmark(item: unknown): item is BookmarkItem {
           if (!item || typeof item !== 'object') return false;
           const candidate = item as Record<string, unknown>;
+          return isSafeLocalUrl(candidate.url) && typeof candidate.title === 'string';
+        }
+
+        function isValidRecent(item: unknown): item is RecentItem {
+          if (!item || typeof item !== 'object') return false;
+          const candidate = item as Record<string, unknown>;
           return (
-            typeof candidate.url === 'string' &&
-            candidate.url.startsWith('/') &&
-            !candidate.url.startsWith('//') &&
-            typeof candidate.title === 'string'
+            isSafeLocalUrl(candidate.url) &&
+            typeof candidate.title === 'string' &&
+            typeof candidate.section === 'string'
           );
+        }
+
+        function renderRecent(): void {
+          try {
+            const rawRecent = localStorage.getItem('css-lab-recent');
+            const rawMastered = localStorage.getItem('css-lab-mastered');
+            const section = document.getElementById('recent-section');
+            const container = document.getElementById('recent-container');
+            if (!section || !container) return;
+
+            const parsedRecent: unknown = rawRecent ? JSON.parse(rawRecent) : [];
+            const items = Array.isArray(parsedRecent) ? parsedRecent.filter(isValidRecent).slice(0, 3) : [];
+
+            const parsedMastered: unknown = rawMastered ? JSON.parse(rawMastered) : [];
+            const masteredUrls = new Set(
+              Array.isArray(parsedMastered) ? parsedMastered.filter(isSafeLocalUrl) : []
+            );
+
+            if (items.length === 0) {
+              section.style.display = 'none';
+              container.replaceChildren();
+              return;
+            }
+
+            section.style.display = 'block';
+            const cards = items.map((item) => {
+              const link = document.createElement('a');
+              link.href = item.url;
+              link.className = 'recent-card';
+
+              const top = document.createElement('div');
+              top.className = 'recent-top';
+
+              const sec = document.createElement('span');
+              sec.className = 'recent-section-tag font-mono text-xs';
+              sec.textContent = item.section;
+              top.append(sec);
+
+              if (masteredUrls.has(item.url)) {
+                const pill = document.createElement('span');
+                pill.className = 'recent-mastered-pill font-mono text-xs';
+                pill.textContent = 'Dominado';
+                top.append(pill);
+              }
+
+              const titleEl = document.createElement('strong');
+              titleEl.className = 'recent-title';
+              titleEl.textContent = item.title;
+
+              link.append(top, titleEl);
+              return link;
+            });
+
+            container.replaceChildren(...cards);
+          } catch {
+            // Ignora JSON inválido ou bloqueio de storage
+          }
         }
 
         function renderBookmarks(): void {
@@ -213,7 +303,13 @@ const quickLinks = [
           }
         }
 
-        document.addEventListener('astro:page-load', renderBookmarks);
+        function syncHomeLocalMemory(): void {
+          renderRecent();
+          renderBookmarks();
+        }
+
+        syncHomeLocalMemory();
+        document.addEventListener('astro:page-load', syncHomeLocalMemory);
       </script>
 
       <!-- Pilares de Conhecimento (Cards Suaves estilo Mintlify) -->
@@ -496,6 +592,67 @@ const quickLinks = [
   .section-all-link:hover {
     color: var(--color-accent-hover);
     text-decoration: none;
+  }
+
+  /* ─── Continuar Estudando (Recentes) ───────────────── */
+  .recent-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr));
+    gap: var(--space-s);
+  }
+
+  :global(.recent-card) {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    padding: var(--space-s) var(--space-m);
+    border-radius: var(--radius-m);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+    text-decoration: none;
+    color: inherit;
+    transition: border-color var(--duration-fast) ease,
+                background-color var(--duration-fast) ease,
+                box-shadow var(--duration-fast) ease;
+  }
+
+  :global(.recent-card:hover) {
+    border-color: var(--color-border-hover);
+    background-color: var(--color-surface-hover);
+    box-shadow: var(--shadow-md);
+    text-decoration: none;
+  }
+
+  :global(.recent-top) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-2xs);
+  }
+
+  :global(.recent-section-tag) {
+    color: var(--color-fg-muted);
+  }
+
+  :global(.recent-mastered-pill) {
+    padding: 0.1em 0.5em;
+    border-radius: var(--radius-full);
+    color: var(--color-success);
+    background-color: var(--color-success-muted);
+    font-weight: 600;
+  }
+
+  :global(.recent-title) {
+    font-size: var(--step-0);
+    font-weight: 600;
+    color: var(--color-text-strong);
+    line-height: 1.3;
+    transition: color var(--duration-fast) ease;
+  }
+
+  :global(.recent-card:hover .recent-title) {
+    color: var(--color-accent);
   }
 
   /* ─── Bookmarks ────────────────────────────────────── */

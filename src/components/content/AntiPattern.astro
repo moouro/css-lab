@@ -1,4 +1,6 @@
 ---
+import UiIcon from '../ui/UiIcon.astro';
+
 export interface Props {
   badCode: string;
   goodCode: string;
@@ -10,9 +12,15 @@ const { badCode, goodCode, explanation } = Astro.props;
 
 <div class="antipattern-box stack" style="--stack-space: var(--space-xs);">
   <div class="antipattern-header">
-    <span class="bad-tag">❌ Anti-pattern</span>
+    <span class="bad-tag">
+      <UiIcon name="x-circle" size={16} />
+      <span>Anti-pattern</span>
+    </span>
     <span class="vs">vs</span>
-    <span class="good-tag">✅ Solução Resiliente</span>
+    <span class="good-tag">
+      <UiIcon name="check-circle" size={16} />
+      <span>Solução Resiliente</span>
+    </span>
   </div>
 
   <div class="code-comparison">
@@ -33,19 +41,28 @@ const { badCode, goodCode, explanation } = Astro.props;
 
 <style>
   .antipattern-box {
-    border: var(--border-thin) solid var(--color-border);
-    border-radius: var(--radius-m);
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-l);
     padding: var(--space-s);
-    background-color: var(--color-bg-raised);
+    background-color: var(--color-bg-surface);
+    box-shadow: var(--shadow-sm);
     margin-block: var(--space-m);
   }
 
   .antipattern-header {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     gap: var(--space-xs);
     font-size: var(--step--1);
     font-weight: var(--weight-semibold);
+  }
+
+  .bad-tag,
+  .good-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
   }
 
   .bad-tag { color: var(--color-error); }
@@ -59,19 +76,20 @@ const { badCode, goodCode, explanation } = Astro.props;
   }
 
   .code-pane {
-    border-radius: var(--radius-s);
+    border-radius: var(--radius-m);
     overflow: hidden;
-    border: var(--border-thin) solid var(--color-border);
+    border: 1px solid var(--color-border);
     min-inline-size: 0;
     inline-size: 100%;
+    background-color: var(--color-bg-inset);
   }
 
   .pane-label {
     font-size: var(--step--2);
     font-family: var(--font-mono);
-    padding: 0.25rem 0.5rem;
-    background-color: var(--color-bg-inset);
-    border-block-end: var(--border-thin) solid var(--color-border);
+    padding: 0.35rem 0.65rem;
+    background-color: var(--color-bg-raised);
+    border-block-end: 1px solid var(--color-border);
     color: var(--color-text-muted);
   }
 
@@ -83,6 +101,10 @@ const { badCode, goodCode, explanation } = Astro.props;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     font-size: var(--step--1);
+  }
+
+  .explanation {
+    margin: 0;
   }
 
   @media (max-width: 640px) {

@@ -1,0 +1,122 @@
+---
+import UiIcon from './UiIcon.astro';
+
+export interface Props {
+  url: string;
+}
+
+const { url } = Astro.props;
+---
+
+<button
+  type="button"
+  class="mastery-btn cluster"
+  data-mastery-url={url}
+  aria-pressed="false"
+>
+  <UiIcon name="check-circle" size={14} class="mastery-icon" />
+  <span class="mastery-label font-mono text-xs">Dominado</span>
+</button>
+
+<script>
+  const MASTERY_STORAGE_KEY = 'css-lab-mastered';
+  let masteryListenerBound = false;
+
+  function isValidUrl(val: unknown): val is string {
+    return typeof val === 'string' && val.startsWith('/') && !val.startsWith('//');
+  }
+
+  function getMastered(): string[] {
+    try {
+      const raw = localStorage.getItem(MASTERY_STORAGE_KEY);
+      const parsed: unknown = raw ? JSON.parse(raw) : [];
+      return Array.isArray(parsed) ? parsed.filter(isValidUrl) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function saveMastered(items: string[]): void {
+    try {
+      localStorage.setItem(MASTERY_STORAGE_KEY, JSON.stringify(items));
+    } catch {
+      // Storage indisponível
+    }
+  }
+
+  function applyMasteryState(btn: HTMLButtonElement, isMastered: boolean): void {
+    btn.setAttribute('aria-pressed', isMastered ? 'true' : 'false');
+    btn.classList.toggle('mastered', isMastered);
+  }
+
+  function syncMasteryButtons(): void {
+    const buttons = document.querySelectorAll<HTMLButtonElement>('.mastery-btn');
+    if (buttons.length === 0) return;
+
+    const mastered = getMastered();
+    buttons.forEach((btn) => {
+      const url = btn.getAttribute('data-mastery-url') || window.location.pathname;
+      applyMasteryState(btn, mastered.includes(url));
+    });
+  }
+
+  if (!masteryListenerBound) {
+    masteryListenerBound = true;
+    document.addEventListener('click', (e) => {
+      const target = e.target as Element | null;
+      const btn = target?.closest<HTMLButtonElement>('.mastery-btn');
+      if (!btn) return;
+
+      const rawUrl = btn.getAttribute('data-mastery-url') || window.location.pathname;
+      if (!rawUrl.startsWith('/') || rawUrl.startsWith('//')) return;
+
+      const current = getMastered();
+      const exists = current.includes(rawUrl);
+      const next = exists
+        ? current.filter((item) => item !== rawUrl)
+        : [rawUrl, ...current].slice(0, 100);
+
+      applyMasteryState(btn, !exists);
+      saveMastered(next);
+    });
+  }
+
+  syncMasteryButtons();
+  document.addEventListener('astro:page-load', syncMasteryButtons);
+</script>
+
+<style>
+  .mastery-btn {
+    align-items: center;
+    gap: var(--space-2xs);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    color: var(--color-fg-muted);
+    padding: 0.3rem 0.75rem;
+    border-radius: var(--radius-full);
+    cursor: pointer;
+    font-size: var(--step--2);
+    transition: border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                background-color var(--duration-fast) var(--ease-out);
+  }
+
+  .mastery-btn:hover {
+    background-color: var(--color-bg-hover);
+    color: var(--color-text-strong);
+    border-color: var(--color-border-hover);
+  }
+
+  .mastery-btn.mastered {
+    color: var(--color-success);
+    border-color: var(--color-success);
+    background-color: var(--color-success-muted);
+  }
+
+  @media (pointer: coarse) {
+    .mastery-btn {
+      min-block-size: 40px;
+      padding-inline: 0.9rem;
+    }
+  }
+</style>
