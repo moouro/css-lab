@@ -1,17 +1,23 @@
 ---
 import UiIcon from '../ui/UiIcon.astro';
 
+export type ChecklistEntry = string | { text?: string; label?: string; checked?: boolean };
+
 export interface Props {
-  items: string[];
+  items: ChecklistEntry[];
 }
 
 const { items = [] } = Astro.props;
+
+const normalizedItems = items
+  .map((item) => (typeof item === 'string' ? item : (item?.text ?? item?.label ?? '')))
+  .filter((text) => text.length > 0);
 ---
 
 <div class="checklist-card stack" style="--stack-space: var(--space-xs);">
   <h4 class="text-sm font-semibold tracking-caps text-muted">Checklist de Resiliência</h4>
   <ul class="checklist stack" style="--stack-space: var(--space-2xs);">
-    {items.map((item) => (
+    {normalizedItems.map((item) => (
       <li class="checklist-item">
         <span class="check-icon-wrap" aria-hidden="true">
           <UiIcon name="check" size={15} class="check-icon" />

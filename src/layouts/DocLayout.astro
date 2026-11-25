@@ -331,13 +331,27 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     const supportsScrollTargetGroup =
       typeof CSS !== 'undefined' && CSS.supports('scroll-target-group: auto');
 
+    const keepTocLinkVisible = (link: HTMLAnchorElement | null | undefined): void => {
+      if (!link) return;
+      const container = link.closest<HTMLElement>('.toc-sticky');
+      if (!container || container.scrollHeight <= container.clientHeight) return;
+
+      const linkTop = link.offsetTop;
+      const linkBottom = linkTop + link.offsetHeight;
+      if (linkTop < container.scrollTop) {
+        container.scrollTop = linkTop;
+      } else if (linkBottom > container.scrollTop + container.clientHeight) {
+        container.scrollTop = linkBottom - container.clientHeight;
+      }
+    };
+
     if (supportsScrollTargetGroup) {
       const syncNativeAria = (): void => {
         const activeLink = document.querySelector<HTMLAnchorElement>('.doc-toc .toc-link:target-current');
         for (const { link } of entries) {
           link.setAttribute('aria-current', link === activeLink ? 'true' : 'false');
         }
-        activeLink?.scrollIntoView({ block: 'nearest' });
+        keepTocLinkVisible(activeLink);
       };
 
       syncNativeAria();
@@ -374,7 +388,7 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
         link.setAttribute('aria-current', isActive ? 'true' : 'false');
       });
 
-      entries[activeIndex]?.link.scrollIntoView({ block: 'nearest' });
+      keepTocLinkVisible(entries[activeIndex]?.link);
     };
 
     const scheduleFallbackUpdate = (): void => {
