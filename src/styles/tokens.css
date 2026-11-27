@@ -1,8 +1,8 @@
 /* ═══════════════════════════════════════════════════════
-   CSS Lab — Design Tokens (Mintlify Docs / Soft UI Evolution)
+   CSS Lab — Design Tokens (Editorial Technical / Design Engineering)
    - Uses @theme for Tailwind CSS v4 typography integration
    - Uses light-dark() for automatic color-scheme resolution
-   - Whisper-quiet translucent borders & smooth modern radii
+   - Crisp neutral surfaces, hairline borders, cobalt accent
    ═══════════════════════════════════════════════════════ */
 
 @theme {
@@ -14,55 +14,55 @@
   /* ─── Mandatory: Native browser color-scheme ───────── */
   color-scheme: light dark;
 
-  /* ─── Neutral Scale (Clean Mintlify / Vercel Neutrals) ─ */
-  --gray-0: #06080b;
-  --gray-1: #090b0e;
-  --gray-2: #0e1116;
-  --gray-3: #151a23;
-  --gray-4: #1f2633;
-  --gray-5: #2d3748;
-  --gray-6: #526074;
-  --gray-7: #7c8b9f;
-  --gray-8: #94a3b8;
-  --gray-9: #cbd5e1;
-  --gray-10: #dce2ea;
-  --gray-11: #e5e9f0;
-  --gray-12: #f8fafc;
+  /* ─── Neutral Scale (Pure Editorial / Dev Tool Neutrals) ─ */
+  --gray-0: #09090b;
+  --gray-1: #0c0c0f;
+  --gray-2: #121216;
+  --gray-3: #1a1a20;
+  --gray-4: #24242c;
+  --gray-5: #32323d;
+  --gray-6: #52525e;
+  --gray-7: #71717a;
+  --gray-8: #a1a1aa;
+  --gray-9: #d4d4d8;
+  --gray-10: #e4e4e7;
+  --gray-11: #ececef;
+  --gray-12: #fafafa;
 
   /* Light Scale Equivalents */
   --light-bg: #ffffff;
   --light-bg-raised: #fafafa;
-  --light-bg-hover: #f4f6f8;
-  --light-bg-inset: #f4f5f7;
-  --light-border: rgb(15 23 42 / 0.08);
-  --light-border-hover: rgb(15 23 42 / 0.16);
-  --light-text: #334155;
-  --light-text-strong: #0f172a;
-  --light-text-muted: #64748b;
-  --light-text-subtle: #64748b;
+  --light-bg-hover: #f4f4f5;
+  --light-bg-inset: #f4f4f5;
+  --light-border: rgb(9 9 11 / 0.08);
+  --light-border-hover: rgb(9 9 11 / 0.16);
+  --light-text: #27272a;
+  --light-text-strong: #09090b;
+  --light-text-muted: #52525b;
+  --light-text-subtle: #71717a;
 
-  /* ─── Accent Colors (Mintlify Emerald / Teal) ──────── */
-  --color-accent-light: #0d9373;
-  --color-accent-dark: #10b981;
+  /* ─── Accent Colors (Technical Cobalt) ─────────────── */
+  --color-accent-light: #2563eb;
+  --color-accent-dark: #60a5fa;
   --color-accent: light-dark(var(--color-accent-light), var(--color-accent-dark));
-  --color-accent-hover: light-dark(#0a7a5f, #34d399);
-  --color-on-accent: light-dark(#ffffff, #032219);
-  --color-accent-muted: light-dark(rgb(13 147 115 / 0.09), rgb(16 185 129 / 0.13));
+  --color-accent-hover: light-dark(#1d4ed8, #93c5fd);
+  --color-on-accent: light-dark(#ffffff, #09090b);
+  --color-accent-muted: light-dark(rgb(37 99 235 / 0.08), rgb(96 165 250 / 0.14));
   --accent-muted: var(--color-accent-muted);
 
   /* ─── Semantic Tokens using light-dark() ────────────── */
   --color-bg: light-dark(var(--light-bg), var(--gray-1));
   --color-bg-raised: light-dark(var(--light-bg-raised), var(--gray-2));
   --color-bg-hover: light-dark(var(--light-bg-hover), var(--gray-3));
-  --color-bg-inset: light-dark(var(--light-bg-inset), #131820);
+  --color-bg-inset: light-dark(var(--light-bg-inset), #141419);
   --color-bg-subtle: var(--color-bg-inset);
-  --color-header-bg: light-dark(rgb(255 255 255 / 0.92), rgb(9 11 14 / 0.92));
+  --color-header-bg: light-dark(rgb(255 255 255 / 0.9), rgb(12 12 15 / 0.9));
 
   /* Whisper-quiet translucent borders */
-  --color-border: light-dark(rgb(15 23 42 / 0.08), rgb(255 255 255 / 0.08));
-  --color-border-strong: light-dark(rgb(15 23 42 / 0.14), rgb(255 255 255 / 0.14));
-  --color-border-hover: light-dark(rgb(15 23 42 / 0.18), rgb(255 255 255 / 0.18));
-  --color-border-subtle: light-dark(rgb(15 23 42 / 0.05), rgb(255 255 255 / 0.05));
+  --color-border: light-dark(rgb(9 9 11 / 0.08), rgb(255 255 255 / 0.09));
+  --color-border-strong: light-dark(rgb(9 9 11 / 0.14), rgb(255 255 255 / 0.15));
+  --color-border-hover: light-dark(rgb(9 9 11 / 0.2), rgb(255 255 255 / 0.22));
+  --color-border-subtle: light-dark(rgb(9 9 11 / 0.05), rgb(255 255 255 / 0.05));
 
   --color-text: light-dark(var(--light-text), var(--gray-11));
   --color-text-strong: light-dark(var(--light-text-strong), var(--gray-12));
@@ -70,8 +70,8 @@
   --color-text-subtle: light-dark(var(--light-text-subtle), var(--gray-7));
   --color-text-code: light-dark(var(--light-text-strong), var(--gray-12));
 
-  --color-surface: light-dark(#ffffff, #11151c);
-  --color-surface-hover: light-dark(#f8fafc, #161c26);
+  --color-surface: light-dark(#ffffff, #121216);
+  --color-surface-hover: light-dark(#fafafa, #18181e);
 
   /* ─── Universal Semantic Aliases ───────────────────── */
   --color-fg: var(--color-text);
@@ -92,11 +92,12 @@
   --color-error: var(--color-danger);
   --color-error-muted: var(--color-danger-subtle);
 
-  /* ─── Transitions & Motion ─────────────────────────── */
-  --duration-fast: 160ms;
-  --duration-normal: 240ms;
-  --duration-slow: 380ms;
-  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  /* ─── Transitions & Motion (Emil Kowalski Curves) ──── */
+  --duration-fast: 150ms;
+  --duration-normal: 200ms;
+  --duration-slow: 320ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
 
   /* ─── Soft Ambient Shadows (Mintlify / Soft UI) ────── */
   --shadow-sm: light-dark(

@@ -5,6 +5,7 @@ dist/
 .wrangler/
 public/pagefind/
 .agents/
+skills-lock.json
 
 # Cloudflare & Wrangler local secrets
 .dev.vars

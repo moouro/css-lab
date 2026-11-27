@@ -2,6 +2,7 @@
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import Center from '@/components/layout/Center.astro';
 import UiIcon, { type IconName } from '@/components/ui/UiIcon.astro';
+import HeroLabDemo from '@/components/home/HeroLabDemo.astro';
 import { getPublishedCollection } from '@/utils/collections';
 
 const everyLayoutEntries = await getPublishedCollection('every-layout');
@@ -88,11 +89,10 @@ const quickLinks = [
 ];
 ---
 
-<BaseLayout title="Home — Segunda Memória de CSS & Layout">
+<BaseLayout title="Home — Guia Técnico de CSS Moderno & Layout">
   <div class="home-page">
-    <!-- Hero Mintlify Docs (limpo, respirável, focado em busca) -->
+    <!-- Hero Editorial Técnico (sem glow genérico, busca + demo CSS ao vivo) -->
     <section class="hero-section">
-      <div class="hero-glow" aria-hidden="true"></div>
       <Center max="860px">
         <div class="hero-inner stack" style="--stack-space: var(--space-s);">
           <a href="#pilares" class="hero-pill">
@@ -106,7 +106,7 @@ const quickLinks = [
           </h1>
 
           <p class="hero-desc text-lg text-muted">
-            Sua segunda memória viva de CSS moderno e arquitetura de layout intrínseco. Pesquise qualquer propriedade, primitiva ou receita em milissegundos.
+            Referência técnica de CSS moderno e composição de layout. Consulte propriedades, primitivas e receitas prontas direto na busca.
           </p>
 
           <!-- Barra de Busca em Destaque (estilo Mintlify / GitBook) -->
@@ -134,6 +134,9 @@ const quickLinks = [
               </a>
             ))}
           </div>
+
+          <!-- Mini Laboratório Interativo (@container ao vivo) -->
+          <HeroLabDemo />
         </div>
       </Center>
     </section>
@@ -322,7 +325,7 @@ const quickLinks = [
                 <h2 class="section-title">Pilares Fundamentais</h2>
               </div>
               <p class="section-subtitle text-sm text-muted">
-                Escolha um tópico para aprofundar ou consultar padrões prontos.
+                Escolha um pilar para consultar propriedades, exemplos e código pronto.
               </p>
             </div>
 
@@ -394,25 +397,11 @@ const quickLinks = [
     padding-block-end: var(--space-3xl);
   }
 
-  /* ─── Hero Mintlify Docs ───────────────────────────── */
+  /* ─── Hero Editorial Técnico ───────────────────────── */
   .hero-section {
     position: relative;
-    padding-block: var(--space-2xl) var(--space-xl);
+    padding-block: var(--space-xl) var(--space-l);
     padding-inline: var(--space-s);
-  }
-
-  .hero-glow {
-    position: absolute;
-    inset-block-start: -8rem;
-    inset-inline: 0;
-    block-size: 28rem;
-    background: radial-gradient(
-      ellipse 60% 55% at 50% 20%,
-      var(--color-accent-muted),
-      transparent 75%
-    );
-    pointer-events: none;
-    z-index: 0;
   }
 
   .hero-inner {
@@ -438,10 +427,12 @@ const quickLinks = [
     transition: border-color var(--duration-fast) ease, color var(--duration-fast) ease;
   }
 
-  .hero-pill:hover {
-    border-color: var(--color-border-hover);
-    color: var(--color-text-strong);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .hero-pill:hover {
+      border-color: var(--color-border-hover);
+      color: var(--color-text-strong);
+      text-decoration: none;
+    }
   }
 
   .pill-dot {
@@ -492,12 +483,15 @@ const quickLinks = [
     min-block-size: 48px;
     transition: border-color var(--duration-fast) var(--ease-out),
                 box-shadow var(--duration-fast) var(--ease-out),
-                color var(--duration-fast) var(--ease-out);
+                color var(--duration-fast) var(--ease-out),
+                transform 120ms var(--ease-out);
   }
 
-  .hero-search-bar:hover {
-    border-color: var(--color-accent);
-    color: var(--color-text-strong);
+  @media (hover: hover) and (pointer: fine) {
+    .hero-search-bar:hover {
+      border-color: var(--color-accent);
+      color: var(--color-text-strong);
+    }
   }
 
   .hero-search-left {
@@ -545,10 +539,12 @@ const quickLinks = [
     transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
   }
 
-  .quick-link-pill:hover {
-    background-color: var(--color-accent-muted);
-    color: var(--color-accent);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .quick-link-pill:hover {
+      background-color: var(--color-accent-muted);
+      color: var(--color-accent);
+      text-decoration: none;
+    }
   }
 
   /* ─── Seções Principais ────────────────────────────── */
@@ -589,9 +585,11 @@ const quickLinks = [
     text-decoration: none;
   }
 
-  .section-all-link:hover {
-    color: var(--color-accent-hover);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .section-all-link:hover {
+      color: var(--color-accent-hover);
+      text-decoration: none;
+    }
   }
 
   /* ─── Continuar Estudando (Recentes) ───────────────── */
@@ -617,11 +615,13 @@ const quickLinks = [
                 box-shadow var(--duration-fast) ease;
   }
 
-  :global(.recent-card:hover) {
-    border-color: var(--color-border-hover);
-    background-color: var(--color-surface-hover);
-    box-shadow: var(--shadow-md);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    :global(.recent-card:hover) {
+      border-color: var(--color-border-hover);
+      background-color: var(--color-surface-hover);
+      box-shadow: var(--shadow-md);
+      text-decoration: none;
+    }
   }
 
   :global(.recent-top) {
@@ -651,8 +651,10 @@ const quickLinks = [
     transition: color var(--duration-fast) ease;
   }
 
-  :global(.recent-card:hover .recent-title) {
-    color: var(--color-accent);
+  @media (hover: hover) and (pointer: fine) {
+    :global(.recent-card:hover .recent-title) {
+      color: var(--color-accent);
+    }
   }
 
   /* ─── Bookmarks ────────────────────────────────────── */
@@ -671,10 +673,12 @@ const quickLinks = [
     transition: border-color var(--duration-fast) ease, color var(--duration-fast) ease;
   }
 
-  :global(.bookmark-chip:hover) {
-    border-color: var(--color-accent);
-    color: var(--color-accent);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    :global(.bookmark-chip:hover) {
+      border-color: var(--color-accent);
+      color: var(--color-accent);
+      text-decoration: none;
+    }
   }
 
   :global(.bookmark-dot) {
@@ -708,11 +712,13 @@ const quickLinks = [
                 background-color var(--duration-normal) var(--ease-out);
   }
 
-  .pillar-card:hover {
-    border-color: var(--color-border-hover);
-    background-color: var(--color-surface-hover);
-    box-shadow: var(--shadow-md);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .pillar-card:hover {
+      border-color: var(--color-border-hover);
+      background-color: var(--color-surface-hover);
+      box-shadow: var(--shadow-md);
+      text-decoration: none;
+    }
   }
 
   .pillar-top {
@@ -734,9 +740,11 @@ const quickLinks = [
     transition: background-color var(--duration-fast) ease, color var(--duration-fast) ease;
   }
 
-  .pillar-card:hover .pillar-icon-badge {
-    background-color: var(--color-accent);
-    color: var(--color-on-accent);
+  @media (hover: hover) and (pointer: fine) {
+    .pillar-card:hover .pillar-icon-badge {
+      background-color: var(--color-accent);
+      color: var(--color-on-accent);
+    }
   }
 
   .pillar-badge {
@@ -763,8 +771,10 @@ const quickLinks = [
     transition: color var(--duration-fast) ease;
   }
 
-  .pillar-card:hover .pillar-title {
-    color: var(--color-accent);
+  @media (hover: hover) and (pointer: fine) {
+    .pillar-card:hover .pillar-title {
+      color: var(--color-accent);
+    }
   }
 
   .pillar-arrow {
@@ -773,9 +783,11 @@ const quickLinks = [
     transition: opacity var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
   }
 
-  .pillar-card:hover .pillar-arrow {
-    opacity: 1;
-    transform: translateX(2px);
+  @media (hover: hover) and (pointer: fine) {
+    .pillar-card:hover .pillar-arrow {
+      opacity: 1;
+      transform: translateX(2px);
+    }
   }
 
   .pillar-desc {
@@ -810,9 +822,11 @@ const quickLinks = [
     border-block-end: none;
   }
 
-  .primitive-row:hover {
-    background-color: var(--color-surface-hover);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .primitive-row:hover {
+      background-color: var(--color-surface-hover);
+      text-decoration: none;
+    }
   }
 
   .primitive-name {
@@ -849,13 +863,15 @@ const quickLinks = [
     transition: transform var(--duration-fast) var(--ease-out), color var(--duration-fast) ease;
   }
 
-  .primitive-row:hover .primitive-name,
-  .primitive-row:hover .primitive-arrow {
-    color: var(--color-accent);
-  }
+  @media (hover: hover) and (pointer: fine) {
+    .primitive-row:hover .primitive-name,
+    .primitive-row:hover .primitive-arrow {
+      color: var(--color-accent);
+    }
 
-  .primitive-row:hover .primitive-arrow {
-    transform: translateX(3px);
+    .primitive-row:hover .primitive-arrow {
+      transform: translateX(3px);
+    }
   }
 
   /* ─── Responsividade ───────────────────────────────── */

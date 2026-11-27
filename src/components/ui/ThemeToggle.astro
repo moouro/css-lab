@@ -84,7 +84,9 @@ import UiIcon from './UiIcon.astro';
     cursor: pointer;
     min-inline-size: 2.25rem;
     min-block-size: 2.25rem;
-    transition: background-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out);
+    transition: background-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                transform 120ms var(--ease-out);
   }
 
   @media (pointer: coarse) {
@@ -94,9 +96,11 @@ import UiIcon from './UiIcon.astro';
     }
   }
 
-  .theme-toggle:hover {
-    background-color: var(--color-bg-hover);
-    color: var(--color-text-strong);
+  @media (hover: hover) and (pointer: fine) {
+    .theme-toggle:hover {
+      background-color: var(--color-bg-hover);
+      color: var(--color-text-strong);
+    }
   }
 
   /* Show appropriate icon based on active color-scheme */

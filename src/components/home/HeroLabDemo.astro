@@ -1,0 +1,297 @@
+---
+// Mini laboratório interativo na Home: demonstra Container Queries + Layout Intrínseco ao vivo.
+---
+
+<div class="hero-lab" data-hero-lab>
+  <div class="hero-lab-toolbar">
+    <div class="hero-lab-meta">
+      <span class="hero-lab-label font-mono text-xs">@container demo</span>
+      <span class="hero-lab-width font-mono text-xs" data-lab-width>100%</span>
+    </div>
+
+    <div class="hero-lab-controls">
+      <label class="visually-hidden" for="hero-lab-range">Largura do container de demonstração</label>
+      <input
+        id="hero-lab-range"
+        type="range"
+        min="280"
+        max="720"
+        value="720"
+        class="hero-lab-slider"
+        data-lab-slider
+      />
+      <div class="hero-lab-presets" role="group" aria-label="Larguras pré-definidas">
+        <button type="button" class="hero-lab-preset font-mono" data-lab-preset="300">300px</button>
+        <button type="button" class="hero-lab-preset font-mono" data-lab-preset="460">460px</button>
+        <button type="button" class="hero-lab-preset font-mono active" data-lab-preset="full">100%</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-lab-stage-wrap">
+    <div class="hero-lab-stage" data-lab-stage>
+      <div class="hero-lab-grid">
+        <div class="hero-lab-card">
+          <span class="hero-lab-dot" aria-hidden="true"></span>
+          <div class="hero-lab-card-body">
+            <strong class="hero-lab-card-title font-mono">Sidebar</strong>
+            <span class="hero-lab-card-desc">Colapsa pelo espaço disponível</span>
+          </div>
+        </div>
+        <div class="hero-lab-card">
+          <span class="hero-lab-dot" aria-hidden="true"></span>
+          <div class="hero-lab-card-body">
+            <strong class="hero-lab-card-title font-mono">Switcher</strong>
+            <span class="hero-lab-card-desc">Linha vira pilha sem media query</span>
+          </div>
+        </div>
+        <div class="hero-lab-card">
+          <span class="hero-lab-dot" aria-hidden="true"></span>
+          <div class="hero-lab-card-body">
+            <strong class="hero-lab-card-title font-mono">@container</strong>
+            <span class="hero-lab-card-desc" data-lab-state>3 colunas · inline-size &gt; 440px</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function initHeroLab(): void {
+    const root = document.querySelector<HTMLElement>('[data-hero-lab]');
+    if (!root || root.dataset.bound === 'true') return;
+    root.dataset.bound = 'true';
+
+    const stage = root.querySelector<HTMLElement>('[data-lab-stage]');
+    const slider = root.querySelector<HTMLInputElement>('[data-lab-slider]');
+    const widthBadge = root.querySelector<HTMLElement>('[data-lab-width]');
+    const stateLabel = root.querySelector<HTMLElement>('[data-lab-state]');
+    const presets = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-lab-preset]'));
+    if (!stage || !slider || !widthBadge || !stateLabel) return;
+
+    const updateReadout = (): void => {
+      const px = Math.round(stage.getBoundingClientRect().width);
+      widthBadge.textContent = `${px}px`;
+      if (px <= 360) {
+        stateLabel.textContent = '1 coluna · inline-size <= 360px';
+      } else if (px <= 520) {
+        stateLabel.textContent = '2 colunas · inline-size <= 520px';
+      } else {
+        stateLabel.textContent = '3 colunas · inline-size > 520px';
+      }
+    };
+
+    const setActivePreset = (value: string | null): void => {
+      presets.forEach((btn) => {
+        btn.classList.toggle('active', btn.dataset.labPreset === value);
+      });
+    };
+
+    slider.addEventListener('input', () => {
+      const val = Number(slider.value);
+      stage.style.maxInlineSize = `${val}px`;
+      setActivePreset(null);
+      updateReadout();
+    });
+
+    presets.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        const preset = btn.dataset.labPreset ?? 'full';
+        if (preset === 'full') {
+          stage.style.maxInlineSize = '100%';
+          slider.value = slider.max;
+        } else {
+          stage.style.maxInlineSize = `${preset}px`;
+          slider.value = preset;
+        }
+        setActivePreset(preset);
+        updateReadout();
+      });
+    });
+
+    if ('ResizeObserver' in window) {
+      const ro = new ResizeObserver(() => updateReadout());
+      ro.observe(stage);
+    } else {
+      updateReadout();
+    }
+  }
+
+  initHeroLab();
+  document.addEventListener('astro:page-load', initHeroLab);
+</script>
+
+<style>
+  .hero-lab {
+    inline-size: 100%;
+    max-inline-size: 760px;
+    margin-block-start: var(--space-s);
+    border-radius: var(--radius-l);
+    border: 1px solid var(--color-border);
+    background-color: var(--color-bg-raised);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    text-align: start;
+  }
+
+  .hero-lab-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+    padding: 0.65rem 0.9rem;
+    border-block-end: 1px solid var(--color-border);
+    background-color: var(--color-bg-surface);
+  }
+
+  .hero-lab-meta {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hero-lab-label {
+    color: var(--color-fg-muted);
+    font-weight: 500;
+  }
+
+  .hero-lab-width {
+    padding: 0.12rem 0.45rem;
+    border-radius: var(--radius-s);
+    background-color: var(--color-accent-muted);
+    color: var(--color-accent);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .hero-lab-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.65rem;
+    flex-wrap: wrap;
+  }
+
+  .hero-lab-slider {
+    inline-size: 110px;
+    accent-color: var(--color-accent);
+    cursor: pointer;
+  }
+
+  .hero-lab-presets {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px;
+    border-radius: var(--radius-s);
+    background-color: var(--color-bg-inset);
+    border: 1px solid var(--color-border);
+  }
+
+  .hero-lab-preset {
+    background: transparent;
+    border: none;
+    padding: 0.22rem 0.5rem;
+    border-radius: 4px;
+    font-size: var(--step--2);
+    color: var(--color-fg-muted);
+    cursor: pointer;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                transform 120ms var(--ease-out);
+  }
+
+  .hero-lab-preset.active {
+    background-color: var(--color-bg-surface);
+    color: var(--color-text-strong);
+    box-shadow: var(--shadow-sm);
+    font-weight: 600;
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hero-lab-preset:hover:not(.active) {
+      color: var(--color-text-strong);
+    }
+  }
+
+  .hero-lab-stage-wrap {
+    padding: var(--space-s);
+    background-image: radial-gradient(var(--color-border-strong) 1px, transparent 1px);
+    background-size: 16px 16px;
+  }
+
+  .hero-lab-stage {
+    container-type: inline-size;
+    container-name: hero-demo;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    margin-inline: auto;
+    border-radius: var(--radius-m);
+    border: 1px dashed var(--color-border-strong);
+    background-color: var(--color-bg);
+    padding: 0.75rem;
+    transition: max-inline-size var(--duration-normal) var(--ease-out);
+  }
+
+  .hero-lab-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.6rem;
+  }
+
+  @container hero-demo (max-width: 520px) {
+    .hero-lab-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @container hero-demo (max-width: 360px) {
+    .hero-lab-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hero-lab-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.65rem 0.75rem;
+    border-radius: var(--radius-s);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+  }
+
+  .hero-lab-dot {
+    inline-size: 7px;
+    block-size: 7px;
+    border-radius: var(--radius-full);
+    background-color: var(--color-accent);
+    margin-block-start: 0.38rem;
+    flex-shrink: 0;
+  }
+
+  .hero-lab-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    min-inline-size: 0;
+  }
+
+  .hero-lab-card-title {
+    font-size: var(--step--2);
+    font-weight: 600;
+    color: var(--color-text-strong);
+  }
+
+  .hero-lab-card-desc {
+    font-size: 0.76rem;
+    color: var(--color-fg-muted);
+    line-height: 1.35;
+  }
+
+  @media (max-width: 540px) {
+    .hero-lab-slider {
+      display: none;
+    }
+  }
+</style>

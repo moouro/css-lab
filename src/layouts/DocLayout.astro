@@ -458,6 +458,7 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     inset-block-start: calc(var(--space-xl) + 2rem);
     max-block-size: calc(100dvh - 6rem);
     overflow-y: auto;
+    overscroll-behavior: contain;
     display: flex;
     flex-direction: column;
     gap: var(--space-s);
@@ -480,8 +481,10 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     transition: opacity var(--duration-fast);
   }
 
-  .collection-back-link:hover {
-    opacity: 0.8;
+  @media (hover: hover) and (pointer: fine) {
+    .collection-back-link:hover {
+      opacity: 0.8;
+    }
   }
 
   .nav-tree {
@@ -504,10 +507,12 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     transition: color var(--duration-fast), background-color var(--duration-fast);
   }
 
-  .tree-link:hover {
-    color: var(--color-fg);
-    background-color: var(--color-bg-hover);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .tree-link:hover {
+      color: var(--color-fg);
+      background-color: var(--color-bg-hover);
+      text-decoration: none;
+    }
   }
 
   .tree-link.active {
@@ -573,6 +578,7 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     border-block-start: 1px solid var(--color-border-subtle);
     max-block-size: 50vh;
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   /* Breadcrumbs */
@@ -598,8 +604,10 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     transition: color var(--duration-fast);
   }
 
-  .breadcrumb-link:hover {
-    color: var(--color-accent);
+  @media (hover: hover) and (pointer: fine) {
+    .breadcrumb-link:hover {
+      color: var(--color-accent);
+    }
   }
 
   .breadcrumb-sep {
@@ -709,6 +717,7 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     inset-block-start: calc(var(--space-xl) + 2rem);
     max-block-size: calc(100dvh - 6rem);
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   .toc-nav {
@@ -739,9 +748,11 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     padding-inline-start: 1.55rem;
   }
 
-  .toc-link:hover {
-    color: var(--color-text-strong);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .toc-link:hover {
+      color: var(--color-text-strong);
+      text-decoration: none;
+    }
   }
 
   /* MANDATORY scrollspy rule: use :is() so unrecognized :target-current never invalidates fallback .target-current */
@@ -826,11 +837,17 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     justify-content: center;
   }
 
-  .pagination-card:hover {
-    background-color: var(--color-surface-hover);
-    border-color: var(--color-accent);
-    box-shadow: var(--shadow-md);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .pagination-card:hover {
+      background-color: var(--color-surface-hover);
+      border-color: var(--color-accent);
+      box-shadow: var(--shadow-md);
+      text-decoration: none;
+    }
+
+    .pagination-card:hover .pagination-title {
+      color: var(--color-accent);
+    }
   }
 
   .pagination-next {
@@ -857,11 +874,7 @@ const nextItem = currentIndex >= 0 && currentIndex < items.length - 1 ? items[cu
     font-weight: 700;
     line-height: 1.25;
     color: var(--color-fg);
-    transition: color 0.2s ease;
-  }
-
-  .pagination-card:hover .pagination-title {
-    color: var(--color-accent);
+    transition: color var(--duration-fast) var(--ease-out);
   }
 
   .mobile-bottom-navigator {

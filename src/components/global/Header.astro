@@ -328,12 +328,15 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
       </nav>
 
       <div class="mobile-drawer-footer cluster" style="--cluster-space: var(--space-xs); justify-content: center; align-items: center;">
-        <a href="https://github.com/moouro/css-lab" target="_blank" rel="noopener noreferrer" class="text-xs text-muted font-mono" style="display: inline-flex; align-items: center; gap: 0.35rem; text-decoration: none;">
+        <a href="https://github.com/moouro/css-lab" target="_blank" rel="noopener noreferrer" class="mobile-drawer-meta-link text-xs text-muted font-mono">
           <span>GitHub</span>
           <span aria-hidden="true">↗</span>
         </a>
         <span class="text-xs text-muted" aria-hidden="true">•</span>
-        <span class="text-xs text-muted font-mono">Segunda Memória</span>
+        <a href="https://mouro.dev" target="_blank" rel="noopener noreferrer" class="mobile-drawer-meta-link text-xs text-muted font-mono">
+          <span>por mouro.dev</span>
+          <span aria-hidden="true">↗</span>
+        </a>
       </div>
     </div>
   </dialog>
@@ -437,6 +440,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     position: sticky;
     inset-block-start: 0;
     z-index: 100;
+    padding-block-start: env(safe-area-inset-top, 0px);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
   }
@@ -505,10 +509,12 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
   }
 
-  .nav-link:hover {
-    color: var(--color-fg);
-    background-color: var(--color-bg-hover);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .nav-link:hover {
+      color: var(--color-fg);
+      background-color: var(--color-bg-hover);
+      text-decoration: none;
+    }
   }
 
   .nav-link.active,
@@ -544,15 +550,16 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     box-shadow: var(--shadow-lg), 0 0 0 1px var(--color-border);
     opacity: 0;
     visibility: hidden;
-    transform: translateY(-4px);
-    transition: opacity var(--duration-fast) ease, transform var(--duration-fast) var(--ease-out), visibility var(--duration-fast);
+    transform-origin: top left;
+    transform: translateY(-4px) scale(0.96);
+    transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out), visibility 180ms;
     z-index: 500;
   }
 
   .dropdown-item.open .dropdown-menu {
     opacity: 1;
     visibility: visible;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 
   .dropdown-item.open .dropdown-arrow {
@@ -578,9 +585,11 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     transition: background-color var(--duration-fast) var(--ease-out);
   }
 
-  .dropdown-link:hover {
-    background-color: var(--color-bg-hover);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .dropdown-link:hover {
+      background-color: var(--color-bg-hover);
+      text-decoration: none;
+    }
   }
 
   .dropdown-link[aria-current="page"] {
@@ -621,14 +630,19 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     padding-block: 0.38rem;
     border-radius: var(--radius-md);
     font-size: var(--step--1);
-    transition: border-color var(--duration-fast) var(--ease-out), color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
+    transition: border-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                background-color var(--duration-fast) var(--ease-out),
+                transform 120ms var(--ease-out);
     cursor: pointer;
   }
 
-  .search-button:hover {
-    border-color: var(--color-border-hover);
-    color: var(--color-text-strong);
-    background-color: var(--color-bg-hover);
+  @media (hover: hover) and (pointer: fine) {
+    .search-button:hover {
+      border-color: var(--color-border-hover);
+      color: var(--color-text-strong);
+      background-color: var(--color-bg-hover);
+    }
   }
 
   .search-kbd {
@@ -657,10 +671,12 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     transition: color var(--duration-fast) var(--ease-out), background-color var(--duration-fast) var(--ease-out);
   }
 
-  .github-link:hover {
-    color: var(--color-text-strong);
-    background-color: var(--color-bg-hover);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .github-link:hover {
+      color: var(--color-text-strong);
+      background-color: var(--color-bg-hover);
+      text-decoration: none;
+    }
   }
 
   /* Mobile Hamburger */
@@ -678,8 +694,10 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     min-block-size: 2.25rem;
   }
 
-  .mobile-menu-btn:hover {
-    background-color: var(--color-bg-hover);
+  @media (hover: hover) and (pointer: fine) {
+    .mobile-menu-btn:hover {
+      background-color: var(--color-bg-hover);
+    }
   }
 
   .hamburger-icon {
@@ -696,7 +714,7 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     border-radius: 1px;
   }
 
-  /* Mobile Menu Dialog Drawer */
+  /* Mobile Menu Dialog Drawer (Emil Kowalski sheet curve + @starting-style) */
   .mobile-drawer {
     position: fixed;
     inset-block: 0;
@@ -714,15 +732,55 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     color: var(--color-fg);
     padding: 0;
     overflow-y: auto;
+    overscroll-behavior: contain;
     -webkit-overflow-scrolling: touch;
     box-sizing: border-box;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: transform var(--duration-slow) var(--ease-drawer),
+                opacity var(--duration-normal) var(--ease-out),
+                overlay var(--duration-slow) var(--ease-drawer) allow-discrete,
+                display var(--duration-slow) var(--ease-drawer) allow-discrete;
+  }
+
+  .mobile-drawer[open] {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  @starting-style {
+    .mobile-drawer[open] {
+      transform: translateX(100%);
+      opacity: 0;
+    }
   }
 
   .mobile-drawer::backdrop {
-    background-color: rgb(0 0 0 / 0.65);
+    background-color: rgb(0 0 0 / 0.55);
     backdrop-filter: blur(4px);
     overflow: hidden;
     overscroll-behavior: contain;
+    opacity: 0;
+    transition: opacity var(--duration-normal) var(--ease-out),
+                overlay var(--duration-slow) var(--ease-drawer) allow-discrete,
+                display var(--duration-slow) var(--ease-drawer) allow-discrete;
+  }
+
+  .mobile-drawer[open]::backdrop {
+    opacity: 1;
+  }
+
+  @starting-style {
+    .mobile-drawer[open]::backdrop {
+      opacity: 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .mobile-drawer,
+    .mobile-drawer::backdrop {
+      transition-duration: 0.01ms;
+    }
   }
 
   .mobile-drawer-content {
@@ -758,9 +816,11 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     cursor: pointer;
   }
 
-  .close-btn:hover {
-    color: var(--color-fg);
-    background-color: var(--color-bg-hover);
+  @media (hover: hover) and (pointer: fine) {
+    .close-btn:hover {
+      color: var(--color-fg);
+      background-color: var(--color-bg-hover);
+    }
   }
 
   .mobile-drawer-nav {
@@ -802,11 +862,13 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     transition: background-color var(--duration-fast) var(--ease-out), border-color var(--duration-fast) var(--ease-out), transform var(--duration-fast) var(--ease-out);
   }
 
-  .mobile-link:hover {
-    background-color: var(--color-bg-hover);
-    border-color: var(--color-border-hover);
-    transform: translateX(2px);
-    text-decoration: none;
+  @media (hover: hover) and (pointer: fine) {
+    .mobile-link:hover {
+      background-color: var(--color-bg-hover);
+      border-color: var(--color-border-hover);
+      transform: translateX(2px);
+      text-decoration: none;
+    }
   }
 
   .mobile-link.active,
@@ -843,6 +905,21 @@ const isResourcesActive = resourceItems.some((item) => isInSection(item.href));
     border-block-start: 1px solid var(--color-border);
     padding-block-start: var(--space-s);
     text-align: center;
+  }
+
+  .mobile-drawer-meta-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    text-decoration: none;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .mobile-drawer-meta-link:hover {
+      color: var(--color-text-strong);
+      text-decoration: underline;
+    }
   }
 
   /* Responsive Breakpoint for Mobile (<= 1024px) */

@@ -10,10 +10,10 @@ import UiIcon from '../ui/UiIcon.astro';
         <span>CSS Lab</span>
       </span>
       <p class="text-sm text-muted">
-        Segunda memória profissional de arquitetura frontend e design de layout intrínseco.
+        Referência técnica de CSS moderno e layout intrínseco.
       </p>
       <p class="text-xs text-subtle">
-        Inspirado pelos princípios de <em>Every Layout (3ª Edição)</em> de Heydon Pickering & Andy Bell.
+        Baseado nos princípios de <em>Every Layout (3ª Edição)</em>, de Heydon Pickering e Andy Bell.
       </p>
     </div>
 
@@ -46,7 +46,7 @@ import UiIcon from '../ui/UiIcon.astro';
 
   <div class="footer-bottom">
     <p class="text-xs text-subtle">
-      100% estático. Zero tracking. Construído com composição algorítmica e CSS moderno.
+      100% estático. Sem tracking. Feito por <a href="https://mouro.dev" target="_blank" rel="noopener noreferrer" class="footer-author-link">mouro.dev ↗</a>.
     </p>
   </div>
 </footer>
@@ -81,11 +81,7 @@ import UiIcon from '../ui/UiIcon.astro';
     font-size: var(--step--1);
     color: var(--color-text-muted);
     text-decoration: none;
-  }
-
-  .footer-link:hover {
-    color: var(--color-text-strong);
-    text-decoration: underline;
+    transition: color var(--duration-fast) var(--ease-out);
   }
 
   .footer-link-btn {
@@ -97,12 +93,23 @@ import UiIcon from '../ui/UiIcon.astro';
     color: var(--color-text-muted);
     cursor: pointer;
     text-align: start;
-    transition: color var(--duration-fast) ease;
+    transition: color var(--duration-fast) var(--ease-out);
   }
 
-  .footer-link-btn:hover {
-    color: var(--color-text-strong);
-    text-decoration: underline;
+  .footer-author-link {
+    color: var(--color-text-muted);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color var(--duration-fast) var(--ease-out);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .footer-link:hover,
+    .footer-link-btn:hover,
+    .footer-author-link:hover {
+      color: var(--color-text-strong);
+      text-decoration: underline;
+    }
   }
 
   .footer-bottom {

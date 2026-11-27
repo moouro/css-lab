@@ -242,6 +242,7 @@ import UiIcon from '../ui/UiIcon.astro';
   #pagefind-container {
     max-block-size: 60dvh;
     overflow-y: auto;
+    overscroll-behavior: contain;
   }
 
   /* ─── Pagefind UI Overrides: Garantia de contraste, digitação e foco ─── */
@@ -356,9 +357,11 @@ import UiIcon from '../ui/UiIcon.astro';
     border-radius: var(--radius-s);
   }
 
-  .close-btn:hover {
-    color: var(--color-text-strong);
-    background-color: var(--color-bg-hover);
+  @media (hover: hover) and (pointer: fine) {
+    .close-btn:hover {
+      color: var(--color-text-strong);
+      background-color: var(--color-bg-hover);
+    }
   }
 
   .dialog-kbd {

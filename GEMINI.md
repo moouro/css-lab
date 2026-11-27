@@ -13,6 +13,7 @@
   - **Deploy & CI/CD:** Cloudflare Workers Static Assets (`wrangler.jsonc`) com Cloudflare Workers Builds conectado à branch `main` (`npm run build` + `npx wrangler deploy`).
   - **Segurança:** CSP estrito em `BaseLayout.astro` e `public/_headers` (`font-src 'self' data:;`), zero tracking/CDNs externos, assets `/_astro/*` com cache imutável de 1 ano.
 - **Estrutura Chave:**
+  - `DESIGN.md` — **Antes de construir ou alterar qualquer UI, leia `DESIGN.md`.** Regras destiladas de Design Engineering, motion, mobile-native e copy.
   - `src/styles/` — `app.css`, `tokens.css`, `typography.css`, `global.css`, `every-layout.css`, `hubs.css`, `utilities.css`.
   - `src/layouts/` — `BaseLayout.astro`, `DocLayout.astro`.
   - `src/components/global/` — `Header.astro`, `Footer.astro`, `CommandPalette.astro`.
@@ -58,7 +59,8 @@
   - `css-lab-bookmarks`: botão **"Salvar na Memória"** (`BookmarkButton.astro`) + chips na Home.
 - [x] **Playgrounds Responsivos (`Playground.astro`):** slider de espaçamento, presets de largura (`320px`, `640px`, `100%`), redimensionamento horizontal (`resize: horizontal`) e leitura ao vivo em `px` via `ResizeObserver`.
 - [x] **Responsividade & UX Mobile:** zero overflow horizontal (375px–1440px), `PropsTable` sem quebra de palavras no desktop e em cards no mobile, `Checklist` em grid `auto 1fr`, `ThemeToggle` 1-clique (Claro ↔ Escuro) e `LayoutInspector` reposicionado no canto inferior direito (`safe-area-inset-bottom`).
-- [x] **Validação:** `astro check` (`0 errors, 0 warnings, 0 hints` em 55 arquivos) e `astro build` (99 páginas / 88 indexadas).
+- [x] **Design Engineering & Identidade Autoral (`emilkowalski/skills` + `human-writing`):** paleta Editorial Neutra + Azul Cobalto Técnico (`#2563EB` / `#60A5FA`), remoção do `.hero-glow` genérico, `HeroLabDemo.astro` (`@container` interativo ao vivo na Home), drawer mobile com `@starting-style` + `--ease-drawer`, curvas `cubic-bezier(0.23, 1, 0.32, 1)` (`150ms/200ms/320ms`), piso touch mobile-native, `:hover` isolado com `@media (hover: hover) and (pointer: fine)`, copy refinado na Home/Footer com link discreto para `mouro.dev` e `DESIGN.md` na raiz.
+- [x] **Validação:** `astro check` (`0 errors, 0 warnings, 0 hints`) e `astro build` (99 páginas / 88 indexadas).
 
 ---
 
@@ -81,6 +83,11 @@
   - `c43f378` — Fase 2 Mintlify Docs (`Callout`, `AntiPattern`, `Checklist`, `PropsTable`, `BookmarkButton`, `hubs.css` nos 9 Hubs), `MasteryButton.astro`, seção "Continuar estudando" em `index.astro` e presets/ResizeObserver em `Playground.astro`.
   - `9f7e18b` — Scroll-Spy ativo no TOC lateral direito (`DocLayout.astro`) com `scroll-target-group: auto` + fallback `IntersectionObserver`/`scroll`.
 - **Principais arquivos criados/modificados:** `design-system/css-lab/MASTER.md`, `src/styles/tokens.css`, `src/styles/hubs.css`, `src/styles/app.css`, `src/layouts/BaseLayout.astro`, `src/layouts/DocLayout.astro`, `src/components/global/Header.astro`, `src/components/global/CommandPalette.astro`, `src/components/ui/UiIcon.astro`, `src/components/ui/CodeCopyEnhancer.astro`, `src/components/ui/MasteryButton.astro`, `src/components/ui/ThemeToggle.astro`, `src/components/ui/LayoutInspector.astro`, `src/components/ui/BookmarkButton.astro`, `src/components/content/{Callout,AntiPattern,Checklist,PropsTable,Playground}.astro`, `src/pages/index.astro`, 9 arquivos `src/pages/*/index.astro` e `public/_headers`.
+
+- **Sessão 2026-11-27 (Design Engineering Polish + Mobile-Native + Human-Writing):**
+  - Instaladas skills `emilkowalski/skills` localmente em `.agents/skills/` (ignoradas pelo Git).
+  - Aplicadas diretrizes de `emil-design-eng`, `improve-animations`, `remove-animations`, `mobile-native`, `learn-taste` e `human-writing` sobre a identidade Mintlify Docs.
+  - **Arquivos criados/modificados:** `DESIGN.md`, `GEMINI.md`, `src/components/home/HeroLabDemo.astro`, `src/layouts/BaseLayout.astro`, `src/layouts/DocLayout.astro`, `src/styles/tokens.css`, `src/styles/global.css`, `src/styles/hubs.css`, `src/components/global/Header.astro`, `src/components/global/Footer.astro`, `src/components/global/CommandPalette.astro`, `src/components/ui/ThemeToggle.astro`, `src/components/ui/CodeCopyEnhancer.astro`, `src/pages/index.astro`.
 
 ---
 
