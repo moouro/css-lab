@@ -1,16 +1,16 @@
 ---
-// Mini laboratório interativo na Home: demonstra Container Queries + Layout Intrínseco ao vivo.
+// Mini laboratório interativo na Home: mostra na prática como um layout se adapta ao espaço disponível.
 ---
 
 <div class="hero-lab" data-hero-lab>
   <div class="hero-lab-toolbar">
     <div class="hero-lab-meta">
-      <span class="hero-lab-label font-mono text-xs">@container demo</span>
+      <span class="hero-lab-label text-xs">Teste ao vivo: mude a largura</span>
       <span class="hero-lab-width font-mono text-xs" data-lab-width>100%</span>
     </div>
 
     <div class="hero-lab-controls">
-      <label class="visually-hidden" for="hero-lab-range">Largura do container de demonstração</label>
+      <label class="visually-hidden" for="hero-lab-range">Largura do bloco de demonstração</label>
       <input
         id="hero-lab-range"
         type="range"
@@ -21,9 +21,9 @@
         data-lab-slider
       />
       <div class="hero-lab-presets" role="group" aria-label="Larguras pré-definidas">
-        <button type="button" class="hero-lab-preset font-mono" data-lab-preset="300">300px</button>
-        <button type="button" class="hero-lab-preset font-mono" data-lab-preset="460">460px</button>
-        <button type="button" class="hero-lab-preset font-mono active" data-lab-preset="full">100%</button>
+        <button type="button" class="hero-lab-preset font-mono" data-lab-preset="300" aria-label="Largura estreita de 300 pixels">300px</button>
+        <button type="button" class="hero-lab-preset font-mono" data-lab-preset="460" aria-label="Largura média de 460 pixels">460px</button>
+        <button type="button" class="hero-lab-preset font-mono active" data-lab-preset="full" aria-label="Largura total">100%</button>
       </div>
     </div>
   </div>
@@ -34,22 +34,22 @@
         <div class="hero-lab-card">
           <span class="hero-lab-dot" aria-hidden="true"></span>
           <div class="hero-lab-card-body">
-            <strong class="hero-lab-card-title font-mono">Sidebar</strong>
-            <span class="hero-lab-card-desc">Colapsa pelo espaço disponível</span>
+            <strong class="hero-lab-card-title">Sem media query</strong>
+            <span class="hero-lab-card-desc">O bloco reage ao próprio espaço, não ao tamanho da janela.</span>
           </div>
         </div>
         <div class="hero-lab-card">
           <span class="hero-lab-dot" aria-hidden="true"></span>
           <div class="hero-lab-card-body">
-            <strong class="hero-lab-card-title font-mono">Switcher</strong>
-            <span class="hero-lab-card-desc">Linha vira pilha sem media query</span>
+            <strong class="hero-lab-card-title">Colunas automáticas</strong>
+            <span class="hero-lab-card-desc">Alterna entre 3, 2 e 1 coluna usando CSS puro (<code>@container</code>).</span>
           </div>
         </div>
         <div class="hero-lab-card">
           <span class="hero-lab-dot" aria-hidden="true"></span>
           <div class="hero-lab-card-body">
-            <strong class="hero-lab-card-title font-mono">@container</strong>
-            <span class="hero-lab-card-desc" data-lab-state>3 colunas · inline-size &gt; 440px</span>
+            <strong class="hero-lab-card-title">Estado atual</strong>
+            <span class="hero-lab-card-desc" data-lab-state>3 colunas · espaço largo</span>
           </div>
         </div>
       </div>
@@ -74,11 +74,11 @@
       const px = Math.round(stage.getBoundingClientRect().width);
       widthBadge.textContent = `${px}px`;
       if (px <= 360) {
-        stateLabel.textContent = '1 coluna · inline-size <= 360px';
+        stateLabel.textContent = '1 coluna · espaço estreito';
       } else if (px <= 520) {
-        stateLabel.textContent = '2 colunas · inline-size <= 520px';
+        stateLabel.textContent = '2 colunas · espaço médio';
       } else {
-        stateLabel.textContent = '3 colunas · inline-size > 520px';
+        stateLabel.textContent = '3 colunas · espaço largo';
       }
     };
 
@@ -286,7 +286,13 @@
   .hero-lab-card-desc {
     font-size: 0.76rem;
     color: var(--color-fg-muted);
-    line-height: 1.35;
+    line-height: 1.4;
+  }
+
+  .hero-lab-card-desc code {
+    font-family: var(--font-mono);
+    font-size: 0.92em;
+    color: var(--color-text-strong);
   }
 
   @media (max-width: 540px) {

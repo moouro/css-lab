@@ -7,27 +7,27 @@ const entries = await getPublishedCollection('design-tokens');
 ---
 
 <BaseLayout
-  title="Design Tokens — A Linguagem Visual do Sistema"
-  description="Documentação técnica dos design tokens da plataforma: paletas semânticas light-dark(), escala fluida clamp(), espaçamentos e raios."
+  title="Design Tokens — Variáveis Visuais em CSS"
+  description="Como estruturar cores com light-dark(), escala tipográfica com clamp(), espaçamentos, bordas e sombras em CSS puro."
 >
   <div class="hub-container">
     <Center max="1100px">
       <div class="stack" style="--stack-space: var(--space-xl);">
         <header class="hub-header stack" style="--stack-space: var(--space-xs);">
           <div class="cluster" style="--cluster-space: var(--space-xs); align-items: center;">
-            <span class="hub-badge font-mono text-xs">Pilar de Fundações</span>
-            <span class="text-xs text-muted">Variáveis Nativas & Escalas Matemáticas</span>
+            <span class="hub-badge font-mono text-xs">Fundações</span>
+            <span class="text-xs text-muted">Variáveis CSS nativas</span>
           </div>
           <h1 class="hub-title">Design Tokens</h1>
           <p class="hub-desc text-lg text-muted">
-            Todas as decisões visuais da plataforma codificadas em CSS Custom Properties puras. Sem pré-processadores, com alternância de tema nativa e responsividade fluida.
+            Todas as cores, tamanhos de fonte, espaçamentos e bordas definidos em CSS Custom Properties — com suporte nativo a modo claro e escuro.
           </p>
         </header>
 
         <div class="axiom-banner">
-          <span class="text-xs font-semibold tracking-caps text-muted">Axioma de Fundações</span>
+          <span class="text-xs font-semibold tracking-caps text-muted">Ideia central</span>
           <blockquote class="axiom-quote">
-            "Design tokens são as menores partículas atômicas da interface. Mudanças na fundação devem propagar organicamente por todo o ecossistema sem quebras de layout."
+            "Centralizar valores visuais em variáveis permite ajustar tema, contraste e ritmo do site inteiro alterando poucos tokens."
           </blockquote>
         </div>
 

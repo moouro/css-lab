@@ -7,27 +7,27 @@ const entries = await getPublishedCollection('container-query-lab');
 ---
 
 <BaseLayout
-  title="Container Query Lab — Componentes Verdadeiramente Modulares"
-  description="Laboratório completo de Container Queries (@container): size queries, style queries, unidades cqi/cqw, contêineres nomeados e padrões de componentes."
+  title="Container Query Lab — Componentes que Respondem ao Espaço"
+  description="Guia prático de Container Queries (@container): size queries, style queries, unidades cqi/cqw e padrões de componentes."
 >
   <div class="hub-container">
     <Center max="1100px">
       <div class="stack" style="--stack-space: var(--space-xl);">
         <header class="hub-header stack" style="--stack-space: var(--space-xs);">
           <div class="cluster" style="--cluster-space: var(--space-xs); align-items: center;">
-            <span class="hub-badge font-mono text-xs">Pilar de Componentes</span>
-            <span class="text-xs text-muted">Contenção e Contexto</span>
+            <span class="hub-badge font-mono text-xs">Componentes</span>
+            <span class="text-xs text-muted">@container</span>
           </div>
           <h1 class="hub-title">Container Query Lab</h1>
           <p class="hub-desc text-lg text-muted">
-            O fim da dependência do viewport. Com Container Queries, o componente responde diretamente ao espaço concedido pelo seu elemento pai, permitindo reutilização 100% universal em qualquer contexto.
+            Com Container Queries, um card ou bloco adapta o próprio visual ao tamanho do espaço onde foi colocado — seja numa barra lateral estreita ou na área principal.
           </p>
         </header>
 
         <div class="axiom-banner">
-          <span class="text-xs font-semibold tracking-caps text-muted">Axioma de Contenção</span>
+          <span class="text-xs font-semibold tracking-caps text-muted">Ideia central</span>
           <blockquote class="axiom-quote">
-            "Um componente não deveria saber o tamanho da tela do dispositivo; ele só precisa saber o espaço que tem disponível no contêiner em que foi renderizado."
+            "Um componente não precisa saber o tamanho da tela inteira; só precisa saber quanto espaço recebeu do container pai."
           </blockquote>
         </div>
 

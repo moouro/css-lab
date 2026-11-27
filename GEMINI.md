@@ -84,10 +84,12 @@
   - `9f7e18b` — Scroll-Spy ativo no TOC lateral direito (`DocLayout.astro`) com `scroll-target-group: auto` + fallback `IntersectionObserver`/`scroll`.
 - **Principais arquivos criados/modificados:** `design-system/css-lab/MASTER.md`, `src/styles/tokens.css`, `src/styles/hubs.css`, `src/styles/app.css`, `src/layouts/BaseLayout.astro`, `src/layouts/DocLayout.astro`, `src/components/global/Header.astro`, `src/components/global/CommandPalette.astro`, `src/components/ui/UiIcon.astro`, `src/components/ui/CodeCopyEnhancer.astro`, `src/components/ui/MasteryButton.astro`, `src/components/ui/ThemeToggle.astro`, `src/components/ui/LayoutInspector.astro`, `src/components/ui/BookmarkButton.astro`, `src/components/content/{Callout,AntiPattern,Checklist,PropsTable,Playground}.astro`, `src/pages/index.astro`, 9 arquivos `src/pages/*/index.astro` e `public/_headers`.
 
-- **Sessão 2026-11-27 (Design Engineering Polish + Mobile-Native + Human-Writing):**
-  - Instaladas skills `emilkowalski/skills` localmente em `.agents/skills/` (ignoradas pelo Git).
-  - Aplicadas diretrizes de `emil-design-eng`, `improve-animations`, `remove-animations`, `mobile-native`, `learn-taste` e `human-writing` sobre a identidade Mintlify Docs.
-  - **Arquivos criados/modificados:** `DESIGN.md`, `GEMINI.md`, `src/components/home/HeroLabDemo.astro`, `src/layouts/BaseLayout.astro`, `src/layouts/DocLayout.astro`, `src/styles/tokens.css`, `src/styles/global.css`, `src/styles/hubs.css`, `src/components/global/Header.astro`, `src/components/global/Footer.astro`, `src/components/global/CommandPalette.astro`, `src/components/ui/ThemeToggle.astro`, `src/components/ui/CodeCopyEnhancer.astro`, `src/pages/index.astro`.
+- **Sessão 2026-11-27 (Design Engineering + Home de Documentação Guiada + Human-Writing + Auditoria Browser):**
+  - Instaladas skills `emilkowalski/skills` localmente em `.agents/skills/` (ignoradas pelo Git junto com `skills-lock.json`).
+  - Aplicadas diretrizes de `emil-design-eng`, `improve-animations`, `remove-animations`, `mobile-native`, `learn-taste` e `human-writing` com paleta Editorial Neutra + Azul Cobalto Técnico (`#2563EB` / `#60A5FA`), drawer mobile com `@starting-style` e `DESIGN.md` na raiz.
+  - Evolução da Home para **Modo Documentação Guiada (Opção 2)**: CTA primário *"Começar pelos fundamentos"* (`/flexbox-lab/fundamentals`) ao lado da busca `⌘K`, trilha *"Por onde começar"* em 3 níveis (Iniciante, Intermediário, Dia a dia), `HeroLabDemo.astro` traduzido para português didático e reescrita das introduções dos 9 Hubs eliminando jargões e clichês de IA.
+  - Auditoria local via navegador (`1280×800` e `375×812`) sem erros de rede/overflow; corrigido erro de CSP em transições do `ClientRouter` (`data:` em `script-src`) e elevada opacidade de `--color-header-bg` para `0.96`.
+  - **Arquivos criados/modificados:** `DESIGN.md`, `GEMINI.md`, `.gitignore`, `public/_headers`, `src/components/home/HeroLabDemo.astro`, `src/layouts/BaseLayout.astro`, `src/layouts/DocLayout.astro`, `src/styles/tokens.css`, `src/styles/global.css`, `src/styles/hubs.css`, `src/components/global/{Header,Footer,CommandPalette}.astro`, `src/components/ui/{ThemeToggle,CodeCopyEnhancer}.astro`, `src/pages/index.astro` e os 9 arquivos `src/pages/*/index.astro`.
 
 ---
 

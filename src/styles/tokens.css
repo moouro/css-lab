@@ -56,7 +56,7 @@
   --color-bg-hover: light-dark(var(--light-bg-hover), var(--gray-3));
   --color-bg-inset: light-dark(var(--light-bg-inset), #141419);
   --color-bg-subtle: var(--color-bg-inset);
-  --color-header-bg: light-dark(rgb(255 255 255 / 0.9), rgb(12 12 15 / 0.9));
+  --color-header-bg: light-dark(rgb(255 255 255 / 0.96), rgb(12 12 15 / 0.96));
 
   /* Whisper-quiet translucent borders */
   --color-border: light-dark(rgb(9 9 11 / 0.08), rgb(255 255 255 / 0.09));

@@ -19,72 +19,114 @@ const pillars: PillarItem[] = [
   {
     icon: 'every-layout',
     title: 'Every Layout Lab',
-    desc: 'As 13 primitivas universais de Heydon Pickering & Andy Bell. Composição algorítmica e intrínseca sem breakpoints.',
+    desc: '13 primitivas de layout criadas por Heydon Pickering e Andy Bell para montar telas flexíveis com menos media queries.',
     href: '/every-layout',
     badge: '13 primitivas',
   },
   {
     icon: 'css-moderno',
     title: 'CSS Moderno',
-    desc: 'Nesting nativo, Cascade Layers, :has(), Container Queries, light-dark() e propriedades lógicas sem JS.',
+    desc: 'Nesting nativo, Cascade Layers, :has(), Container Queries, light-dark() e propriedades lógicas direto no navegador.',
     href: '/css-moderno',
     badge: '11 tópicos',
   },
   {
     icon: 'grid-lab',
     title: 'Grid Lab',
-    desc: 'De minmax() com auto-fill e auto-fit até subgrid e mapeamento visual de template areas.',
+    desc: 'De colunas responsivas com minmax() e auto-fill até subgrid e áreas nomeadas com template-areas.',
     href: '/grid-lab',
     badge: '7 tópicos',
   },
   {
     icon: 'flexbox-lab',
     title: 'Flexbox Lab',
-    desc: 'Domínio de flex-basis, quebra de linha suave, Holy Albatross, eixos e alinhamento com margin: auto.',
+    desc: 'Alinhamento em linha e coluna, comportamento de flex-basis, quebras automáticas e espaçamento com margin: auto.',
     href: '/flexbox-lab',
     badge: '6 tópicos',
   },
   {
     icon: 'container-query',
     title: 'Container Query Lab',
-    desc: 'Size queries, style queries, unidades cqi/cqw e componentes verdadeiramente autocontidos.',
+    desc: 'Size queries, style queries e unidades cqi/cqw para componentes que se adaptam ao espaço do elemento pai.',
     href: '/container-query-lab',
     badge: '5 tópicos',
   },
   {
     icon: 'components',
     title: 'Component Library',
-    desc: 'Buttons, Modals com <dialog>, Tabs nativas, Accordions modernos e Cards com subgrid.',
+    desc: 'Botões, modais com <dialog>, abas, accordions e cards com subgrid usando HTML semântico e CSS nativo.',
     href: '/components',
     badge: '10 guias',
   },
   {
     icon: 'snippets',
     title: 'Snippets Library',
-    desc: 'Receitas prontas de CSS moderno para layout, tipografia, micro-interações e padrões de produção.',
+    desc: '25 trechos de CSS prontos para copiar: centralização, tipografia fluida, animações leves e padrões comuns.',
     href: '/snippets',
     badge: '25 receitas',
   },
   {
     icon: 'cheatsheets',
     title: 'Cheatsheets',
-    desc: 'Guias de consulta rápida para o dia a dia, otimizados para leitura ágil e impressão em folha A4.',
+    desc: 'Resumos de consulta rápida organizados em tabelas diretas, prontos para ler na tela ou imprimir em A4.',
     href: '/cheatsheets',
     badge: '6 guias A4',
   },
   {
     icon: 'design-tokens',
     title: 'Design Tokens',
-    desc: 'Arquitetura de tokens e decisões de design codificadas em variáveis nativas e escalas fluidas.',
+    desc: 'Como organizar cores, tipografia, espaçamento, bordas e sombras com variáveis CSS nativas.',
     href: '/design-tokens',
     badge: '5 guias',
   },
 ];
 
+interface LearningStep {
+  step: string;
+  level: string;
+  title: string;
+  desc: string;
+  links: Array<{ label: string; href: string }>;
+}
+
+const learningPath: LearningStep[] = [
+  {
+    step: '01',
+    level: 'Iniciante',
+    title: 'Domine as bases de layout',
+    desc: 'Comece entendendo como alinhar elementos em linha com Flexbox e como distribuir colunas e linhas com Grid.',
+    links: [
+      { label: 'Flexbox Lab', href: '/flexbox-lab/fundamentals' },
+      { label: 'Grid Lab', href: '/grid-lab/fundamentals' },
+    ],
+  },
+  {
+    step: '02',
+    level: 'Intermediário',
+    title: 'Layouts que se adaptam sozinhos',
+    desc: 'Combine as 13 primitivas do Every Layout com Container Queries para construir páginas que respondem ao espaço.',
+    links: [
+      { label: 'Every Layout', href: '/every-layout' },
+      { label: 'Container Queries', href: '/container-query-lab/fundamentals' },
+    ],
+  },
+  {
+    step: '03',
+    level: 'Dia a dia',
+    title: 'Aplique em projetos reais',
+    desc: 'Consulte recursos do CSS moderno, monte componentes sem JavaScript pesado e copie snippets testados.',
+    links: [
+      { label: 'CSS Moderno', href: '/css-moderno' },
+      { label: 'Snippets', href: '/snippets' },
+      { label: 'Cheatsheets', href: '/cheatsheets' },
+    ],
+  },
+];
+
 const quickLinks = [
+  { label: 'Flexbox', href: '/flexbox-lab/fundamentals' },
+  { label: 'Grid', href: '/grid-lab/fundamentals' },
   { label: 'Every Layout', href: '/every-layout' },
-  { label: 'CSS Moderno', href: '/css-moderno' },
-  { label: 'Grid Lab', href: '/grid-lab' },
   { label: 'Snippets', href: '/snippets' },
 ];
 ---
@@ -95,31 +137,36 @@ const quickLinks = [
     <section class="hero-section">
       <Center max="860px">
         <div class="hero-inner stack" style="--stack-space: var(--space-s);">
-          <a href="#pilares" class="hero-pill">
+          <a href="#trilha" class="hero-pill">
             <span class="pill-dot" aria-hidden="true"></span>
-            <span>9 pilares · 13 primitivas · 88 guias</span>
+            <span>9 pilares · 88 guias gratuitos · do básico ao avançado</span>
             <UiIcon name="arrow-down" size={13} />
           </a>
 
           <h1 class="hero-title">
-            Como o layout responde ao conteúdo, e não à tela.
+            Aprenda e consulte CSS moderno na prática.
           </h1>
 
           <p class="hero-desc text-lg text-muted">
-            Referência técnica de CSS moderno e composição de layout. Consulte propriedades, primitivas e receitas prontas direto na busca.
+            Guias diretos sobre Flexbox, Grid, layout responsivo e componentes nativos — com exemplos interativos para estudar no seu ritmo ou consultar no dia a dia.
           </p>
 
-          <!-- Barra de Busca em Destaque (estilo Mintlify / GitBook) -->
-          <div class="hero-search-wrap">
+          <!-- Ação Principal (Iniciante) + Busca Rápida (Consulta) -->
+          <div class="hero-actions-bar">
+            <a href="/flexbox-lab/fundamentals" class="hero-primary-cta">
+              <span>Começar pelos fundamentos</span>
+              <UiIcon name="arrow-right" size={16} />
+            </a>
+
             <button
               type="button"
               class="hero-search-bar"
               data-open-search
-              aria-label="Abrir busca rápida por conceitos, propriedades e snippets (Atalho: Cmd+K ou Ctrl+K)"
+              aria-label="Abrir busca rápida por guias, propriedades e snippets (Atalho: Cmd+K ou Ctrl+K)"
             >
               <span class="hero-search-left">
-                <UiIcon name="search" size={18} class="hero-search-icon" />
-                <span class="hero-search-placeholder">Buscar primitivas, subgrid, :has(), snippets...</span>
+                <UiIcon name="search" size={17} class="hero-search-icon" />
+                <span class="hero-search-placeholder">Buscar propriedades, guias ou snippets...</span>
               </span>
               <kbd class="hero-search-kbd font-mono">⌘K</kbd>
             </button>
@@ -127,7 +174,7 @@ const quickLinks = [
 
           <!-- Acesso Rápido -->
           <div class="quick-links cluster" style="--cluster-space: var(--space-2xs); justify-content: center;">
-            <span class="quick-links-label text-xs text-muted">Populares:</span>
+            <span class="quick-links-label text-xs text-muted">Acesso rápido:</span>
             {quickLinks.map((item) => (
               <a href={item.href} class="quick-link-pill text-xs">
                 {item.label}
@@ -315,7 +362,47 @@ const quickLinks = [
         document.addEventListener('astro:page-load', syncHomeLocalMemory);
       </script>
 
-      <!-- Pilares de Conhecimento (Cards Suaves estilo Mintlify) -->
+      <!-- Trilha de Estudo: Por onde começar -->
+      <section class="path-section" id="trilha">
+        <Center max="1140px">
+          <div class="stack" style="--stack-space: var(--space-m);">
+            <div class="section-header">
+              <div class="stack" style="--stack-space: 0.2rem;">
+                <span class="section-kicker text-xs font-semibold text-accent">Trilha sugerida</span>
+                <h2 class="section-title">Por onde começar</h2>
+              </div>
+              <p class="section-subtitle text-sm text-muted">
+                Novo em CSS ou revisando a base? Siga os três passos abaixo na ordem.
+              </p>
+            </div>
+
+            <div class="path-grid">
+              {learningPath.map((item) => (
+                <article class="path-card">
+                  <div class="path-card-top">
+                    <span class="path-step font-mono text-xs">{item.step}</span>
+                    <span class="path-level text-xs font-medium">{item.level}</span>
+                  </div>
+                  <div class="path-card-body">
+                    <h3 class="path-title">{item.title}</h3>
+                    <p class="path-desc text-sm text-muted">{item.desc}</p>
+                  </div>
+                  <div class="path-links">
+                    {item.links.map((link) => (
+                      <a href={link.href} class="path-link text-xs font-medium">
+                        <span>{link.label}</span>
+                        <UiIcon name="arrow-right" size={13} />
+                      </a>
+                    ))}
+                  </div>
+                </article>
+              ))}
+            </div>
+          </div>
+        </Center>
+      </section>
+
+      <!-- Pilares de Conhecimento -->
       <section class="pillars-section" id="pilares">
         <Center max="1140px">
           <div class="stack" style="--stack-space: var(--space-m);">
@@ -458,24 +545,62 @@ const quickLinks = [
     line-height: 1.6;
   }
 
-  /* Barra de Busca Principal */
-  .hero-search-wrap {
+  /* Ação Principal + Barra de Busca */
+  .hero-actions-bar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: var(--space-xs);
     inline-size: 100%;
-    max-inline-size: 540px;
+    max-inline-size: 720px;
     padding-block-start: var(--space-xs);
   }
 
+  .hero-primary-cta {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.78rem 1.25rem;
+    min-block-size: 48px;
+    border-radius: var(--radius-m);
+    background-color: var(--color-accent);
+    color: var(--color-on-accent);
+    font-size: var(--step--1);
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    box-shadow: var(--shadow-sm);
+    transition: background-color var(--duration-fast) var(--ease-out),
+                transform 120ms var(--ease-out);
+  }
+
+  .hero-primary-cta:active {
+    transform: scale(0.97);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .hero-primary-cta:hover {
+      background-color: var(--color-accent-hover);
+      color: var(--color-on-accent);
+      text-decoration: none;
+    }
+  }
+
   .hero-search-bar {
+    flex: 1 1 280px;
+    max-inline-size: 420px;
     display: flex;
     align-items: center;
     justify-content: space-between;
     gap: var(--space-s);
     inline-size: 100%;
-    padding: 0.8rem 1rem 0.8rem 1.1rem;
+    padding: 0.78rem 0.95rem 0.78rem 1.05rem;
     border-radius: var(--radius-m);
     background-color: var(--color-bg-surface);
     border: 1px solid var(--color-border-strong);
-    box-shadow: var(--shadow-md);
+    box-shadow: var(--shadow-sm);
     color: var(--color-fg-muted);
     font-family: inherit;
     font-size: var(--step--1);
@@ -491,6 +616,104 @@ const quickLinks = [
     .hero-search-bar:hover {
       border-color: var(--color-accent);
       color: var(--color-text-strong);
+    }
+  }
+
+  /* ─── Trilha: Por onde começar ─────────────────────── */
+  .path-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--space-m);
+  }
+
+  @media (max-width: 900px) {
+    .path-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-s);
+    }
+  }
+
+  .path-card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-s);
+    padding: var(--space-m);
+    border-radius: var(--radius-l);
+    background-color: var(--color-bg-surface);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .path-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-xs);
+  }
+
+  .path-step {
+    font-weight: 700;
+    color: var(--color-accent);
+    background-color: var(--color-accent-muted);
+    padding: 0.18rem 0.55rem;
+    border-radius: var(--radius-full);
+  }
+
+  .path-level {
+    color: var(--color-fg-muted);
+  }
+
+  .path-card-body {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;
+  }
+
+  .path-title {
+    font-size: var(--step-1);
+    font-weight: 600;
+    color: var(--color-text-strong);
+    margin: 0;
+  }
+
+  .path-desc {
+    margin: 0;
+    line-height: 1.55;
+  }
+
+  .path-links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+    padding-block-start: var(--space-xs);
+    border-block-start: 1px solid var(--color-border-subtle);
+  }
+
+  .path-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.28rem;
+    padding: 0.32rem 0.65rem;
+    border-radius: var(--radius-s);
+    background-color: var(--color-bg-inset);
+    color: var(--color-text-strong);
+    text-decoration: none;
+    transition: background-color var(--duration-fast) var(--ease-out),
+                color var(--duration-fast) var(--ease-out),
+                transform 120ms var(--ease-out);
+  }
+
+  .path-link:active {
+    transform: scale(0.97);
+  }
+
+  @media (hover: hover) and (pointer: fine) {
+    .path-link:hover {
+      background-color: var(--color-accent-muted);
+      color: var(--color-accent);
+      text-decoration: none;
     }
   }
 
